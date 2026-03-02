@@ -35,41 +35,57 @@ const featuredProjects = allProjects
 <Layout>
   <section class="py-20 sm:py-28">
     <Container>
-      <div class="max-w-2xl">
-        <p class="text-sm font-semibold text-sky-300/90">{site.location}</p>
-        <h1 class="mt-4 text-4xl font-semibold tracking-tight text-slate-50 sm:text-6xl">
-          {site.roles.es}.<br />
-          <span class="text-slate-300">Entregando productos de datos con impacto.</span>
-        </h1>
-        <p class="mt-6 text-lg leading-relaxed text-slate-300">{site.summaries.es}</p>
+      <div class="grid gap-10 lg:grid-cols-[1fr_18rem] lg:items-center">
+        <div class="max-w-2xl">
+          <p class="text-sm font-semibold text-sky-300/90">{site.location}</p>
+          <h1 class="mt-4 text-4xl font-semibold tracking-tight text-slate-50 sm:text-6xl">
+            {site.roles.es}.<br />
+            <span class="text-slate-300">Entregando productos de datos con impacto.</span>
+          </h1>
+          <p class="mt-6 text-lg leading-relaxed text-slate-300">{site.summaries.es}</p>
 
-        <div class="mt-10 flex flex-wrap gap-3">
-          <a
-            class="rounded-full bg-sky-500 px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/60"
-            href="/es/projects/"
-          >
-            Ver casos de estudio
-          </a>
-          <a
-            class="rounded-full border border-slate-800 bg-slate-900/40 px-5 py-2.5 text-sm font-semibold text-slate-100 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/30"
-            href="/es/experience/"
-          >
-            Línea de tiempo
-          </a>
-          <a
-            class="rounded-full border border-slate-800 bg-slate-900/40 px-5 py-2.5 text-sm font-semibold text-slate-100 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/30"
-            href="/es/cv/"
-          >
-            CV
-          </a>
+          <div class="mt-10 flex flex-wrap gap-3">
+            <a
+              class="rounded-full bg-sky-500 px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/60"
+              href="/es/projects/"
+            >
+              Ver casos de estudio
+            </a>
+            <a
+              class="rounded-full border border-slate-800 bg-slate-900/40 px-5 py-2.5 text-sm font-semibold text-slate-100 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/30"
+              href="/es/experience/"
+            >
+              Línea de tiempo
+            </a>
+            <a
+              class="rounded-full border border-slate-800 bg-slate-900/40 px-5 py-2.5 text-sm font-semibold text-slate-100 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/30"
+              href="/es/cv/"
+            >
+              CV
+            </a>
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-2 text-sm text-slate-300">
+            <Chip label="Pipelines" />
+            <Chip label="Warehouses" />
+            <Chip label="dbt / Spark" />
+            <Chip label="IaC" />
+            <Chip label="Calidad & Observabilidad" />
+          </div>
         </div>
 
-        <div class="mt-8 flex flex-wrap gap-2 text-sm text-slate-300">
-          <Chip label="Pipelines" />
-          <Chip label="Warehouses" />
-          <Chip label="dbt / Spark" />
-          <Chip label="IaC" />
-          <Chip label="Calidad & Observabilidad" />
+        <div class="mx-auto lg:mx-0 lg:justify-self-end">
+          <div class="h-44 w-44 overflow-hidden rounded-full border border-slate-800 bg-slate-950/30 shadow-xl shadow-slate-950/50 sm:h-52 sm:w-52">
+            <img
+              src={site.avatar.src}
+              alt={site.avatar.alt[locale]}
+              width="208"
+              height="208"
+              loading="eager"
+              decoding="async"
+              class="h-full w-full object-cover"
+            />
+          </div>
         </div>
       </div>
     </Container>

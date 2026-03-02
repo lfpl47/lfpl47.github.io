@@ -15,7 +15,6 @@ const nav = [
   { href: withLocale("/experience/", locale), label: t(locale, "experience") },
   { href: withLocale("/projects/", locale), label: t(locale, "projects") },
   { href: withLocale("/cv/", locale), label: t(locale, "cv") },
-  { href: withLocale("/blog/", locale), label: t(locale, "blog") },
 ];
 
 function isActive(href: string) {
@@ -26,8 +25,17 @@ function isActive(href: string) {
 
 <header class="sticky top-0 z-50 border-b border-slate-800/60 bg-slate-950/70 backdrop-blur">
   <Container class="flex h-16 items-center justify-between gap-4">
-    <a class="font-semibold tracking-tight text-slate-100 hover:text-white" href={homeHref}>
-      {site.handle}
+    <a class="flex items-center gap-2 font-semibold tracking-tight text-slate-100 hover:text-white" href={homeHref}>
+      <img
+        src={site.avatar.src}
+        alt={site.avatar.alt[locale]}
+        width="32"
+        height="32"
+        loading="eager"
+        decoding="async"
+        class="h-8 w-8 rounded-full border border-slate-800 object-cover"
+      />
+      <span>{site.handle}</span>
     </a>
 
     <nav class="hidden items-center gap-1 sm:flex" aria-label="Primary">
