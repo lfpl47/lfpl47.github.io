@@ -1,15 +1,16 @@
-const monthYearFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  year: "numeric",
-});
+import type { Locale } from "../i18n/locales";
 
-export function formatMonthYear(date: Date): string {
-  return monthYearFormatter.format(date);
+const monthYearFormatters: Record<Locale, Intl.DateTimeFormat> = {
+  en: new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" }),
+  es: new Intl.DateTimeFormat("es-ES", { month: "short", year: "numeric" }),
+};
+
+export function formatMonthYear(date: Date, locale: Locale = "en"): string {
+  return monthYearFormatters[locale].format(date);
 }
 
-export function formatDateRange(start: Date, end?: Date): string {
-  const startLabel = formatMonthYear(start);
-  const endLabel = end ? formatMonthYear(end) : "Present";
+export function formatDateRange(start: Date, end: Date | undefined, locale: Locale = "en"): string {
+  const startLabel = formatMonthYear(start, locale);
+  const endLabel = end ? formatMonthYear(end, locale) : locale === "es" ? "Actual" : "Present";
   return `${startLabel} — ${endLabel}`;
 }
-

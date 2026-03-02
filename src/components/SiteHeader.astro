@@ -1,25 +1,32 @@
 ---
 import Container from "./Container.astro";
 import { site } from "../config/site";
+import { getLocaleFromPathname, otherLocale, withLocale } from "../i18n/routing";
+import { t } from "../i18n/ui";
 
 const pathname = Astro.url.pathname;
+const locale = getLocaleFromPathname(pathname);
+const targetLocale = otherLocale(locale);
+const toggleHref = withLocale(pathname, targetLocale);
+
+const homeHref = withLocale("/", locale);
 const nav = [
-  { href: "/", label: "Home" },
-  { href: "/experience/", label: "Experience" },
-  { href: "/projects/", label: "Projects" },
-  { href: "/cv/", label: "CV" },
-  { href: "/blog/", label: "Blog" },
+  { href: homeHref, label: t(locale, "home") },
+  { href: withLocale("/experience/", locale), label: t(locale, "experience") },
+  { href: withLocale("/projects/", locale), label: t(locale, "projects") },
+  { href: withLocale("/cv/", locale), label: t(locale, "cv") },
+  { href: withLocale("/blog/", locale), label: t(locale, "blog") },
 ];
 
 function isActive(href: string) {
-  if (href === "/") return pathname === "/";
+  if (href === homeHref) return pathname === homeHref;
   return pathname.startsWith(href);
 }
 ---
 
 <header class="sticky top-0 z-50 border-b border-slate-800/60 bg-slate-950/70 backdrop-blur">
   <Container class="flex h-16 items-center justify-between gap-4">
-    <a class="font-semibold tracking-tight text-slate-100 hover:text-white" href="/">
+    <a class="font-semibold tracking-tight text-slate-100 hover:text-white" href={homeHref}>
       {site.handle}
     </a>
 
@@ -48,7 +55,7 @@ function isActive(href: string) {
         target="_blank"
         rel="noreferrer"
       >
-        GitHub
+        {t(locale, "github")}
       </a>
       {
         site.links.linkedin ? (
@@ -58,15 +65,23 @@ function isActive(href: string) {
             target="_blank"
             rel="noreferrer"
           >
-            LinkedIn
+            {t(locale, "linkedin")}
           </a>
         ) : null
       }
+      <a
+        class="rounded-full border border-slate-800 bg-slate-900/40 px-3 py-1.5 text-sm font-semibold text-slate-100 hover:bg-slate-900"
+        href={toggleHref}
+        aria-label={`${t(locale, "language")}: ${targetLocale === "es" ? t(locale, "language_es") : t(locale, "language_en")}`}
+        lang={targetLocale}
+      >
+        {targetLocale.toUpperCase()}
+      </a>
     </div>
 
     <details class="relative sm:hidden">
       <summary class="list-none rounded-full border border-slate-800 bg-slate-900/40 px-3 py-1.5 text-sm font-semibold text-slate-100 hover:bg-slate-900">
-        Menu
+        {t(locale, "menu")}
       </summary>
       <div class="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-xl">
         <nav class="flex flex-col p-2" aria-label="Mobile">
@@ -92,7 +107,7 @@ function isActive(href: string) {
             target="_blank"
             rel="noreferrer"
           >
-            GitHub
+            {t(locale, "github")}
           </a>
           {
             site.links.linkedin ? (
@@ -102,13 +117,20 @@ function isActive(href: string) {
                 target="_blank"
                 rel="noreferrer"
               >
-                LinkedIn
+                {t(locale, "linkedin")}
               </a>
             ) : null
           }
+          <a
+            class="rounded-xl px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-900/60 hover:text-white"
+            href={toggleHref}
+            lang={targetLocale}
+          >
+            {t(locale, "language")}:{" "}
+            {targetLocale === "es" ? t(locale, "language_es") : t(locale, "language_en")}
+          </a>
         </nav>
       </div>
     </details>
   </Container>
 </header>
-

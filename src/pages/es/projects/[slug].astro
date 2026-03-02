@@ -1,14 +1,14 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
-import Chip from "../../components/Chip.astro";
-import Container from "../../components/Container.astro";
-import SectionIntro from "../../components/SectionIntro.astro";
-import Layout from "../../layouts/Layout.astro";
-import { isSlugForLocale, stripLocaleFromSlug } from "../../i18n/content";
-import { formatMonthYear } from "../../utils/dates";
-import { flattenStack, formatStackCategory, stackEntries } from "../../utils/stack";
+import Chip from "../../../components/Chip.astro";
+import Container from "../../../components/Container.astro";
+import SectionIntro from "../../../components/SectionIntro.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { isSlugForLocale, stripLocaleFromSlug } from "../../../i18n/content";
+import { formatMonthYear } from "../../../utils/dates";
+import { flattenStack, formatStackCategory, stackEntries } from "../../../utils/stack";
 
-const locale = "en" as const;
+const locale = "es" as const;
 
 export async function getStaticPaths() {
   const entries = (await getCollection("projects")).filter((p) => isSlugForLocale(p.slug, locale));
@@ -27,16 +27,16 @@ const tagLabels = [...(entry.data.tags ?? []), ...flattenStack(entry.data.stack)
 const stack = stackEntries(entry.data.stack);
 ---
 
-<Layout title={`${title} — Projects`}>
+<Layout title={`${title} — Proyectos`}>
   <section class="py-16 sm:py-20">
     <Container>
-      <a class="text-sm font-semibold text-sky-300 hover:text-sky-200" href="/projects/">
-        ← Back to projects
+      <a class="text-sm font-semibold text-sky-300 hover:text-sky-200" href="/es/projects/">
+        ← Volver a proyectos
       </a>
 
       <div class="mt-6 flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
         <div class="max-w-2xl">
-          <SectionIntro kicker="Project" title={title} />
+          <SectionIntro kicker="Proyecto" title={title} />
           <p class="mt-4 text-sm text-slate-400">
             {formatMonthYear(entry.data.date, locale)}
             {entry.data.type ? ` · ${entry.data.type}` : ""}
@@ -45,7 +45,7 @@ const stack = stackEntries(entry.data.stack);
 
           {entry.data.nda ? (
             <p class="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-              Some details may be limited due to NDA / privacy.
+              Algunos detalles pueden ser limitados por NDA / privacidad.
             </p>
           ) : null}
 
@@ -70,7 +70,7 @@ const stack = stackEntries(entry.data.stack);
         </div>
 
         <div class="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
-          <p class="text-sm font-semibold text-slate-200">Highlights</p>
+          <p class="text-sm font-semibold text-slate-200">Puntos clave</p>
           <ul class="mt-4 list-disc space-y-2 pl-5 text-slate-300">
             {entry.data.highlights.map((h) => (
               <li>{h}</li>
@@ -81,14 +81,14 @@ const stack = stackEntries(entry.data.stack);
 
       <div class="mt-10 grid gap-10 lg:grid-cols-[1fr_22rem]">
         <div>
-          <h3 class="text-sm font-semibold text-slate-200">Write-up</h3>
+          <h3 class="text-sm font-semibold text-slate-200">Descripción</h3>
           <article class="prose prose-invert mt-4 max-w-none prose-a:text-sky-300 prose-a:no-underline hover:prose-a:text-sky-200">
             <Content />
           </article>
 
           {entry.data.results?.length ? (
             <div class="mt-10">
-              <h3 class="text-sm font-semibold text-slate-200">Results</h3>
+              <h3 class="text-sm font-semibold text-slate-200">Resultados</h3>
               <ul class="mt-4 list-disc space-y-2 pl-5 text-slate-300">
                 {entry.data.results.map((r) => (
                   <li>{r}</li>
@@ -99,7 +99,7 @@ const stack = stackEntries(entry.data.stack);
 
           {entry.data.learnings?.length ? (
             <div class="mt-10">
-              <h3 class="text-sm font-semibold text-slate-200">Learnings</h3>
+              <h3 class="text-sm font-semibold text-slate-200">Aprendizajes</h3>
               <ul class="mt-4 list-disc space-y-2 pl-5 text-slate-300">
                 {entry.data.learnings.map((r) => (
                   <li>{r}</li>

@@ -1,0 +1,66 @@
+{
+  "basics": {
+    "name": "Luis Felipe Peña Lozano",
+    "label": "Data Engineer | Backend Engineer",
+    "location": "Bogotá, Colombia",
+    "email": "lfpl47@gmail.com",
+    "summary": "Data Engineer (8+ years) designing and operating cloud data platforms on AWS, GCP, and Azure. Build batch and streaming pipelines with Python/SQL/Spark; orchestrate with Airflow/Cloud Composer and Dataform/dbt; and deliver reliable, measurable data products.",
+    "profiles": [
+      {
+        "network": "GitHub",
+        "username": "lfpl47",
+        "url": "https://github.com/lfpl47"
+      },
+      {
+        "network": "LinkedIn",
+        "username": "luis-felipe-pena",
+        "url": "https://www.linkedin.com/in/luis-felipe-pena/"
+      }
+    ]
+  },
+  "languages": [
+    {
+      "name": "English",
+      "level": "B2"
+    }
+  ],
+  "education": [
+    {
+      "institution": "SENA",
+      "area": "Information Systems Analysis and Development",
+      "studyType": "Technologist",
+      "startDate": "2015",
+      "endDate": "2018"
+    },
+    {
+      "institution": "Politécnico Grancolombiano",
+      "area": "Software Engineering",
+      "studyType": "Bachelor’s Degree",
+      "startDate": "2018",
+      "endDate": "2021"
+    }
+  ],
+  "additionalStudies": [
+    "Platzi — 60+ course certificates completed (in progress).",
+    "Categories: Data Science & BI, Programming, Productivity, Cloud Computing."
+  ],
+  "skills": [
+    {
+      "name": "Programming",
+      "keywords": ["Python", "SQL", "Java", "JavaScript", "HTML", "CSS"]
+    },
+    {
+      "name": "Data & BI",
+      "keywords": ["Spark", "Hadoop", "Power BI", "Excel", "VBA"]
+    },
+    {
+      "name": "Cloud & DevOps",
+      "keywords": ["GCP", "AWS", "Azure", "Terraform", "Git"]
+    },
+    {
+      "name": "Practices",
+      "keywords": ["Scrum"]
+    }
+  ]
+}
+

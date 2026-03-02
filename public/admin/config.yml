@@ -16,12 +16,12 @@ media_folder: public/uploads
 public_folder: /uploads
 
 collections:
-  - name: experience
-    label: Experience
+  - name: experience_en
+    label: Experience (EN)
     label_singular: Role
-    folder: src/content/experience
+    folder: src/content/experience/en
     create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    slug: "{{slug}}"
     fields:
       - { label: Company, name: company, widget: string }
       - { label: Role, name: role, widget: string }
@@ -70,12 +70,66 @@ collections:
       - { label: Featured, name: featured, widget: boolean, required: false, default: false }
       - { label: Body, name: body, widget: markdown, required: false }
 
-  - name: projects
-    label: Projects
-    label_singular: Project
-    folder: src/content/projects
+  - name: experience_es
+    label: Experiencia (ES)
+    label_singular: Rol
+    folder: src/content/experience/es
     create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    slug: "{{slug}}"
+    fields:
+      - { label: Compañía, name: company, widget: string }
+      - { label: Rol, name: role, widget: string }
+      - { label: Inicio, name: start, widget: datetime, time_format: false, format: "YYYY-MM-DD" }
+      - {
+          label: Fin,
+          name: end,
+          widget: datetime,
+          time_format: false,
+          format: "YYYY-MM-DD",
+          required: false
+        }
+      - { label: Ubicación, name: location, widget: string, required: false }
+      - {
+          label: Tipo de empleo,
+          name: employmentType,
+          widget: select,
+          required: false,
+          options: ["Full-time", "Part-time", "Contract", "Freelance", "Internship"]
+        }
+      - { label: Resumen, name: summary, widget: text, required: false }
+      - label: Stack
+        name: stack
+        widget: object
+        required: false
+        fields:
+          - { label: Cloud, name: cloud, widget: list, required: false }
+          - { label: Data, name: data, widget: list, required: false }
+          - { label: Orchestration, name: orchestration, widget: list, required: false }
+          - { label: IaC, name: iac, widget: list, required: false }
+          - { label: Languages, name: languages, widget: list, required: false }
+          - { label: DB, name: db, widget: list, required: false }
+          - { label: Streaming, name: streaming, widget: list, required: false }
+          - { label: Observability, name: observability, widget: list, required: false }
+          - { label: CI/CD, name: cicd, widget: list, required: false }
+          - { label: Misc, name: misc, widget: list, required: false }
+      - { label: Logros, name: highlights, widget: list }
+      - label: Impacto
+        name: impact
+        widget: list
+        required: false
+        fields:
+          - { label: Label, name: label, widget: string }
+          - { label: Value, name: value, widget: string }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Destacado, name: featured, widget: boolean, required: false, default: false }
+      - { label: Body, name: body, widget: markdown, required: false }
+
+  - name: projects_en
+    label: Projects (EN)
+    label_singular: Project
+    folder: src/content/projects/en
+    create: true
+    slug: "{{slug}}"
     fields:
       - { label: Title, name: title, widget: string }
       - { label: Date, name: date, widget: datetime, time_format: false, format: "YYYY-MM-DD" }
@@ -118,10 +172,58 @@ collections:
       - { label: Featured, name: featured, widget: boolean, required: false, default: false }
       - { label: Body, name: body, widget: markdown, required: false }
 
-  - name: posts
-    label: Blog
+  - name: projects_es
+    label: Proyectos (ES)
+    label_singular: Proyecto
+    folder: src/content/projects/es
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Título, name: title, widget: string }
+      - { label: Fecha, name: date, widget: datetime, time_format: false, format: "YYYY-MM-DD" }
+      - {
+          label: Tipo,
+          name: type,
+          widget: select,
+          required: false,
+          options: ["Case Study", "Project", "Open Source", "Talk"]
+        }
+      - {
+          label: Estado,
+          name: status,
+          widget: select,
+          required: false,
+          options: ["Active", "Completed", "Paused"]
+        }
+      - label: Stack
+        name: stack
+        widget: object
+        required: false
+        fields:
+          - { label: Cloud, name: cloud, widget: list, required: false }
+          - { label: Data, name: data, widget: list, required: false }
+          - { label: Orchestration, name: orchestration, widget: list, required: false }
+          - { label: IaC, name: iac, widget: list, required: false }
+          - { label: Languages, name: languages, widget: list, required: false }
+          - { label: DB, name: db, widget: list, required: false }
+          - { label: Streaming, name: streaming, widget: list, required: false }
+          - { label: Observability, name: observability, widget: list, required: false }
+          - { label: CI/CD, name: cicd, widget: list, required: false }
+          - { label: Misc, name: misc, widget: list, required: false }
+      - { label: Repo URL, name: repo, widget: string, required: false }
+      - { label: NDA, name: nda, widget: boolean, required: false, default: false }
+      - { label: Cover, name: cover, widget: image, required: false }
+      - { label: Highlights, name: highlights, widget: list }
+      - { label: Resultados, name: results, widget: list, required: false }
+      - { label: Aprendizajes, name: learnings, widget: list, required: false }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Destacado, name: featured, widget: boolean, required: false, default: false }
+      - { label: Body, name: body, widget: markdown, required: false }
+
+  - name: posts_en
+    label: Blog (EN)
     label_singular: Post
-    folder: src/content/posts
+    folder: src/content/posts/en
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
@@ -132,3 +234,16 @@ collections:
       - { label: Tags, name: tags, widget: list, required: false }
       - { label: Body, name: body, widget: markdown }
 
+  - name: posts_es
+    label: Blog (ES)
+    label_singular: Post
+    folder: src/content/posts/es
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: Título, name: title, widget: string }
+      - { label: Descripción, name: description, widget: text, required: false }
+      - { label: Fecha, name: date, widget: datetime, time_format: false, format: "YYYY-MM-DD" }
+      - { label: Draft, name: draft, widget: boolean, required: false, default: false }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Body, name: body, widget: markdown }

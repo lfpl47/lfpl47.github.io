@@ -20,10 +20,24 @@ Prereqs: Node.js `>=22`
 
 ## Content model
 
-- Experience: `src/content/experience/*.md`
-- Projects: `src/content/projects/*.md`
-- Blog posts: `src/content/posts/*.md` (optional)
-- CV data: `src/data/resume.json`
+- Languages:
+  - English (default): `/`
+  - Español: `/es/`
+
+- Experience:
+  - `src/content/experience/en/*.md`
+  - `src/content/experience/es/*.md`
+- Projects:
+  - `src/content/projects/en/*.md`
+  - `src/content/projects/es/*.md`
+- Blog posts (optional):
+  - `src/content/posts/en/*.md`
+  - `src/content/posts/es/*.md`
+- CV data:
+  - `src/data/resume.en.json`
+  - `src/data/resume.es.json`
+- CV PDFs (optional):
+  - `public/cv/*`
 
 ## Admin (/admin) with Decap CMS
 

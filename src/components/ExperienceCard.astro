@@ -1,5 +1,7 @@
 ---
 import Chip from "./Chip.astro";
+import { getLocaleFromPathname } from "../i18n/routing";
+import { t } from "../i18n/ui";
 
 type Props = {
   href: string;
@@ -14,6 +16,7 @@ type Props = {
 const { href, company, role, dateRange, location, highlights, tags } = Astro.props;
 const visibleTags = tags.slice(0, 8);
 const moreCount = Math.max(0, tags.length - visibleTags.length);
+const locale = getLocaleFromPathname(Astro.url.pathname);
 ---
 
 <a
@@ -30,7 +33,7 @@ const moreCount = Math.max(0, tags.length - visibleTags.length);
       </p>
     </div>
     <span class="text-sm font-semibold text-sky-300 opacity-0 transition group-hover:opacity-100">
-      View →
+      {t(locale, "view")} →
     </span>
   </div>
 
@@ -43,8 +46,7 @@ const moreCount = Math.max(0, tags.length - visibleTags.length);
       {visibleTags.map((t) => (
         <Chip label={t} />
       ))}
-      {moreCount ? <Chip label={`+${moreCount}`} title="More" /> : null}
+      {moreCount ? <Chip label={`+${moreCount}`} title={t(locale, "more")} /> : null}
     </div>
   ) : null}
 </a>
-

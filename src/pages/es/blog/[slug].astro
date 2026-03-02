@@ -1,12 +1,12 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
-import Container from "../../components/Container.astro";
-import SectionIntro from "../../components/SectionIntro.astro";
-import Layout from "../../layouts/Layout.astro";
-import { isSlugForLocale, stripLocaleFromSlug } from "../../i18n/content";
-import { formatMonthYear } from "../../utils/dates";
+import Container from "../../../components/Container.astro";
+import SectionIntro from "../../../components/SectionIntro.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { isSlugForLocale, stripLocaleFromSlug } from "../../../i18n/content";
+import { formatMonthYear } from "../../../utils/dates";
 
-const locale = "en" as const;
+const locale = "es" as const;
 
 export async function getStaticPaths() {
   const posts = (await getCollection("posts"))
@@ -26,8 +26,8 @@ const { Content } = await entry.render();
 <Layout title={`${entry.data.title} — Blog`} description={entry.data.description}>
   <section class="py-16 sm:py-20">
     <Container>
-      <a class="text-sm font-semibold text-sky-300 hover:text-sky-200" href="/blog/">
-        ← Back to blog
+      <a class="text-sm font-semibold text-sky-300 hover:text-sky-200" href="/es/blog/">
+        ← Volver al blog
       </a>
 
       <div class="mt-6 max-w-3xl">

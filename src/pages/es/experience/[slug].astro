@@ -1,14 +1,14 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
-import Chip from "../../components/Chip.astro";
-import Container from "../../components/Container.astro";
-import SectionIntro from "../../components/SectionIntro.astro";
-import Layout from "../../layouts/Layout.astro";
-import { isSlugForLocale, stripLocaleFromSlug } from "../../i18n/content";
-import { formatDateRange } from "../../utils/dates";
-import { flattenStack, formatStackCategory, stackEntries } from "../../utils/stack";
+import Chip from "../../../components/Chip.astro";
+import Container from "../../../components/Container.astro";
+import SectionIntro from "../../../components/SectionIntro.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { isSlugForLocale, stripLocaleFromSlug } from "../../../i18n/content";
+import { formatDateRange } from "../../../utils/dates";
+import { flattenStack, formatStackCategory, stackEntries } from "../../../utils/stack";
 
-const locale = "en" as const;
+const locale = "es" as const;
 
 export async function getStaticPaths() {
   const entries = (await getCollection("experience")).filter((e) => isSlugForLocale(e.slug, locale));
@@ -27,16 +27,16 @@ const tagLabels = [...(entry.data.tags ?? []), ...flattenStack(entry.data.stack)
 const stack = stackEntries(entry.data.stack);
 ---
 
-<Layout title={`${title} — Experience`}>
+<Layout title={`${title} — Experiencia`}>
   <section class="py-16 sm:py-20">
     <Container>
-      <a class="text-sm font-semibold text-sky-300 hover:text-sky-200" href="/experience/">
-        ← Back to timeline
+      <a class="text-sm font-semibold text-sky-300 hover:text-sky-200" href="/es/experience/">
+        ← Volver a la línea de tiempo
       </a>
 
       <div class="mt-6 flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
         <div class="max-w-2xl">
-          <SectionIntro kicker="Experience" title={title} description={entry.data.summary} />
+          <SectionIntro kicker="Experiencia" title={title} description={entry.data.summary} />
           <p class="mt-4 text-sm text-slate-400">
             {formatDateRange(entry.data.start, entry.data.end, locale)}
             {entry.data.location ? ` · ${entry.data.location}` : ""}
@@ -52,7 +52,7 @@ const stack = stackEntries(entry.data.stack);
 
         {entry.data.impact?.length ? (
           <div class="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
-            <p class="text-sm font-semibold text-slate-200">Impact</p>
+            <p class="text-sm font-semibold text-slate-200">Impacto</p>
             <dl class="mt-4 grid gap-3">
               {entry.data.impact.map((m) => (
                 <div class="flex items-baseline justify-between gap-4">
@@ -67,7 +67,7 @@ const stack = stackEntries(entry.data.stack);
 
       <div class="mt-10 grid gap-10 lg:grid-cols-[1fr_22rem]">
         <div>
-          <h3 class="text-sm font-semibold text-slate-200">Highlights</h3>
+          <h3 class="text-sm font-semibold text-slate-200">Logros</h3>
           <ul class="mt-4 list-disc space-y-2 pl-5 text-slate-300">
             {entry.data.highlights.map((h) => (
               <li>{h}</li>
@@ -75,7 +75,7 @@ const stack = stackEntries(entry.data.stack);
           </ul>
 
           <div class="mt-10">
-            <h3 class="text-sm font-semibold text-slate-200">Details</h3>
+            <h3 class="text-sm font-semibold text-slate-200">Detalles</h3>
             <article class="prose prose-invert mt-4 max-w-none prose-a:text-sky-300 prose-a:no-underline hover:prose-a:text-sky-200">
               <Content />
             </article>

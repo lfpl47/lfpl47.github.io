@@ -1,16 +1,16 @@
 ---
 import { getCollection } from "astro:content";
-import Container from "../../components/Container.astro";
-import ExperienceCard from "../../components/ExperienceCard.astro";
-import SectionIntro from "../../components/SectionIntro.astro";
-import Layout from "../../layouts/Layout.astro";
-import { site } from "../../config/site";
-import { isSlugForLocale, stripLocaleFromSlug } from "../../i18n/content";
-import { formatDateRange } from "../../utils/dates";
-import { flattenStack } from "../../utils/stack";
-import { toTagId } from "../../utils/tags";
+import Container from "../../../components/Container.astro";
+import ExperienceCard from "../../../components/ExperienceCard.astro";
+import SectionIntro from "../../../components/SectionIntro.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { site } from "../../../config/site";
+import { isSlugForLocale, stripLocaleFromSlug } from "../../../i18n/content";
+import { formatDateRange } from "../../../utils/dates";
+import { flattenStack } from "../../../utils/stack";
+import { toTagId } from "../../../utils/tags";
 
-const locale = "en" as const;
+const locale = "es" as const;
 const entries = (await getCollection("experience"))
   .filter((e) => isSlugForLocale(e.slug, locale))
   .sort((a, b) => b.data.start.valueOf() - a.data.start.valueOf());
@@ -29,23 +29,23 @@ const tagOptions = Array.from(tagLabelById, ([id, label]) => ({ id, label })).so
 );
 ---
 
-<Layout title={`Experience — ${site.handle}`}>
+<Layout title={`Experiencia — ${site.handle}`}>
   <section class="py-16 sm:py-20">
     <Container>
       <SectionIntro
-        kicker="Experience"
-        title="Timeline"
-        description="Filter by stack, search by keywords, and open each role for full context, decisions, and outcomes."
+        kicker="Experiencia"
+        title="Línea de tiempo"
+        description="Filtra por stack, busca por palabras clave y abre cada rol para ver contexto y resultados."
       />
 
       <div class="mt-10 rounded-3xl border border-slate-800 bg-slate-950/30 p-4 sm:p-6">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <label class="flex-1">
-            <span class="sr-only">Search experience</span>
+            <span class="sr-only">Buscar experiencia</span>
             <input
               id="search"
               type="search"
-              placeholder="Search (company, role, tools, outcomes…) "
+              placeholder="Buscar (compañía, rol, herramientas, impacto…) "
               class="w-full rounded-2xl border border-slate-800 bg-slate-950/50 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-400/40"
             />
           </label>
@@ -57,7 +57,7 @@ const tagOptions = Array.from(tagLabelById, ([id, label]) => ({ id, label })).so
               type="button"
               class="rounded-full border border-slate-800 bg-slate-900/40 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-900"
             >
-              Clear
+              Limpiar
             </button>
           </div>
         </div>
@@ -95,7 +95,7 @@ const tagOptions = Array.from(tagLabelById, ([id, label]) => ({ id, label })).so
             return (
               <li data-filter-item data-tags={tagIds.join(" ")} data-text={text}>
                 <ExperienceCard
-                  href={`/experience/${stripLocaleFromSlug(entry.slug, locale)}/`}
+                  href={`/es/experience/${stripLocaleFromSlug(entry.slug, locale)}/`}
                   company={entry.data.company}
                   role={entry.data.role}
                   dateRange={formatDateRange(entry.data.start, entry.data.end, locale)}

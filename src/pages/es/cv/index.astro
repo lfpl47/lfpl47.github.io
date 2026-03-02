@@ -1,15 +1,15 @@
 ---
 import { getCollection } from "astro:content";
-import Chip from "../../components/Chip.astro";
-import Container from "../../components/Container.astro";
-import SectionIntro from "../../components/SectionIntro.astro";
-import Layout from "../../layouts/Layout.astro";
-import { site } from "../../config/site";
-import { isSlugForLocale, stripLocaleFromSlug } from "../../i18n/content";
-import resume from "../../data/resume.en.json";
-import { formatDateRange } from "../../utils/dates";
+import Chip from "../../../components/Chip.astro";
+import Container from "../../../components/Container.astro";
+import SectionIntro from "../../../components/SectionIntro.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { site } from "../../../config/site";
+import { isSlugForLocale, stripLocaleFromSlug } from "../../../i18n/content";
+import resume from "../../../data/resume.es.json";
+import { formatDateRange } from "../../../utils/dates";
 
-const locale = "en" as const;
+const locale = "es" as const;
 const experience = (await getCollection("experience"))
   .filter((e) => isSlugForLocale(e.slug, locale))
   .sort((a, b) => b.data.start.valueOf() - a.data.start.valueOf());
@@ -35,9 +35,9 @@ const experience = (await getCollection("experience"))
       <div class="mt-8 flex flex-wrap gap-3">
         <a
           class="rounded-full bg-sky-500 px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/60"
-          href={site.cvPdf.en}
+          href={site.cvPdf.es}
         >
-          Download PDF
+          Descargar PDF
         </a>
         <a
           class="rounded-full border border-slate-800 bg-slate-900/40 px-5 py-2.5 text-sm font-semibold text-slate-100 hover:bg-slate-900"
@@ -51,7 +51,7 @@ const experience = (await getCollection("experience"))
 
       <div class="mt-12 grid gap-10 lg:grid-cols-[1fr_22rem]">
         <div>
-          <h3 class="text-sm font-semibold text-slate-200">Experience</h3>
+          <h3 class="text-sm font-semibold text-slate-200">Experiencia</h3>
           <div class="mt-6 space-y-6">
             {experience.map((entry) => (
               <div class="rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
@@ -72,9 +72,9 @@ const experience = (await getCollection("experience"))
                 <div class="mt-5">
                   <a
                     class="text-sm font-semibold text-sky-300 hover:text-sky-200"
-                    href={`/experience/${stripLocaleFromSlug(entry.slug, locale)}/`}
+                    href={`/es/experience/${stripLocaleFromSlug(entry.slug, locale)}/`}
                   >
-                    View details →
+                    Ver detalles →
                   </a>
                 </div>
               </div>
@@ -85,7 +85,7 @@ const experience = (await getCollection("experience"))
         <aside class="rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
           <div class="space-y-8">
             <div>
-              <h3 class="text-sm font-semibold text-slate-200">Skills</h3>
+              <h3 class="text-sm font-semibold text-slate-200">Habilidades</h3>
               <div class="mt-4 space-y-6">
                 {resume.skills.map((group) => (
                   <div>
@@ -103,7 +103,7 @@ const experience = (await getCollection("experience"))
             </div>
 
             <div>
-              <h3 class="text-sm font-semibold text-slate-200">Education</h3>
+              <h3 class="text-sm font-semibold text-slate-200">Estudios</h3>
               <ul class="mt-4 space-y-4 text-sm text-slate-300">
                 {resume.education.map((e) => (
                   <li>
@@ -117,7 +117,7 @@ const experience = (await getCollection("experience"))
 
             {resume.languages?.length ? (
               <div>
-                <h3 class="text-sm font-semibold text-slate-200">Languages</h3>
+                <h3 class="text-sm font-semibold text-slate-200">Idiomas</h3>
                 <ul class="mt-4 space-y-2 text-sm text-slate-300">
                   {resume.languages.map((l) => (
                     <li class="flex items-baseline justify-between gap-4">
@@ -131,7 +131,7 @@ const experience = (await getCollection("experience"))
 
             {resume.additionalStudies?.length ? (
               <div>
-                <h3 class="text-sm font-semibold text-slate-200">Additional studies</h3>
+                <h3 class="text-sm font-semibold text-slate-200">Estudios complementarios</h3>
                 <ul class="mt-4 list-disc space-y-2 pl-5 text-sm text-slate-300">
                   {resume.additionalStudies.map((s) => (
                     <li>{s}</li>

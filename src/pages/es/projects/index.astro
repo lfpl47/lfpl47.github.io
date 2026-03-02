@@ -1,16 +1,16 @@
 ---
 import { getCollection } from "astro:content";
-import Container from "../../components/Container.astro";
-import ProjectCard from "../../components/ProjectCard.astro";
-import SectionIntro from "../../components/SectionIntro.astro";
-import Layout from "../../layouts/Layout.astro";
-import { site } from "../../config/site";
-import { isSlugForLocale, stripLocaleFromSlug } from "../../i18n/content";
-import { formatMonthYear } from "../../utils/dates";
-import { flattenStack } from "../../utils/stack";
-import { toTagId } from "../../utils/tags";
+import Container from "../../../components/Container.astro";
+import ProjectCard from "../../../components/ProjectCard.astro";
+import SectionIntro from "../../../components/SectionIntro.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { site } from "../../../config/site";
+import { isSlugForLocale, stripLocaleFromSlug } from "../../../i18n/content";
+import { formatMonthYear } from "../../../utils/dates";
+import { flattenStack } from "../../../utils/stack";
+import { toTagId } from "../../../utils/tags";
 
-const locale = "en" as const;
+const locale = "es" as const;
 const entries = (await getCollection("projects"))
   .filter((p) => isSlugForLocale(p.slug, locale))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -29,36 +29,36 @@ const tagOptions = Array.from(tagLabelById, ([id, label]) => ({ id, label })).so
 );
 ---
 
-<Layout title={`Projects — ${site.handle}`}>
+<Layout title={`Proyectos — ${site.handle}`}>
   <section class="py-16 sm:py-20">
     <Container>
       <SectionIntro
-        kicker="Projects"
-        title="Case studies & builds"
-        description="Each card opens a detailed write-up: problem, solution, architecture, tradeoffs, results, and learnings."
+        kicker="Proyectos"
+        title="Casos de estudio & builds"
+        description="Cada card abre un write-up detallado: problema, solución, arquitectura, tradeoffs, resultados y aprendizajes."
       />
 
       {entries.length ? (
         <div class="mt-10 rounded-3xl border border-slate-800 bg-slate-950/30 p-4 sm:p-6">
           <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <label class="flex-1">
-              <span class="sr-only">Search projects</span>
+              <span class="sr-only">Buscar proyectos</span>
               <input
                 id="search"
                 type="search"
-                placeholder="Search (domain, tools, outcomes…) "
+                placeholder="Buscar (dominio, herramientas, resultados…) "
                 class="w-full rounded-2xl border border-slate-800 bg-slate-950/50 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-400/40"
               />
             </label>
 
             <div class="flex flex-wrap items-center gap-3">
-              <p id="results" class="text-sm text-slate-400">{entries.length} projects</p>
+              <p id="results" class="text-sm text-slate-400">{entries.length} proyectos</p>
               <button
                 id="clear"
                 type="button"
                 class="rounded-full border border-slate-800 bg-slate-900/40 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-900"
               >
-                Clear
+                Limpiar
               </button>
             </div>
           </div>
@@ -80,9 +80,10 @@ const tagOptions = Array.from(tagLabelById, ([id, label]) => ({ id, label })).so
         </div>
       ) : (
         <div class="mt-10 rounded-3xl border border-slate-800 bg-slate-950/30 p-6 text-slate-300">
-          <p class="text-sm font-semibold text-slate-200">No projects yet</p>
+          <p class="text-sm font-semibold text-slate-200">Aún no hay proyectos</p>
           <p class="mt-2 text-sm text-slate-400">
-            Add case studies via <a class="text-sky-300 hover:text-sky-200" href="/admin/">/admin</a>.
+            Agrega casos de estudio desde{" "}
+            <a class="text-sky-300 hover:text-sky-200" href="/admin/">/admin</a>.
           </p>
         </div>
       )}
@@ -99,7 +100,7 @@ const tagOptions = Array.from(tagLabelById, ([id, label]) => ({ id, label })).so
             return (
               <li data-filter-item data-tags={tagIds.join(" ")} data-text={text}>
                 <ProjectCard
-                  href={`/projects/${stripLocaleFromSlug(entry.slug, locale)}/`}
+                  href={`/es/projects/${stripLocaleFromSlug(entry.slug, locale)}/`}
                   title={entry.data.title}
                   dateLabel={formatMonthYear(entry.data.date, locale)}
                   type={entry.data.type}
@@ -147,7 +148,7 @@ const tagOptions = Array.from(tagLabelById, ([id, label]) => ({ id, label })).so
           if (show) visible += 1;
         }
 
-        if (results) results.textContent = `${visible} / ${items.length} projects`;
+        if (results) results.textContent = `${visible} / ${items.length} proyectos`;
       }
 
       for (const btn of tagButtons) {

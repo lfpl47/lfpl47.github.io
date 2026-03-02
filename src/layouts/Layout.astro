@@ -3,28 +3,39 @@ import "../styles/global.css";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import { site } from "../config/site";
+import type { Locale } from "../i18n/locales";
+import { getLocaleFromPathname, withLocale } from "../i18n/routing";
+import { t } from "../i18n/ui";
 
 type Props = {
   title?: string;
   description?: string;
   noIndex?: boolean;
+  locale?: Locale;
 };
 
-const title = Astro.props.title ?? site.title;
-const description = Astro.props.description ?? site.description;
+const pathname = Astro.url.pathname;
+const locale = Astro.props.locale ?? getLocaleFromPathname(pathname);
+const title = Astro.props.title ?? site.titles[locale];
+const description = Astro.props.description ?? site.descriptions[locale];
 const noIndex = Astro.props.noIndex ?? false;
 
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
+const alternateEn = Astro.site ? new URL(withLocale(pathname, "en"), Astro.site).toString() : undefined;
+const alternateEs = Astro.site ? new URL(withLocale(pathname, "es"), Astro.site).toString() : undefined;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     {noIndex ? <meta name="robots" content="noindex,nofollow" /> : null}
     {canonical ? <link rel="canonical" href={canonical} /> : null}
+    {alternateEn ? <link rel="alternate" href={alternateEn} hreflang="en" /> : null}
+    {alternateEs ? <link rel="alternate" href={alternateEs} hreflang="es" /> : null}
+    {alternateEn ? <link rel="alternate" href={alternateEn} hreflang="x-default" /> : null}
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -38,7 +49,7 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString(
     class="min-h-screen bg-slate-950 text-slate-100 selection:bg-sky-500/30 selection:text-slate-50"
   >
     <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-slate-900 focus:px-4 focus:py-2 focus:text-slate-50" href="#main">
-      Skip to content
+      {t(locale, "skip_to_content")}
     </a>
 
     <div class="pointer-events-none fixed inset-0 -z-10">
