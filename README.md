@@ -9,6 +9,10 @@ Professional portfolio for a Data Engineer.
 - Content (“repo as DB”): Markdown + YAML frontmatter in `src/content/*`
 - Admin UI: Decap CMS at `/admin` (optional, needs OAuth proxy)
 
+## GitHub Pages settings
+
+In GitHub: **Settings → Pages → Build and deployment → Source = GitHub Actions**.
+
 ## Local development
 
 Prereqs: Node.js `>=22`
