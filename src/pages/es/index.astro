@@ -2,25 +2,17 @@
 import Layout from "../../layouts/Layout.astro";
 import Container from "../../components/Container.astro";
 import SectionIntro from "../../components/SectionIntro.astro";
-import ExperienceCard from "../../components/ExperienceCard.astro";
+import Chip from "../../components/Chip.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
-import { getCollection } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
 import { site } from "../../config/site";
 import { isSlugForLocale, stripLocaleFromSlug } from "../../i18n/content";
-import { formatDateRange, formatMonthYear } from "../../utils/dates";
+import { formatMonthYear } from "../../utils/dates";
 import { flattenStack } from "../../utils/stack";
 
 const locale = "es" as const;
 const allExperience = (await getCollection("experience")).filter((e) => isSlugForLocale(e.slug, locale));
 const allProjects = (await getCollection("projects")).filter((p) => isSlugForLocale(p.slug, locale));
-
-const featuredExperience = allExperience
-  .sort(
-    (a, b) =>
-      Number(b.data.featured ?? false) - Number(a.data.featured ?? false) ||
-      b.data.start.valueOf() - a.data.start.valueOf(),
-  )
-  .slice(0, 2);
 
 const featuredProjects = allProjects
   .sort(
@@ -29,6 +21,79 @@ const featuredProjects = allProjects
       b.data.date.valueOf() - a.data.date.valueOf(),
   )
   .slice(0, 3);
+
+type TrackId = "analytics" | "development" | "engineering";
+type ExperienceEntry = CollectionEntry<"experience">;
+
+function trackForRole(role: string): TrackId {
+  const r = role.toLowerCase();
+  if (
+    r.includes("ingeniero de datos") ||
+    r.includes("data engineer") ||
+    r.includes("data engineering") ||
+    r.includes("engineering")
+  ) {
+    return "engineering";
+  }
+  if (r.includes("web master") || r.includes("developer") || r.includes("desarrollador") || r.includes("backend")) {
+    return "development";
+  }
+  if (r.includes("analista") || r.includes("analyst") || r.includes("analytics") || r.includes("estrategia") || r.includes("wfm")) {
+    return "analytics";
+  }
+  return "engineering";
+}
+
+const experienceByTrack: Record<TrackId, ExperienceEntry[]> = {
+  analytics: [],
+  development: [],
+  engineering: [],
+};
+
+for (const entry of allExperience) {
+  experienceByTrack[trackForRole(entry.data.role)].push(entry);
+}
+
+function yearSpan(entries: ExperienceEntry[]): string | null {
+  if (!entries.length) return null;
+  const startYear = Math.min(...entries.map((e) => e.data.start.getFullYear()));
+  const endYear = entries.some((e) => !e.data.end)
+    ? "Actual"
+    : Math.max(...entries.map((e) => (e.data.end ?? e.data.start).getFullYear()));
+  return `${startYear}—${endYear}`;
+}
+
+function topChips(entries: ExperienceEntry[], max = 4): string[] {
+  const counts = new Map<string, number>();
+  for (const entry of entries) {
+    for (const label of flattenStack(entry.data.stack)) {
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+  }
+
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([label]) => label)
+    .slice(0, max);
+}
+
+const careerTracks = [
+  {
+    id: "analytics" as const,
+    label: "Analítica de datos",
+    description: "Reporting, dashboards, KPIs y soporte a decisiones.",
+  },
+  {
+    id: "development" as const,
+    label: "Desarrollo de datos",
+    description: "Automatización, integraciones y bases backend para productos de datos.",
+  },
+  {
+    id: "engineering" as const,
+    label: "Ingeniería de datos",
+    description: "Plataformas cloud, pipelines, orquestación y entrega confiable.",
+  },
+];
 ---
 
 <Layout>
@@ -149,35 +214,101 @@ const featuredProjects = allProjects
   <section class="py-16">
     <Container>
       <div class="flex flex-wrap items-end justify-between gap-6">
-        <div>
-          <SectionIntro
-            kicker="Experiencia"
-            title="Roles destacados"
-            description="Una línea de tiempo enfocada en impacto: stack, resultados y entregables."
-          />
-          <p class="mt-3 text-sm text-slate-400">
-            Evolución: Analista de Datos → Desarrollador Backend → Ingeniero de Datos
-          </p>
-        </div>
+        <SectionIntro
+          kicker="Experiencia"
+          title="Resumen de carrera"
+          description="Un vistazo rápido a mi trayectoria — la línea de tiempo completa está en Experiencia."
+        />
         <a class="text-sm font-semibold text-sky-300 hover:text-sky-200" href="/es/experience/">
           Ver todo →
         </a>
       </div>
 
-      <div class="mt-10 grid gap-4">
-        {
-          featuredExperience.map((entry) => (
-            <ExperienceCard
-              href={`/es/experience/${stripLocaleFromSlug(entry.slug, locale)}/`}
-              company={entry.data.company}
-              role={entry.data.role}
-              dateRange={formatDateRange(entry.data.start, entry.data.end, locale)}
-              location={entry.data.location}
-              highlights={entry.data.highlights}
-              tags={[...(entry.data.tags ?? []), ...flattenStack(entry.data.stack)].slice(0, 12)}
-            />
-          ))
-        }
+      <div class="mt-10 grid gap-4 sm:grid-cols-3">
+        {careerTracks.map((track) => {
+          const entries = experienceByTrack[track.id];
+          const span = yearSpan(entries);
+          const chips = topChips(entries);
+
+          return (
+            <a
+              class="group block rounded-3xl border border-slate-800 bg-slate-950/30 p-6 transition hover:border-slate-700 hover:bg-slate-900/30"
+              href="/es/experience/"
+            >
+              <div class="flex items-start gap-3">
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-800 bg-slate-950/40 text-sky-300">
+                  {track.id === "analytics" ? (
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="h-5 w-5"
+                      aria-hidden="true"
+                    >
+                      <path d="M4 19V5" />
+                      <path d="M4 19h16" />
+                      <path d="M8 15v-6" />
+                      <path d="M12 15V9" />
+                      <path d="M16 15v-3" />
+                    </svg>
+                  ) : track.id === "development" ? (
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="h-5 w-5"
+                      aria-hidden="true"
+                    >
+                      <path d="m10 8-4 4 4 4" />
+                      <path d="m14 16 4-4-4-4" />
+                      <path d="M12 6 10 18" />
+                    </svg>
+                  ) : (
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="h-5 w-5"
+                      aria-hidden="true"
+                    >
+                      <path d="M7.5 18a4.5 4.5 0 0 1 0-9 6 6 0 0 1 11.5 1.5A3.5 3.5 0 0 1 18.5 18H7.5Z" />
+                    </svg>
+                  )}
+                </span>
+
+                <div class="min-w-0">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    {entries.length} roles{span ? ` · ${span}` : ""}
+                  </p>
+                  <h3 class="mt-1 text-sm font-semibold text-slate-50">{track.label}</h3>
+                </div>
+              </div>
+
+              <p class="mt-3 text-sm leading-relaxed text-slate-300">{track.description}</p>
+
+              {chips.length ? (
+                <div class="mt-4 flex flex-wrap gap-2">
+                  {chips.map((c) => (
+                    <Chip label={c} />
+                  ))}
+                </div>
+              ) : null}
+
+              <p class="mt-5 text-sm font-semibold text-sky-300 opacity-0 transition group-hover:opacity-100">
+                Ver línea de tiempo →
+              </p>
+            </a>
+          );
+        })}
       </div>
     </Container>
   </section>
