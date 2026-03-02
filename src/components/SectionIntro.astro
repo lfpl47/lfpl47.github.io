@@ -6,13 +6,13 @@ type Props = {
 };
 
 const { kicker, title, description } = Astro.props;
+const hasTitleSlot = Astro.slots.has("title");
 ---
 
 <div>
   {kicker ? <p class="text-sm font-semibold text-sky-300/90">{kicker}</p> : null}
   <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-50 sm:text-3xl">
-    {title}
+    {hasTitleSlot ? <slot name="title" /> : title}
   </h2>
   {description ? <p class="mt-3 max-w-2xl text-slate-300">{description}</p> : null}
 </div>
-

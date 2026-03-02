@@ -36,7 +36,25 @@ const tagOptions = Array.from(tagLabelById, ([id, label]) => ({ id, label })).so
         kicker="Proyectos"
         title="Casos de estudio & builds"
         description="Cada card abre un write-up detallado: problema, solución, arquitectura, tradeoffs, resultados y aprendizajes."
-      />
+      >
+        <span slot="title" class="inline-flex items-center gap-3">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="h-7 w-7 text-sky-300"
+            aria-hidden="true"
+          >
+            <path d="M9 7V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1" />
+            <rect x="3" y="7" width="18" height="14" rx="2" />
+            <path d="M3 12h18" />
+          </svg>
+          <span>Casos de estudio &amp; builds</span>
+        </span>
+      </SectionIntro>
 
       {entries.length ? (
         <div class="mt-10 rounded-3xl border border-slate-800 bg-slate-950/30 p-4 sm:p-6">

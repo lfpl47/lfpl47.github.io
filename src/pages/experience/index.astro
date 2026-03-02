@@ -20,7 +20,30 @@ const entries = (await getCollection("experience"))
         kicker="Experience"
         title="Timeline"
         description="A timeline of roles and responsibilities, grouped by year — use the year navigation to jump across time."
-      />
+      >
+        <span slot="title" class="inline-flex items-center gap-3">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="h-7 w-7 text-sky-300"
+            aria-hidden="true"
+          >
+            <circle cx="7" cy="6" r="1.75" />
+            <circle cx="7" cy="12" r="1.75" />
+            <circle cx="7" cy="18" r="1.75" />
+            <path d="M7 7.75v2.5" />
+            <path d="M7 13.75v2.5" />
+            <path d="M11 6h10" />
+            <path d="M11 12h10" />
+            <path d="M11 18h10" />
+          </svg>
+          <span>Timeline</span>
+        </span>
+      </SectionIntro>
 
       <ExperienceTimelineByYear entries={entries} locale={locale} />
     </Container>
