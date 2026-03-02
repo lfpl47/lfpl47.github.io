@@ -19,10 +19,10 @@ const tagOptions = certifications.folders.map((f) => ({ id: f.key, label: f.labe
       <SectionIntro
         kicker="Formación"
         title="Educación & certificaciones"
-        description="Formación académica y aprendizaje complementario. Los certificados están almacenados en Google Drive."
+        description="Formación académica y certificaciones. Los certificados están almacenados en Google Drive."
       />
 
-      <div class="mt-10 grid gap-4 lg:grid-cols-2">
+      <div class="mt-10 grid gap-4">
         <div class="rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
           <h3 class="text-sm font-semibold text-slate-200">Formación académica</h3>
           <ul class="mt-4 space-y-4 text-sm text-slate-300">
@@ -36,15 +36,6 @@ const tagOptions = certifications.folders.map((f) => ({ id: f.key, label: f.labe
                   {e.startDate} — {e.endDate}
                 </p>
               </li>
-            ))}
-          </ul>
-        </div>
-
-        <div class="rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
-          <h3 class="text-sm font-semibold text-slate-200">Formación complementaria</h3>
-          <ul class="mt-4 list-disc space-y-2 pl-5 text-sm text-slate-300">
-            {resume.additionalStudies?.map((s) => (
-              <li>{s}</li>
             ))}
           </ul>
         </div>
@@ -197,4 +188,3 @@ const tagOptions = certifications.folders.map((f) => ({ id: f.key, label: f.labe
     })();
   </script>
 </Layout>
-

@@ -18,7 +18,7 @@ const experience = (await getCollection("experience"))
 <Layout title={`CV — ${site.handle}`}>
   <section class="py-16 sm:py-20">
     <Container>
-      <div class="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
+      <div class="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-10">
         <div class="max-w-2xl">
           <SectionIntro kicker="CV" title={resume.basics.name} description={resume.basics.summary} />
         </div>
@@ -69,7 +69,17 @@ const experience = (await getCollection("experience"))
 
       <div class="mt-12 grid gap-10 lg:grid-cols-[1fr_22rem]">
         <div>
-          <h3 class="text-sm font-semibold text-slate-200">Experiencia</h3>
+          <div class="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <h3 class="text-sm font-semibold text-slate-200">Experiencia</h3>
+              <p class="mt-2 text-sm text-slate-400">
+                Evolución: Analista de Datos → Desarrollador Backend → Ingeniero de Datos
+              </p>
+            </div>
+            <a class="text-sm font-semibold text-sky-300 hover:text-sky-200" href="/es/experience/">
+              Ver línea de tiempo →
+            </a>
+          </div>
           <div class="mt-6 space-y-6">
             {experience.map((entry) => (
               <div class="rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
@@ -77,16 +87,14 @@ const experience = (await getCollection("experience"))
                   <div>
                     <p class="text-sm font-semibold text-slate-50">{entry.data.role}</p>
                     <p class="text-sm text-slate-400">{entry.data.company}</p>
+                    {entry.data.location ? (
+                      <p class="mt-1 text-xs text-slate-500">{entry.data.location}</p>
+                    ) : null}
                   </div>
                   <p class="text-xs text-slate-500">
                     {formatDateRange(entry.data.start, entry.data.end, locale)}
                   </p>
                 </div>
-                <ul class="mt-4 list-disc space-y-1 pl-5 text-sm text-slate-300">
-                  {entry.data.highlights.map((h) => (
-                    <li>{h}</li>
-                  ))}
-                </ul>
                 <div class="mt-5">
                   <a
                     class="text-sm font-semibold text-sky-300 hover:text-sky-200"
