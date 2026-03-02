@@ -4,10 +4,106 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Content Manager</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
+          "Segoe UI Emoji";
+        background: #020617;
+        color: #e2e8f0;
+      }
+      a {
+        color: #38bdf8;
+      }
+      .wrap {
+        padding: 24px;
+      }
+      .card {
+        max-width: 52rem;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 18px;
+        background: rgba(2, 6, 23, 0.55);
+        padding: 18px;
+      }
+      .muted {
+        color: rgba(226, 232, 240, 0.75);
+      }
+      code {
+        background: rgba(15, 23, 42, 0.9);
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+    </style>
   </head>
   <body>
+    <noscript>
+      <div class="wrap">
+        <div class="card">
+          <h1>Admin</h1>
+          <p class="muted">This page requires JavaScript.</p>
+        </div>
+      </div>
+    </noscript>
+
+    <div id="fallback" class="wrap">
+      <div class="card">
+        <h1>Admin</h1>
+        <p class="muted">Loading Decap CMS…</p>
+        <p class="muted">
+          If this stays blank, open DevTools → Console. The most common cause on GitHub Pages is OAuth not configured.
+          Update <code>/admin/config.yml</code> (<code>backend.base_url</code>) after deploying the Worker in
+          <code>cms-oauth-proxy/</code>.
+        </p>
+      </div>
+    </div>
+
     <div id="nc-root"></div>
-    <script src="https://unpkg.com/decap-cms@3.8.1/dist/decap-cms.js"></script>
+    <script>
+      (() => {
+        const sources = [
+          "https://unpkg.com/decap-cms@3.8.1/dist/decap-cms.js",
+          "https://cdn.jsdelivr.net/npm/decap-cms@3.8.1/dist/decap-cms.js",
+        ];
+
+        function setFallbackError(message) {
+          const fallback = document.getElementById("fallback");
+          if (!fallback) return;
+          const card = fallback.querySelector(".card");
+          if (!card) return;
+          const p = document.createElement("p");
+          p.className = "muted";
+          p.textContent = message;
+          card.appendChild(p);
+        }
+
+        function hideFallback() {
+          const fallback = document.getElementById("fallback");
+          if (fallback) fallback.remove();
+        }
+
+        function load(index) {
+          const src = sources[index];
+          if (!src) {
+            setFallbackError("Failed to load Decap CMS (CDN blocked or offline). Try another network or disable blockers.");
+            return;
+          }
+
+          const s = document.createElement("script");
+          s.src = src;
+          s.async = true;
+          s.onload = () => {
+            if (window.CMS) hideFallback();
+          };
+          s.onerror = () => load(index + 1);
+          document.body.appendChild(s);
+        }
+
+        window.addEventListener("error", (e) => {
+          if (e?.message) setFallbackError(`Error: ${e.message}`);
+        });
+
+        load(0);
+      })();
+    </script>
   </body>
 </html>
-

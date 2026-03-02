@@ -4,6 +4,7 @@ backend:
   name: github
   repo: lfpl47/lfpl47.github.io
   branch: main
+  auth_endpoint: auth
   # Required for GitHub Pages (Decap needs an external OAuth proxy):
   # 1) Deploy the Worker in `cms-oauth-proxy/` (or any compatible OAuth proxy).
   # 2) Set base_url to the Worker URL (no trailing slash), e.g.:
