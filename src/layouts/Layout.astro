@@ -31,6 +31,7 @@ const alternateEs = Astro.site ? new URL(withLocale(pathname, "es"), Astro.site)
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     {noIndex ? <meta name="robots" content="noindex,nofollow" /> : null}
     {canonical ? <link rel="canonical" href={canonical} /> : null}
     {alternateEn ? <link rel="alternate" href={alternateEn} hreflang="en" /> : null}

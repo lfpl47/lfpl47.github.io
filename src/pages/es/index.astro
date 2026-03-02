@@ -4,7 +4,6 @@ import Container from "../../components/Container.astro";
 import SectionIntro from "../../components/SectionIntro.astro";
 import ExperienceCard from "../../components/ExperienceCard.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
-import Chip from "../../components/Chip.astro";
 import { getCollection } from "astro:content";
 import { site } from "../../config/site";
 import { isSlugForLocale, stripLocaleFromSlug } from "../../i18n/content";
@@ -64,14 +63,6 @@ const featuredProjects = allProjects
             >
               CV
             </a>
-          </div>
-
-          <div class="mt-8 flex flex-wrap gap-2 text-sm text-slate-300">
-            <Chip label="Pipelines" />
-            <Chip label="Warehouses" />
-            <Chip label="dbt / Spark" />
-            <Chip label="IaC" />
-            <Chip label="Calidad & Observabilidad" />
           </div>
         </div>
 
