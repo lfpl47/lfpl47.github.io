@@ -1,0 +1,167 @@
+---
+import type { CollectionEntry } from "astro:content";
+import type { Locale } from "../i18n/locales";
+import { stripLocaleFromSlug } from "../i18n/content";
+import { withLocale } from "../i18n/routing";
+import { formatDateRange } from "../utils/dates";
+import { flattenStack } from "../utils/stack";
+import ExperienceCard from "./ExperienceCard.astro";
+
+type Props = {
+  locale: Locale;
+  entries: CollectionEntry<"experience">[];
+};
+
+const { locale, entries } = Astro.props;
+
+const entriesByYear = new Map<number, CollectionEntry<"experience">[]>();
+for (const entry of entries) {
+  const year = entry.data.start.getFullYear();
+  const group = entriesByYear.get(year) ?? [];
+  group.push(entry);
+  entriesByYear.set(year, group);
+}
+
+const years = [...entriesByYear.keys()].sort((a, b) => b - a);
+
+const yearsLabel = locale === "es" ? "Años" : "Years";
+const emptyTitle = locale === "es" ? "Aún no hay experiencia" : "No experience yet";
+const emptyDescription =
+  locale === "es"
+    ? "Cuando agregues entradas, aparecerán aquí en una línea de tiempo por año."
+    : "Once you add entries, they will show up here in a year-based timeline.";
+---
+
+{
+  years.length ? (
+    <div data-experience-timeline class="mt-10 grid gap-8 lg:grid-cols-[10rem_1fr]">
+      <nav
+        class="flex gap-2 overflow-x-auto pb-2 lg:sticky lg:top-24 lg:block lg:space-y-2 lg:pb-0"
+        aria-label={yearsLabel}
+      >
+        {years.map((year, index) => (
+          <a
+            href={`#y-${year}`}
+            data-year-link={String(year)}
+            aria-current={index === 0 ? "true" : undefined}
+            class:list={[
+              "inline-flex items-center whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-sky-400/40",
+              index === 0
+                ? "border-sky-400 bg-sky-500 text-slate-950 hover:bg-sky-400"
+                : "border-slate-800 bg-slate-900/30 text-slate-200 hover:bg-slate-900 hover:text-white",
+            ]}
+          >
+            {year}
+          </a>
+        ))}
+      </nav>
+
+      <div class="relative">
+        <div class="pointer-events-none absolute bottom-0 left-4 top-0 w-px bg-gradient-to-b from-sky-500/20 via-slate-800/70 to-fuchsia-500/10" />
+
+        <div class="space-y-10">
+          {years.map((year) => (
+            <section id={`y-${year}`} class="relative scroll-mt-28">
+              <div data-year-marker={String(year)} class="relative">
+                <span
+                  aria-hidden="true"
+                  class="absolute left-2 top-0.5 h-4 w-4 rounded-full border border-slate-700 bg-slate-950 ring-4 ring-slate-950"
+                />
+                <h3 class="pl-10 text-xs font-semibold uppercase tracking-wide text-slate-400">{year}</h3>
+              </div>
+
+              <ul class="mt-6 grid gap-4">
+                {(entriesByYear.get(year) ?? []).map((entry) => {
+                  const slug = stripLocaleFromSlug(entry.slug, locale);
+                  const href = withLocale(`/experience/${slug}/`, locale);
+                  const tags = [...(entry.data.tags ?? []), ...flattenStack(entry.data.stack)];
+
+                  return (
+                    <li class="relative pl-10">
+                      <span
+                        aria-hidden="true"
+                        class="absolute left-2.5 top-7 h-3 w-3 rounded-full bg-sky-400 ring-4 ring-slate-950"
+                      />
+                      <ExperienceCard
+                        href={href}
+                        company={entry.data.company}
+                        role={entry.data.role}
+                        dateRange={formatDateRange(entry.data.start, entry.data.end, locale)}
+                        location={entry.data.location}
+                        highlights={entry.data.highlights}
+                        tags={tags}
+                      />
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </div>
+
+      <script is:inline>
+        (() => {
+          const root = document.querySelector("[data-experience-timeline]");
+          if (!root) return;
+
+          const links = Array.from(root.querySelectorAll("[data-year-link]"));
+          const markers = Array.from(root.querySelectorAll("[data-year-marker]"));
+          if (!links.length || !markers.length) return;
+
+          const inactiveClasses = [
+            "bg-slate-900/30",
+            "text-slate-200",
+            "border-slate-800",
+            "hover:bg-slate-900",
+            "hover:text-white",
+          ];
+          const activeClasses = ["bg-sky-500", "text-slate-950", "border-sky-400", "hover:bg-sky-400"];
+
+          function setActive(year) {
+            for (const link of links) {
+              const active = link.getAttribute("data-year-link") === year;
+              if (active) link.setAttribute("aria-current", "true");
+              else link.removeAttribute("aria-current");
+
+              for (const c of inactiveClasses) link.classList.toggle(c, !active);
+              for (const c of activeClasses) link.classList.toggle(c, active);
+            }
+          }
+
+          const initial =
+            links.find((l) => l.hasAttribute("aria-current"))?.getAttribute("data-year-link") ||
+            links[0]?.getAttribute("data-year-link");
+          if (initial) setActive(initial);
+
+          for (const link of links) {
+            link.addEventListener("click", () => {
+              const year = link.getAttribute("data-year-link");
+              if (year) setActive(year);
+            });
+          }
+
+          if (!("IntersectionObserver" in window)) return;
+
+          const observer = new IntersectionObserver(
+            (entries) => {
+              const visible = entries.filter((e) => e.isIntersecting);
+              if (!visible.length) return;
+              visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+              const year = visible[0].target.getAttribute("data-year-marker");
+              if (year) setActive(year);
+            },
+            { root: null, rootMargin: "-25% 0px -65% 0px", threshold: 0 },
+          );
+
+          for (const marker of markers) observer.observe(marker);
+        })();
+      </script>
+    </div>
+  ) : (
+    <div class="mt-10 rounded-3xl border border-slate-800 bg-slate-950/30 p-6 text-slate-300">
+      <p class="text-sm font-semibold text-slate-200">{emptyTitle}</p>
+      <p class="mt-2 text-sm text-slate-400">{emptyDescription}</p>
+    </div>
+  )
+}

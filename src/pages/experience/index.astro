@@ -1,13 +1,11 @@
 ---
 import { getCollection } from "astro:content";
 import Container from "../../components/Container.astro";
-import ExperienceCard from "../../components/ExperienceCard.astro";
+import ExperienceTimelineByYear from "../../components/ExperienceTimelineByYear.astro";
 import SectionIntro from "../../components/SectionIntro.astro";
 import Layout from "../../layouts/Layout.astro";
 import { site } from "../../config/site";
-import { isSlugForLocale, stripLocaleFromSlug } from "../../i18n/content";
-import { formatDateRange } from "../../utils/dates";
-import { flattenStack } from "../../utils/stack";
+import { isSlugForLocale } from "../../i18n/content";
 
 const locale = "en" as const;
 const entries = (await getCollection("experience"))
@@ -21,30 +19,10 @@ const entries = (await getCollection("experience"))
       <SectionIntro
         kicker="Experience"
         title="Timeline"
-        description="A timeline of roles and responsibilities — open each entry for full context, stack, and highlights."
+        description="A timeline of roles and responsibilities, grouped by year — use the year navigation to jump across time."
       />
 
-      <ul class="mt-10 grid gap-4">
-        {
-          entries.map((entry) => {
-            const tags = [...(entry.data.tags ?? []), ...flattenStack(entry.data.stack)];
-
-            return (
-              <li>
-                <ExperienceCard
-                  href={`/experience/${stripLocaleFromSlug(entry.slug, locale)}/`}
-                  company={entry.data.company}
-                  role={entry.data.role}
-                  dateRange={formatDateRange(entry.data.start, entry.data.end, locale)}
-                  location={entry.data.location}
-                  highlights={entry.data.highlights}
-                  tags={tags}
-                />
-              </li>
-            );
-          })
-        }
-      </ul>
+      <ExperienceTimelineByYear entries={entries} locale={locale} />
     </Container>
   </section>
 </Layout>
