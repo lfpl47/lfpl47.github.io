@@ -1,0 +1,37 @@
+---
+import Container from "./Container.astro";
+import { site } from "../config/site";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-slate-800/60">
+  <Container class="py-10 text-sm text-slate-400">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <p>
+        © {year} {site.name}. Built with <span class="text-slate-300">Astro</span> and
+        <span class="text-slate-300">Tailwind</span>.
+      </p>
+      <div class="flex flex-wrap items-center gap-3">
+        <a class="hover:text-slate-200" href="/admin/">Admin</a>
+        <a class="hover:text-slate-200" href={site.links.github} target="_blank" rel="noreferrer">
+          GitHub
+        </a>
+        {
+          site.links.linkedin ? (
+            <a
+              class="hover:text-slate-200"
+              href={site.links.linkedin}
+              target="_blank"
+              rel="noreferrer"
+            >
+              LinkedIn
+            </a>
+          ) : null
+        }
+        <a class="hover:text-slate-200" href={site.links.email}>Email</a>
+      </div>
+    </div>
+  </Container>
+</footer>
+

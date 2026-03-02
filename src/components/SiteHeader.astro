@@ -1,0 +1,114 @@
+---
+import Container from "./Container.astro";
+import { site } from "../config/site";
+
+const pathname = Astro.url.pathname;
+const nav = [
+  { href: "/", label: "Home" },
+  { href: "/experience/", label: "Experience" },
+  { href: "/projects/", label: "Projects" },
+  { href: "/cv/", label: "CV" },
+  { href: "/blog/", label: "Blog" },
+];
+
+function isActive(href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname.startsWith(href);
+}
+---
+
+<header class="sticky top-0 z-50 border-b border-slate-800/60 bg-slate-950/70 backdrop-blur">
+  <Container class="flex h-16 items-center justify-between gap-4">
+    <a class="font-semibold tracking-tight text-slate-100 hover:text-white" href="/">
+      {site.handle}
+    </a>
+
+    <nav class="hidden items-center gap-1 sm:flex" aria-label="Primary">
+      {
+        nav.map((item) => (
+          <a
+            class:list={[
+              "rounded-full px-3 py-1.5 text-sm font-medium transition",
+              isActive(item.href)
+                ? "bg-slate-900 text-white"
+                : "text-slate-300 hover:bg-slate-900/60 hover:text-white",
+            ]}
+            href={item.href}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="hidden items-center gap-2 sm:flex">
+      <a
+        class="rounded-full border border-slate-800 bg-slate-900/40 px-3 py-1.5 text-sm font-semibold text-slate-100 hover:bg-slate-900"
+        href={site.links.github}
+        target="_blank"
+        rel="noreferrer"
+      >
+        GitHub
+      </a>
+      {
+        site.links.linkedin ? (
+          <a
+            class="rounded-full border border-slate-800 bg-slate-900/40 px-3 py-1.5 text-sm font-semibold text-slate-100 hover:bg-slate-900"
+            href={site.links.linkedin}
+            target="_blank"
+            rel="noreferrer"
+          >
+            LinkedIn
+          </a>
+        ) : null
+      }
+    </div>
+
+    <details class="relative sm:hidden">
+      <summary class="list-none rounded-full border border-slate-800 bg-slate-900/40 px-3 py-1.5 text-sm font-semibold text-slate-100 hover:bg-slate-900">
+        Menu
+      </summary>
+      <div class="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-xl">
+        <nav class="flex flex-col p-2" aria-label="Mobile">
+          {
+            nav.map((item) => (
+              <a
+                class:list={[
+                  "rounded-xl px-3 py-2 text-sm font-medium",
+                  isActive(item.href)
+                    ? "bg-slate-900 text-white"
+                    : "text-slate-300 hover:bg-slate-900/60 hover:text-white",
+                ]}
+                href={item.href}
+              >
+                {item.label}
+              </a>
+            ))
+          }
+          <div class="my-2 h-px bg-slate-800/80" />
+          <a
+            class="rounded-xl px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-900/60 hover:text-white"
+            href={site.links.github}
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub
+          </a>
+          {
+            site.links.linkedin ? (
+              <a
+                class="rounded-xl px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-900/60 hover:text-white"
+                href={site.links.linkedin}
+                target="_blank"
+                rel="noreferrer"
+              >
+                LinkedIn
+              </a>
+            ) : null
+          }
+        </nav>
+      </div>
+    </details>
+  </Container>
+</header>
+

@@ -1,0 +1,43 @@
+{
+  "basics": {
+    "name": "Your Name",
+    "label": "Data Engineer",
+    "location": "Bogotá, Colombia",
+    "email": "you@example.com",
+    "summary": "Data Engineer focused on reliable pipelines, analytics enablement, and pragmatic architecture.",
+    "profiles": [
+      {
+        "network": "GitHub",
+        "username": "lfpl47",
+        "url": "https://github.com/lfpl47"
+      },
+      {
+        "network": "LinkedIn",
+        "username": "",
+        "url": ""
+      }
+    ]
+  },
+  "skills": [
+    {
+      "name": "Data Engineering",
+      "keywords": ["Python", "SQL", "dbt", "Airflow", "Spark", "BigQuery", "Terraform"]
+    },
+    {
+      "name": "Practices",
+      "keywords": ["Data modeling", "Data quality", "CI/CD", "Observability", "Cost optimization"]
+    }
+  ],
+  "work": [
+    {
+      "company": "Example Company",
+      "position": "Data Engineer",
+      "startDate": "2025-03",
+      "endDate": "",
+      "highlights": [
+        "Built ELT pipelines and curated datasets for analytics.",
+        "Improved reliability with data contracts and monitoring."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Container from "../components/Container.astro";
+import SectionIntro from "../components/SectionIntro.astro";
+import ExperienceCard from "../components/ExperienceCard.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import Chip from "../components/Chip.astro";
+import { getCollection } from "astro:content";
+import { site } from "../config/site";
+import { formatDateRange, formatMonthYear } from "../utils/dates";
+import { flattenStack } from "../utils/stack";
+
+const allExperience = await getCollection("experience");
+const allProjects = await getCollection("projects");
+
+const featuredExperience = allExperience
+  .sort(
+    (a, b) =>
+      Number(b.data.featured ?? false) - Number(a.data.featured ?? false) ||
+      b.data.start.valueOf() - a.data.start.valueOf(),
+  )
+  .slice(0, 2);
+
+const featuredProjects = allProjects
+  .sort(
+    (a, b) =>
+      Number(b.data.featured ?? false) - Number(a.data.featured ?? false) ||
+      b.data.date.valueOf() - a.data.date.valueOf(),
+  )
+  .slice(0, 3);
+---
+
+<Layout title="lfpl47 — Data Engineer">
+  <section class="py-20 sm:py-28">
+    <Container>
+      <div class="max-w-2xl">
+        <p class="text-sm font-semibold text-sky-300/90">{site.location}</p>
+        <h1 class="mt-4 text-4xl font-semibold tracking-tight text-slate-50 sm:text-6xl">
+          {site.role}.<br />
+          <span class="text-slate-300">Shipping data products with impact.</span>
+        </h1>
+        <p class="mt-6 text-lg leading-relaxed text-slate-300">{site.summary}</p>
+
+        <div class="mt-10 flex flex-wrap gap-3">
+          <a
+            class="rounded-full bg-sky-500 px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/60"
+            href="/projects/"
+          >
+            View case studies
+          </a>
+          <a
+            class="rounded-full border border-slate-800 bg-slate-900/40 px-5 py-2.5 text-sm font-semibold text-slate-100 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/30"
+            href="/experience/"
+          >
+            Experience timeline
+          </a>
+          <a
+            class="rounded-full border border-slate-800 bg-slate-900/40 px-5 py-2.5 text-sm font-semibold text-slate-100 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/30"
+            href="/cv/"
+          >
+            CV
+          </a>
+        </div>
+
+        <div class="mt-8 flex flex-wrap gap-2 text-sm text-slate-300">
+          <Chip label="Pipelines" />
+          <Chip label="Warehouses" />
+          <Chip label="dbt / Spark" />
+          <Chip label="IaC" />
+          <Chip label="Quality & Observability" />
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <section class="py-16">
+    <Container>
+      <SectionIntro
+        kicker="What I do"
+        title="Reliable data systems, measurable outcomes"
+        description="I focus on architecture and execution: shipping pipelines and models that teams trust, with strong quality signals and pragmatic cost/performance choices."
+      />
+
+      <div class="mt-10 grid gap-4 sm:grid-cols-3">
+        <div class="rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
+          <h3 class="text-base font-semibold text-slate-50">Data platforms</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-300">
+            Layered warehouses, data contracts, documentation, and ownership that scale.
+          </p>
+        </div>
+        <div class="rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
+          <h3 class="text-base font-semibold text-slate-50">Pipelines & orchestration</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-300">
+            Backfills, SLAs, retries, and observability — without guessing why things broke.
+          </p>
+        </div>
+        <div class="rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
+          <h3 class="text-base font-semibold text-slate-50">Quality & reliability</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-300">
+            Tests, lineage, and alerting so stakeholders can trust metrics and decisions.
+          </p>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <section class="py-16">
+    <Container>
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <SectionIntro
+          kicker="Experience"
+          title="Selected roles"
+          description="A timeline of impact-focused work: stack, outcomes, and what shipped."
+        />
+        <a class="text-sm font-semibold text-sky-300 hover:text-sky-200" href="/experience/">
+          View all →
+        </a>
+      </div>
+
+      <div class="mt-10 grid gap-4">
+        {
+          featuredExperience.map((entry) => (
+            <ExperienceCard
+              href={`/experience/${entry.slug}/`}
+              company={entry.data.company}
+              role={entry.data.role}
+              dateRange={formatDateRange(entry.data.start, entry.data.end)}
+              location={entry.data.location}
+              highlights={entry.data.highlights}
+              tags={[...(entry.data.tags ?? []), ...flattenStack(entry.data.stack)].slice(0, 12)}
+            />
+          ))
+        }
+      </div>
+    </Container>
+  </section>
+
+  <section class="py-16">
+    <Container>
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <SectionIntro
+          kicker="Projects"
+          title="Case studies"
+          description="Problem → solution → architecture → tradeoffs → results."
+        />
+        <a class="text-sm font-semibold text-sky-300 hover:text-sky-200" href="/projects/">
+          View all →
+        </a>
+      </div>
+
+      <div class="mt-10 grid gap-4 sm:grid-cols-2">
+        {
+          featuredProjects.map((entry) => (
+            <ProjectCard
+              href={`/projects/${entry.slug}/`}
+              title={entry.data.title}
+              dateLabel={formatMonthYear(entry.data.date)}
+              type={entry.data.type}
+              status={entry.data.status}
+              highlights={entry.data.highlights}
+              tags={[...(entry.data.tags ?? []), ...flattenStack(entry.data.stack)].slice(0, 12)}
+            />
+          ))
+        }
+      </div>
+    </Container>
+  </section>
+</Layout>

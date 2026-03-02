@@ -1,0 +1,45 @@
+---
+import { getCollection } from "astro:content";
+import Container from "../../components/Container.astro";
+import SectionIntro from "../../components/SectionIntro.astro";
+import Layout from "../../layouts/Layout.astro";
+import { formatMonthYear } from "../../utils/dates";
+
+const posts = (await getCollection("posts"))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<Layout title="Blog — lfpl47" description="Short technical posts about data engineering.">
+  <section class="py-16 sm:py-20">
+    <Container>
+      <SectionIntro
+        kicker="Blog"
+        title="Notes & write-ups"
+        description="Short technical posts to document learnings and show how I think."
+      />
+
+      {posts.length ? (
+        <ul class="mt-10 grid gap-4">
+          {posts.map((post) => (
+            <li>
+              <a
+                class="block rounded-3xl border border-slate-800 bg-slate-950/30 p-6 hover:bg-slate-900/30"
+                href={`/blog/${post.slug}/`}
+              >
+                <p class="text-sm text-slate-400">{formatMonthYear(post.data.date)}</p>
+                <h3 class="mt-2 text-lg font-semibold text-slate-50">{post.data.title}</h3>
+                {post.data.description ? (
+                  <p class="mt-2 text-sm text-slate-300">{post.data.description}</p>
+                ) : null}
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="mt-8 text-slate-300">No posts yet.</p>
+      )}
+    </Container>
+  </section>
+</Layout>
+

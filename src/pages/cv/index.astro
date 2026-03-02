@@ -1,0 +1,85 @@
+---
+import Container from "../../components/Container.astro";
+import SectionIntro from "../../components/SectionIntro.astro";
+import Layout from "../../layouts/Layout.astro";
+import { site } from "../../config/site";
+import resume from "../../data/resume.json";
+import Chip from "../../components/Chip.astro";
+---
+
+<Layout title={`CV — ${site.handle}`}>
+  <section class="py-16 sm:py-20">
+    <Container>
+      <SectionIntro kicker="CV" title={resume.basics.name} description={resume.basics.summary} />
+
+      <div class="mt-6 flex flex-wrap items-center gap-3 text-sm text-slate-300">
+        <span class="rounded-full border border-slate-800 bg-slate-950/30 px-3 py-1.5">
+          {resume.basics.label}
+        </span>
+        <span class="text-slate-500">•</span>
+        <span>{resume.basics.location}</span>
+        <span class="text-slate-500">•</span>
+        <a class="text-sky-300 hover:text-sky-200" href={`mailto:${resume.basics.email}`}>
+          {resume.basics.email}
+        </a>
+      </div>
+
+      {site.cvPdfPath ? (
+        <div class="mt-8">
+          <a
+            class="rounded-full bg-sky-500 px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/60"
+            href={site.cvPdfPath}
+          >
+            Download PDF
+          </a>
+        </div>
+      ) : null}
+
+      <div class="mt-12 grid gap-10 lg:grid-cols-[1fr_22rem]">
+        <div>
+          <h3 class="text-sm font-semibold text-slate-200">Experience</h3>
+          <div class="mt-6 space-y-6">
+            {resume.work.map((job) => (
+              <div class="rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
+                <div class="flex flex-wrap items-baseline justify-between gap-3">
+                  <div>
+                    <p class="text-sm font-semibold text-slate-50">{job.position}</p>
+                    <p class="text-sm text-slate-400">{job.company}</p>
+                  </div>
+                  <p class="text-xs text-slate-500">
+                    {job.startDate}
+                    {job.endDate ? ` — ${job.endDate}` : " — Present"}
+                  </p>
+                </div>
+                <ul class="mt-4 list-disc space-y-1 pl-5 text-sm text-slate-300">
+                  {job.highlights.map((h) => (
+                    <li>{h}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <aside class="rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
+          <h3 class="text-sm font-semibold text-slate-200">Skills</h3>
+          <div class="mt-4 space-y-6">
+            {resume.skills.map((group) => (
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  {group.name}
+                </p>
+                <div class="mt-2 flex flex-wrap gap-2">
+                  {group.keywords.map((k) => (
+                    <Chip label={k} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </aside>
+      </div>
+    </Container>
+  </section>
+</Layout>
+

@@ -1,0 +1,134 @@
+site_url: https://lfpl47.github.io
+
+backend:
+  name: github
+  repo: lfpl47/lfpl47.github.io
+  branch: main
+  # Required for GitHub Pages (Decap needs an external OAuth proxy):
+  # 1) Deploy the Worker in `cms-oauth-proxy/` (or any compatible OAuth proxy).
+  # 2) Set base_url to the Worker URL (no trailing slash), e.g.:
+  # base_url: https://your-decap-proxy.yourdomain.com
+  base_url: https://REPLACE-ME.example.com
+
+publish_mode: editorial_workflow
+
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  - name: experience
+    label: Experience
+    label_singular: Role
+    folder: src/content/experience
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: Company, name: company, widget: string }
+      - { label: Role, name: role, widget: string }
+      - { label: Start, name: start, widget: datetime, time_format: false, format: "YYYY-MM-DD" }
+      - {
+          label: End,
+          name: end,
+          widget: datetime,
+          time_format: false,
+          format: "YYYY-MM-DD",
+          required: false
+        }
+      - { label: Location, name: location, widget: string, required: false }
+      - {
+          label: Employment Type,
+          name: employmentType,
+          widget: select,
+          required: false,
+          options: ["Full-time", "Part-time", "Contract", "Freelance", "Internship"]
+        }
+      - { label: Summary, name: summary, widget: text, required: false }
+      - label: Stack
+        name: stack
+        widget: object
+        required: false
+        fields:
+          - { label: Cloud, name: cloud, widget: list, required: false }
+          - { label: Data, name: data, widget: list, required: false }
+          - { label: Orchestration, name: orchestration, widget: list, required: false }
+          - { label: IaC, name: iac, widget: list, required: false }
+          - { label: Languages, name: languages, widget: list, required: false }
+          - { label: DB, name: db, widget: list, required: false }
+          - { label: Streaming, name: streaming, widget: list, required: false }
+          - { label: Observability, name: observability, widget: list, required: false }
+          - { label: CI/CD, name: cicd, widget: list, required: false }
+          - { label: Misc, name: misc, widget: list, required: false }
+      - { label: Highlights, name: highlights, widget: list }
+      - label: Impact
+        name: impact
+        widget: list
+        required: false
+        fields:
+          - { label: Label, name: label, widget: string }
+          - { label: Value, name: value, widget: string }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Featured, name: featured, widget: boolean, required: false, default: false }
+      - { label: Body, name: body, widget: markdown, required: false }
+
+  - name: projects
+    label: Projects
+    label_singular: Project
+    folder: src/content/projects
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime, time_format: false, format: "YYYY-MM-DD" }
+      - {
+          label: Type,
+          name: type,
+          widget: select,
+          required: false,
+          options: ["Case Study", "Project", "Open Source", "Talk"]
+        }
+      - {
+          label: Status,
+          name: status,
+          widget: select,
+          required: false,
+          options: ["Active", "Completed", "Paused"]
+        }
+      - label: Stack
+        name: stack
+        widget: object
+        required: false
+        fields:
+          - { label: Cloud, name: cloud, widget: list, required: false }
+          - { label: Data, name: data, widget: list, required: false }
+          - { label: Orchestration, name: orchestration, widget: list, required: false }
+          - { label: IaC, name: iac, widget: list, required: false }
+          - { label: Languages, name: languages, widget: list, required: false }
+          - { label: DB, name: db, widget: list, required: false }
+          - { label: Streaming, name: streaming, widget: list, required: false }
+          - { label: Observability, name: observability, widget: list, required: false }
+          - { label: CI/CD, name: cicd, widget: list, required: false }
+          - { label: Misc, name: misc, widget: list, required: false }
+      - { label: Repo URL, name: repo, widget: string, required: false }
+      - { label: NDA, name: nda, widget: boolean, required: false, default: false }
+      - { label: Cover, name: cover, widget: image, required: false }
+      - { label: Highlights, name: highlights, widget: list }
+      - { label: Results, name: results, widget: list, required: false }
+      - { label: Learnings, name: learnings, widget: list, required: false }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Featured, name: featured, widget: boolean, required: false, default: false }
+      - { label: Body, name: body, widget: markdown, required: false }
+
+  - name: posts
+    label: Blog
+    label_singular: Post
+    folder: src/content/posts
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Description, name: description, widget: text, required: false }
+      - { label: Date, name: date, widget: datetime, time_format: false, format: "YYYY-MM-DD" }
+      - { label: Draft, name: draft, widget: boolean, required: false, default: false }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Body, name: body, widget: markdown }
+

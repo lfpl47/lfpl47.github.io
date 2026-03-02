@@ -1,0 +1,7 @@
+name = "decap-proxy"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# For TS in the Cloudflare dashboard or local builds, you may need:
+# compatibility_flags = ["nodejs_compat"]
+

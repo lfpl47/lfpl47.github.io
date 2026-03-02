@@ -1,0 +1,103 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import Chip from "../../components/Chip.astro";
+import Container from "../../components/Container.astro";
+import SectionIntro from "../../components/SectionIntro.astro";
+import Layout from "../../layouts/Layout.astro";
+import { formatDateRange } from "../../utils/dates";
+import { flattenStack, formatStackCategory, stackEntries } from "../../utils/stack";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("experience");
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+type Props = { entry: CollectionEntry<"experience"> };
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+
+const title = `${entry.data.role} — ${entry.data.company}`;
+const tagLabels = [...(entry.data.tags ?? []), ...flattenStack(entry.data.stack)];
+const stack = stackEntries(entry.data.stack);
+---
+
+<Layout title={`${title} — Experience`}>
+  <section class="py-16 sm:py-20">
+    <Container>
+      <a class="text-sm font-semibold text-sky-300 hover:text-sky-200" href="/experience/">
+        ← Back to timeline
+      </a>
+
+      <div class="mt-6 flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+        <div class="max-w-2xl">
+          <SectionIntro kicker="Experience" title={title} description={entry.data.summary} />
+          <p class="mt-4 text-sm text-slate-400">
+            {formatDateRange(entry.data.start, entry.data.end)}
+            {entry.data.location ? ` · ${entry.data.location}` : ""}
+            {entry.data.employmentType ? ` · ${entry.data.employmentType}` : ""}
+          </p>
+
+          <div class="mt-6 flex flex-wrap gap-2">
+            {tagLabels.slice(0, 18).map((t) => (
+              <Chip label={t} />
+            ))}
+          </div>
+        </div>
+
+        {entry.data.impact?.length ? (
+          <div class="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
+            <p class="text-sm font-semibold text-slate-200">Impact</p>
+            <dl class="mt-4 grid gap-3">
+              {entry.data.impact.map((m) => (
+                <div class="flex items-baseline justify-between gap-4">
+                  <dt class="text-sm text-slate-400">{m.label}</dt>
+                  <dd class="text-sm font-semibold text-slate-100">{m.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        ) : null}
+      </div>
+
+      <div class="mt-10 grid gap-10 lg:grid-cols-[1fr_22rem]">
+        <div>
+          <h3 class="text-sm font-semibold text-slate-200">Highlights</h3>
+          <ul class="mt-4 list-disc space-y-2 pl-5 text-slate-300">
+            {entry.data.highlights.map((h) => (
+              <li>{h}</li>
+            ))}
+          </ul>
+
+          <div class="mt-10">
+            <h3 class="text-sm font-semibold text-slate-200">Details</h3>
+            <article class="prose prose-invert mt-4 max-w-none prose-a:text-sky-300 prose-a:no-underline hover:prose-a:text-sky-200">
+              <Content />
+            </article>
+          </div>
+        </div>
+
+        <aside class="rounded-3xl border border-slate-800 bg-slate-950/30 p-6">
+          <h3 class="text-sm font-semibold text-slate-200">Stack</h3>
+          <div class="mt-4 space-y-5">
+            {stack.map((group) => (
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  {formatStackCategory(group.category)}
+                </p>
+                <div class="mt-2 flex flex-wrap gap-2">
+                  {group.items.map((item) => (
+                    <Chip label={item} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </aside>
+      </div>
+    </Container>
+  </section>
+</Layout>
+

@@ -1,0 +1,25 @@
+---
+type Props = {
+  label: string;
+  href?: string;
+  title?: string;
+};
+
+const { label, href, title } = Astro.props;
+const base =
+  "inline-flex items-center rounded-full border border-slate-800 bg-slate-900/40 px-2.5 py-1 text-xs font-medium text-slate-200";
+const hover = href ? " hover:bg-slate-900 hover:text-white" : "";
+---
+
+{
+  href ? (
+    <a class={base + hover} href={href} title={title}>
+      {label}
+    </a>
+  ) : (
+    <span class={base} title={title}>
+      {label}
+    </span>
+  )
+}
+

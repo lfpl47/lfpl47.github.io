@@ -1,0 +1,56 @@
+---
+import "../styles/global.css";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import { site } from "../config/site";
+
+type Props = {
+  title?: string;
+  description?: string;
+  noIndex?: boolean;
+};
+
+const title = Astro.props.title ?? site.title;
+const description = Astro.props.description ?? site.description;
+const noIndex = Astro.props.noIndex ?? false;
+
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    {noIndex ? <meta name="robots" content="noindex,nofollow" /> : null}
+    {canonical ? <link rel="canonical" href={canonical} /> : null}
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical ? <meta property="og:url" content={canonical} /> : null}
+    <meta property="og:type" content="website" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>{title}</title>
+  </head>
+  <body
+    class="min-h-screen bg-slate-950 text-slate-100 selection:bg-sky-500/30 selection:text-slate-50"
+  >
+    <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-slate-900 focus:px-4 focus:py-2 focus:text-slate-50" href="#main">
+      Skip to content
+    </a>
+
+    <div class="pointer-events-none fixed inset-0 -z-10">
+      <div class="absolute -top-24 left-1/2 h-72 w-[52rem] -translate-x-1/2 rounded-full bg-sky-500/15 blur-3xl" />
+      <div class="absolute -bottom-24 right-[-8rem] h-72 w-96 rounded-full bg-fuchsia-500/10 blur-3xl" />
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.06),transparent_55%)]" />
+    </div>
+
+    <SiteHeader />
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>
