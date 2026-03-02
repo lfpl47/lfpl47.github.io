@@ -11,9 +11,9 @@ import { flattenStack, formatStackCategory, stackEntries } from "../../utils/sta
 const locale = "en" as const;
 
 export async function getStaticPaths() {
-  const entries = (await getCollection("experience")).filter((e) => isSlugForLocale(e.slug, locale));
+  const entries = (await getCollection("experience")).filter((e) => isSlugForLocale(e.slug, "en"));
   return entries.map((entry) => ({
-    params: { slug: stripLocaleFromSlug(entry.slug, locale) },
+    params: { slug: stripLocaleFromSlug(entry.slug, "en") },
     props: { entry },
   }));
 }
