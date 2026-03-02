@@ -5,6 +5,10 @@ dist/
 .env
 .env.*
 
+# Python
+__pycache__/
+*.pyc
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

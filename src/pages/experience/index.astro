@@ -8,25 +8,11 @@ import { site } from "../../config/site";
 import { isSlugForLocale, stripLocaleFromSlug } from "../../i18n/content";
 import { formatDateRange } from "../../utils/dates";
 import { flattenStack } from "../../utils/stack";
-import { toTagId } from "../../utils/tags";
 
 const locale = "en" as const;
 const entries = (await getCollection("experience"))
   .filter((e) => isSlugForLocale(e.slug, locale))
   .sort((a, b) => b.data.start.valueOf() - a.data.start.valueOf());
-
-const tagLabelById = new Map<string, string>();
-for (const entry of entries) {
-  const labels = [...(entry.data.tags ?? []), ...flattenStack(entry.data.stack)];
-  for (const label of labels) {
-    const id = toTagId(label);
-    if (!tagLabelById.has(id)) tagLabelById.set(id, label);
-  }
-}
-
-const tagOptions = Array.from(tagLabelById, ([id, label]) => ({ id, label })).sort((a, b) =>
-  a.label.localeCompare(b.label),
-);
 ---
 
 <Layout title={`Experience — ${site.handle}`}>
@@ -35,65 +21,16 @@ const tagOptions = Array.from(tagLabelById, ([id, label]) => ({ id, label })).so
       <SectionIntro
         kicker="Experience"
         title="Timeline"
-        description="Filter by stack, search by keywords, and open each role for full context, decisions, and outcomes."
+        description="A timeline of roles and responsibilities — open each entry for full context, stack, and highlights."
       />
-
-      <div class="mt-10 rounded-3xl border border-slate-800 bg-slate-950/30 p-4 sm:p-6">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <label class="flex-1">
-            <span class="sr-only">Search experience</span>
-            <input
-              id="search"
-              type="search"
-              placeholder="Search (company, role, tools, outcomes…) "
-              class="w-full rounded-2xl border border-slate-800 bg-slate-950/50 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-400/40"
-            />
-          </label>
-
-          <div class="flex flex-wrap items-center gap-3">
-            <p id="results" class="text-sm text-slate-400">{entries.length} roles</p>
-            <button
-              id="clear"
-              type="button"
-              class="rounded-full border border-slate-800 bg-slate-900/40 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-900"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-
-        <div class="mt-4 flex flex-wrap gap-2">
-          {
-            tagOptions.map((tag) => (
-              <button
-                type="button"
-                data-filter-tag={tag.id}
-                aria-pressed="false"
-                class="rounded-full border border-slate-800 bg-slate-900/30 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-900"
-              >
-                {tag.label}
-              </button>
-            ))
-          }
-        </div>
-      </div>
 
       <ul class="mt-10 grid gap-4">
         {
           entries.map((entry) => {
             const tags = [...(entry.data.tags ?? []), ...flattenStack(entry.data.stack)];
-            const tagIds = Array.from(new Set(tags.map(toTagId)));
-            const text = [
-              entry.data.company,
-              entry.data.role,
-              tags.join(" "),
-              entry.data.highlights.join(" "),
-            ]
-              .join(" ")
-              .toLowerCase();
 
             return (
-              <li data-filter-item data-tags={tagIds.join(" ")} data-text={text}>
+              <li>
                 <ExperienceCard
                   href={`/experience/${stripLocaleFromSlug(entry.slug, locale)}/`}
                   company={entry.data.company}
@@ -110,63 +47,4 @@ const tagOptions = Array.from(tagLabelById, ([id, label]) => ({ id, label })).so
       </ul>
     </Container>
   </section>
-
-  <script is:inline>
-    (() => {
-      const selected = new Set();
-      const items = Array.from(document.querySelectorAll("[data-filter-item]"));
-      const tagButtons = Array.from(document.querySelectorAll("[data-filter-tag]"));
-      const search = document.getElementById("search");
-      const clear = document.getElementById("clear");
-      const results = document.getElementById("results");
-
-      const inactiveClasses = ["bg-slate-900/30", "text-slate-200", "border-slate-800"];
-      const activeClasses = ["bg-sky-500", "text-slate-950", "border-sky-400"];
-
-      function setActive(btn, active) {
-        btn.setAttribute("aria-pressed", active ? "true" : "false");
-        for (const c of inactiveClasses) btn.classList.toggle(c, !active);
-        for (const c of activeClasses) btn.classList.toggle(c, active);
-      }
-
-      function apply() {
-        const query = (search?.value || "").trim().toLowerCase();
-        let visible = 0;
-
-        for (const el of items) {
-          const tags = (el.getAttribute("data-tags") || "").split(" ").filter(Boolean);
-          const text = el.getAttribute("data-text") || "";
-          const matchesQuery = !query || text.includes(query);
-          const matchesTags = Array.from(selected).every((t) => tags.includes(t));
-          const show = matchesQuery && matchesTags;
-          el.hidden = !show;
-          if (show) visible += 1;
-        }
-
-        if (results) results.textContent = `${visible} / ${items.length} roles`;
-      }
-
-      for (const btn of tagButtons) {
-        btn.addEventListener("click", () => {
-          const tag = btn.getAttribute("data-filter-tag");
-          if (!tag) return;
-          const next = !selected.has(tag);
-          if (next) selected.add(tag);
-          else selected.delete(tag);
-          setActive(btn, next);
-          apply();
-        });
-      }
-
-      search?.addEventListener("input", apply);
-      clear?.addEventListener("click", () => {
-        selected.clear();
-        for (const btn of tagButtons) setActive(btn, false);
-        if (search) search.value = "";
-        apply();
-      });
-
-      apply();
-    })();
-  </script>
 </Layout>

@@ -1,0 +1,655 @@
+{
+  "generatedAt": "2026-03-02T07:09:48.741595+00:00",
+  "folders": [
+    {
+      "key": "productivity",
+      "id": "1FoLPpFMMTd4a58OWVCVZ_vkHkwXfZktL",
+      "url": "https://drive.google.com/drive/folders/1FoLPpFMMTd4a58OWVCVZ_vkHkwXfZktL?usp=sharing",
+      "labels": {
+        "en": "Productivity",
+        "es": "Productividad"
+      }
+    },
+    {
+      "key": "programming",
+      "id": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "url": "https://drive.google.com/drive/folders/1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk?usp=sharing",
+      "labels": {
+        "en": "Programming",
+        "es": "Programación"
+      }
+    },
+    {
+      "key": "data_science_bi",
+      "id": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "url": "https://drive.google.com/drive/folders/14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l?usp=sharing",
+      "labels": {
+        "en": "Data Science & BI",
+        "es": "Ciencia de datos & BI"
+      }
+    },
+    {
+      "key": "cloud",
+      "id": "1d9RIRpi20g6ve4FZj4QMZXe6P1a_Gjxc",
+      "url": "https://drive.google.com/drive/folders/1d9RIRpi20g6ve4FZj4QMZXe6P1a_Gjxc?usp=sharing",
+      "labels": {
+        "en": "Cloud",
+        "es": "Cloud"
+      }
+    }
+  ],
+  "items": [
+    {
+      "id": "1vq9HfZxei6mRYgEHcLLbBSpV2uaM_G8X",
+      "folderKey": "cloud",
+      "folderId": "1d9RIRpi20g6ve4FZj4QMZXe6P1a_Gjxc",
+      "fileName": "AWS Cómputo, Almacenamiento y Bases de Datos.pdf",
+      "title": "AWS Cómputo, Almacenamiento y Bases de Datos",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1vq9HfZxei6mRYgEHcLLbBSpV2uaM_G8X/view?usp=drivesdk"
+    },
+    {
+      "id": "1r5ftRerGqEUvuyk-fafCzOhTAOLzQpP7",
+      "folderKey": "cloud",
+      "folderId": "1d9RIRpi20g6ve4FZj4QMZXe6P1a_Gjxc",
+      "fileName": "AWS Fundamentos de Cloud Computing.pdf",
+      "title": "AWS Fundamentos de Cloud Computing",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1r5ftRerGqEUvuyk-fafCzOhTAOLzQpP7/view?usp=drivesdk"
+    },
+    {
+      "id": "19wkxjLT8AywkTLMqF3lh8XYZslz1xMYE",
+      "folderKey": "cloud",
+      "folderId": "1d9RIRpi20g6ve4FZj4QMZXe6P1a_Gjxc",
+      "fileName": "AZURE DATA FUNDAMENTALS - DP-900.pdf",
+      "title": "AZURE DATA FUNDAMENTALS - DP-900",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/19wkxjLT8AywkTLMqF3lh8XYZslz1xMYE/view?usp=drivesdk"
+    },
+    {
+      "id": "1saSVmrF-9gHTq7xZuGDUaZaTLyv06w8x",
+      "folderKey": "cloud",
+      "folderId": "1d9RIRpi20g6ve4FZj4QMZXe6P1a_Gjxc",
+      "fileName": "Certificación Cloud Digital Leader.pdf",
+      "title": "Certificación Cloud Digital Leader",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1saSVmrF-9gHTq7xZuGDUaZaTLyv06w8x/view?usp=drivesdk"
+    },
+    {
+      "id": "1zTBiW21T7rqd0RFkZfdSY2DttAyEjdcm",
+      "folderKey": "cloud",
+      "folderId": "1d9RIRpi20g6ve4FZj4QMZXe6P1a_Gjxc",
+      "fileName": "Curso de Terraform.pdf",
+      "title": "Curso de Terraform",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1zTBiW21T7rqd0RFkZfdSY2DttAyEjdcm/view?usp=drivesdk"
+    },
+    {
+      "id": "1DKKvtGYif6xSRk2uiWGS6DV1g3MhaBSC",
+      "folderKey": "cloud",
+      "folderId": "1d9RIRpi20g6ve4FZj4QMZXe6P1a_Gjxc",
+      "fileName": "Curso Práctico de AWS Cloud.pdf",
+      "title": "Curso Práctico de AWS Cloud",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1DKKvtGYif6xSRk2uiWGS6DV1g3MhaBSC/view?usp=drivesdk"
+    },
+    {
+      "id": "1o2KqtPEVl0p2SllF3d7Cf2W1fbeQb74r",
+      "folderKey": "cloud",
+      "folderId": "1d9RIRpi20g6ve4FZj4QMZXe6P1a_Gjxc",
+      "fileName": "DP-203 Ingeniería de datos en Microsoft Azure.pdf",
+      "title": "DP-203 Ingeniería de datos en Microsoft Azure",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1o2KqtPEVl0p2SllF3d7Cf2W1fbeQb74r/view?usp=drivesdk"
+    },
+    {
+      "id": "1hbYSl85sQuMdepoZ8LRsixMAhQHL3EpA",
+      "folderKey": "cloud",
+      "folderId": "1d9RIRpi20g6ve4FZj4QMZXe6P1a_Gjxc",
+      "fileName": "Introducción a Google Cloud Platform.pdf",
+      "title": "Introducción a Google Cloud Platform",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1hbYSl85sQuMdepoZ8LRsixMAhQHL3EpA/view?usp=drivesdk"
+    },
+    {
+      "id": "1uMvYkPDKVifIxpJblFKgp0ygfmUlVnLA",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Administrador de bases de datos.pdf",
+      "title": "Administrador de bases de datos",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1uMvYkPDKVifIxpJblFKgp0ygfmUlVnLA/view?usp=drivesdk"
+    },
+    {
+      "id": "119JG2D1zmOxJ4WxtZT07BittccKQnZId",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Análisis de Negocios para Ciencia de Datos.pdf",
+      "title": "Análisis de Negocios para Ciencia de Datos",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/119JG2D1zmOxJ4WxtZT07BittccKQnZId/view?usp=drivesdk"
+    },
+    {
+      "id": "1P0ByzChC8do499WUu8bPRePU9u-dpYzP",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Análisis Exploratorio de Datos.pdf",
+      "title": "Análisis Exploratorio de Datos",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1P0ByzChC8do499WUu8bPRePU9u-dpYzP/view?usp=drivesdk"
+    },
+    {
+      "id": "1u_bx2yF6D6VO2HlNtIOWSkh5m8Idff4E",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Business Intelligence con Excel.pdf",
+      "title": "Business Intelligence con Excel",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1u_bx2yF6D6VO2HlNtIOWSkh5m8Idff4E/view?usp=drivesdk"
+    },
+    {
+      "id": "1SPInPEul5lKAdkqKS8eb7Hw3L0UMakty",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Business Intelligence Utilidad y Áreas de Oportunidad.pdf",
+      "title": "Business Intelligence Utilidad y Áreas de Oportunidad",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1SPInPEul5lKAdkqKS8eb7Hw3L0UMakty/view?usp=drivesdk"
+    },
+    {
+      "id": "1ZAlo3XAvvgpzfhTtO7pcMJigjwNIbwc4",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Configuración Profesional de Entorno de Trabajo para Ciencia de Datos.pdf",
+      "title": "Configuración Profesional de Entorno de Trabajo para Ciencia de Datos",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1ZAlo3XAvvgpzfhTtO7pcMJigjwNIbwc4/view?usp=drivesdk"
+    },
+    {
+      "id": "14aoh4q9cGn_Wqyyk29x0ZhWwaJ3XsH-5",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Curso de Análisis de Datos con Power BI.pdf",
+      "title": "Curso de Análisis de Datos con Power BI",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/14aoh4q9cGn_Wqyyk29x0ZhWwaJ3XsH-5/view?usp=drivesdk"
+    },
+    {
+      "id": "13Q_VcEdM9vHw2QtaBdbT-ITs12fp4h3A",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Curso de Análisis Exploratorio de Datos.pdf",
+      "title": "Curso de Análisis Exploratorio de Datos",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/13Q_VcEdM9vHw2QtaBdbT-ITs12fp4h3A/view?usp=drivesdk"
+    },
+    {
+      "id": "1yl-MydAoJMFSpfpRAb02mnM6xDDM58JV",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Curso de Databricks Arquitectura Delta Lake.pdf",
+      "title": "Curso de Databricks Arquitectura Delta Lake",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1yl-MydAoJMFSpfpRAb02mnM6xDDM58JV/view?usp=drivesdk"
+    },
+    {
+      "id": "1okl5rDFrZANZg7j2BsNecKZebkH0A4jZ",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Cómo y Por Qué Aprender Data Science e Inteligencia Artificial.pdf",
+      "title": "Cómo y Por Qué Aprender Data Science e Inteligencia Artificial",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1okl5rDFrZANZg7j2BsNecKZebkH0A4jZ/view?usp=drivesdk"
+    },
+    {
+      "id": "1cuGeEbkGyi6mXQZHfjjMJXUdyqJgYTnT",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Data Warehousing y Modelado OLAP.pdf",
+      "title": "Data Warehousing y Modelado OLAP",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1cuGeEbkGyi6mXQZHfjjMJXUdyqJgYTnT/view?usp=drivesdk"
+    },
+    {
+      "id": "1vdChZ13eqtos-7BJAaj4oalE-Do7d1Rr",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Entorno de Trabajo para Ciencia de Datos con Jupyter Notebooks y Anaconda.pdf",
+      "title": "Entorno de Trabajo para Ciencia de Datos con Jupyter Notebooks y Anaconda",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1vdChZ13eqtos-7BJAaj4oalE-Do7d1Rr/view?usp=drivesdk"
+    },
+    {
+      "id": "19XoABbVY7JFKg3gRXKGobDDJWTVsMavc",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Estadística Computacional con Python.pdf",
+      "title": "Estadística Computacional con Python",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/19XoABbVY7JFKg3gRXKGobDDJWTVsMavc/view?usp=drivesdk"
+    },
+    {
+      "id": "13mkchA5u8kVVr3-prS4BtO52jWc4nsMd",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Evaluador de Indicadores Clave (KPI).pdf",
+      "title": "Evaluador de Indicadores Clave (KPI)",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/13mkchA5u8kVVr3-prS4BtO52jWc4nsMd/view?usp=drivesdk"
+    },
+    {
+      "id": "1UfKdCfd3cfeX5oM74DLEjSZUEHAH9NYl",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Excel Intermedio para Analistas con Tableros y Fórmulas.pdf",
+      "title": "Excel Intermedio para Analistas con Tableros y Fórmulas",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1UfKdCfd3cfeX5oM74DLEjSZUEHAH9NYl/view?usp=drivesdk"
+    },
+    {
+      "id": "1puhnAvL4HDP8rK7Mv-bBlx6yCZ6WqRmg",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Excel para el Análisis de Datos.pdf",
+      "title": "Excel para el Análisis de Datos",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1puhnAvL4HDP8rK7Mv-bBlx6yCZ6WqRmg/view?usp=drivesdk"
+    },
+    {
+      "id": "1tWYWEEVY_imMGADkONa_Z2Uu3GTzY8NK",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Funciones Matemáticas para Data Science e Inteligencia Artificial.pdf",
+      "title": "Funciones Matemáticas para Data Science e Inteligencia Artificial",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1tWYWEEVY_imMGADkONa_Z2Uu3GTzY8NK/view?usp=drivesdk"
+    },
+    {
+      "id": "1zZnQQpt6_JXJUaKwPt3nGcGaO9fLeE8E",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Fundamentos de Bases de Datos.pdf",
+      "title": "Fundamentos de Bases de Datos",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1zZnQQpt6_JXJUaKwPt3nGcGaO9fLeE8E/view?usp=drivesdk"
+    },
+    {
+      "id": "1Nvkh4uKw_KGkPqnvNMIxpRUR03KehpNW",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Fundamentos de ETL con Python y Pentaho.pdf",
+      "title": "Fundamentos de ETL con Python y Pentaho",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1Nvkh4uKw_KGkPqnvNMIxpRUR03KehpNW/view?usp=drivesdk"
+    },
+    {
+      "id": "1KMPEKEC0AuVWLyqcPPqu8JoyVx4i1nYP",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Fundamentos de Ingeniería de Datos.pdf",
+      "title": "Fundamentos de Ingeniería de Datos",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1KMPEKEC0AuVWLyqcPPqu8JoyVx4i1nYP/view?usp=drivesdk"
+    },
+    {
+      "id": "1D-87xGCru2VRSrYD4I3MbaeaKHcmxQh7",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Herramientas de Inteligencia Artificial para Equipos de Datos.pdf",
+      "title": "Herramientas de Inteligencia Artificial para Equipos de Datos",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1D-87xGCru2VRSrYD4I3MbaeaKHcmxQh7/view?usp=drivesdk"
+    },
+    {
+      "id": "16iL6ZYzsIrx4Vj4UvBFQViRxPskhOFRl",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Ingeniería de Datos con Python.pdf",
+      "title": "Ingeniería de Datos con Python",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/16iL6ZYzsIrx4Vj4UvBFQViRxPskhOFRl/view?usp=drivesdk"
+    },
+    {
+      "id": "1IMP-3eL0QqQhlv5vfqFSMCDVXvZbWoO7",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Instrumentación de Datos para Decisiones de Negocio.pdf",
+      "title": "Instrumentación de Datos para Decisiones de Negocio",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1IMP-3eL0QqQhlv5vfqFSMCDVXvZbWoO7/view?usp=drivesdk"
+    },
+    {
+      "id": "1x6d0aBI2B1RZiHOR3a9ialHJUT7RWNMz",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Introducción a Selenium con Python.pdf",
+      "title": "Introducción a Selenium con Python",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1x6d0aBI2B1RZiHOR3a9ialHJUT7RWNMz/view?usp=drivesdk"
+    },
+    {
+      "id": "1lshwGsjM7qEo3JZUl3H2Mfy3jrlRX-_C",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Introducción al Pensamiento Computacional con Python.pdf",
+      "title": "Introducción al Pensamiento Computacional con Python",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1lshwGsjM7qEo3JZUl3H2Mfy3jrlRX-_C/view?usp=drivesdk"
+    },
+    {
+      "id": "1Q4dCDI11z0X09eL5ma-ilXRbwJMY8zqv",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Manipulación y Transformación de Datos con Pandas y NumPy.pdf",
+      "title": "Manipulación y Transformación de Datos con Pandas y NumPy",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1Q4dCDI11z0X09eL5ma-ilXRbwJMY8zqv/view?usp=drivesdk"
+    },
+    {
+      "id": "1cabNapRIcij6TPwLYfDHFdbUvJ7c8OSd",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Matemáticas para Data Science Estadística Descriptiva.pdf",
+      "title": "Matemáticas para Data Science Estadística Descriptiva",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1cabNapRIcij6TPwLYfDHFdbUvJ7c8OSd/view?usp=drivesdk"
+    },
+    {
+      "id": "1jeDZ53XhaDmHUe4mMa0dEE4VbIY1OllL",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "PostgreSQL.pdf",
+      "title": "PostgreSQL",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1jeDZ53XhaDmHUe4mMa0dEE4VbIY1OllL/view?usp=drivesdk"
+    },
+    {
+      "id": "1nwP4bE-cJpclKFHYPsC0XtwA7rw9JyYK",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "PostgreSQL Aplicado a Ciencia de Datos.pdf",
+      "title": "PostgreSQL Aplicado a Ciencia de Datos",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1nwP4bE-cJpclKFHYPsC0XtwA7rw9JyYK/view?usp=drivesdk"
+    },
+    {
+      "id": "1zBQt7mrP7LBzm9dTHTczlQb8nEs-WYfA",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Principios de Visualización de Datos para Business Intelligence.pdf",
+      "title": "Principios de Visualización de Datos para Business Intelligence",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1zBQt7mrP7LBzm9dTHTczlQb8nEs-WYfA/view?usp=drivesdk"
+    },
+    {
+      "id": "1KOgUfv88iCl5hQ2fIjrIIABs8DSiqmWp",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Regresión Lineal con Python.pdf",
+      "title": "Regresión Lineal con Python",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1KOgUfv88iCl5hQ2fIjrIIABs8DSiqmWp/view?usp=drivesdk"
+    },
+    {
+      "id": "1x5DQwCNDvU5DLYLZyWs9IR3oo_EjKtLu",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Spark para Big Data.pdf",
+      "title": "Spark para Big Data",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1x5DQwCNDvU5DLYLZyWs9IR3oo_EjKtLu/view?usp=drivesdk"
+    },
+    {
+      "id": "1I68YP-yhLSEGh9nLYPneJydRgIzqMQg-",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Visualización de Datos con Matplotlib y Seaborn.pdf",
+      "title": "Visualización de Datos con Matplotlib y Seaborn",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1I68YP-yhLSEGh9nLYPneJydRgIzqMQg-/view?usp=drivesdk"
+    },
+    {
+      "id": "16mnBpxymCQSAdoItATIgNJzIBjR-dRi_",
+      "folderKey": "data_science_bi",
+      "folderId": "14nFR4HDK2S2utS4hyWhbarSJ9-JW1g9l",
+      "fileName": "Ética y Manejo de Datos para Data Science e Inteligencia Artificial.pdf",
+      "title": "Ética y Manejo de Datos para Data Science e Inteligencia Artificial",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/16mnBpxymCQSAdoItATIgNJzIBjR-dRi_/view?usp=drivesdk"
+    },
+    {
+      "id": "14evTm-asa_IqmANjU5F5MoexWzUw5jHy",
+      "folderKey": "productivity",
+      "folderId": "1FoLPpFMMTd4a58OWVCVZ_vkHkwXfZktL",
+      "fileName": "APLICACION DE HERRAMIENTAS OFIMATICAS CON MICROSOFT WORD EN EL ENTORNO LABORAL.pdf",
+      "title": "APLICACION DE HERRAMIENTAS OFIMATICAS CON MICROSOFT WORD EN EL ENTORNO LABORAL",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/14evTm-asa_IqmANjU5F5MoexWzUw5jHy/view?usp=drivesdk"
+    },
+    {
+      "id": "1SGsUWtkv3Uq6szRKvQIQIBpkJ9mgKfUr",
+      "folderKey": "productivity",
+      "folderId": "1FoLPpFMMTd4a58OWVCVZ_vkHkwXfZktL",
+      "fileName": "ChatGPT.pdf",
+      "title": "ChatGPT",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1SGsUWtkv3Uq6szRKvQIQIBpkJ9mgKfUr/view?usp=drivesdk"
+    },
+    {
+      "id": "16PPC6BxBp1xi8OFRsbrxlrfkpVHtXAUa",
+      "folderKey": "productivity",
+      "folderId": "1FoLPpFMMTd4a58OWVCVZ_vkHkwXfZktL",
+      "fileName": "Curso de N8N.pdf",
+      "title": "Curso de N8N",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/16PPC6BxBp1xi8OFRsbrxlrfkpVHtXAUa/view?usp=drivesdk"
+    },
+    {
+      "id": "1C0xbOZobp2OxlOXitReVeCc5XRPnSVqP",
+      "folderKey": "productivity",
+      "folderId": "1FoLPpFMMTd4a58OWVCVZ_vkHkwXfZktL",
+      "fileName": "Curso de Prompt Engineering.pdf",
+      "title": "Curso de Prompt Engineering",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1C0xbOZobp2OxlOXitReVeCc5XRPnSVqP/view?usp=drivesdk"
+    },
+    {
+      "id": "0BwakxtKfmbbzbkk5cE1NbGM0bUU",
+      "folderKey": "productivity",
+      "folderId": "1FoLPpFMMTd4a58OWVCVZ_vkHkwXfZktL",
+      "fileName": "FUNDAMENTACION DE ENSAMBLE Y MANTENIMIENTO DE COMPUTADORES PARA LOS PROCESOS DE SOPORTE TECNICO.pdf",
+      "title": "FUNDAMENTACION DE ENSAMBLE Y MANTENIMIENTO DE COMPUTADORES PARA LOS PROCESOS DE SOPORTE TECNICO",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/0BwakxtKfmbbzbkk5cE1NbGM0bUU/view?usp=drivesdk&resourcekey=0-Xt-r1sKE6C1SD3Tekrutyg"
+    },
+    {
+      "id": "1tmxKPmgMKQhAS-M5kgAUAfg001yrZXsO",
+      "folderKey": "productivity",
+      "folderId": "1FoLPpFMMTd4a58OWVCVZ_vkHkwXfZktL",
+      "fileName": "Microsoft Teams.pdf",
+      "title": "Microsoft Teams",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1tmxKPmgMKQhAS-M5kgAUAfg001yrZXsO/view?usp=drivesdk"
+    },
+    {
+      "id": "1P2ClrHJUyKG2gxUFqqx_D_gmsNUx13c3",
+      "folderKey": "productivity",
+      "folderId": "1FoLPpFMMTd4a58OWVCVZ_vkHkwXfZktL",
+      "fileName": "Prompt Engineering con ChatGPT.pdf",
+      "title": "Prompt Engineering con ChatGPT",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1P2ClrHJUyKG2gxUFqqx_D_gmsNUx13c3/view?usp=drivesdk"
+    },
+    {
+      "id": "1pydZsgRXAVDuJoK8B7nVqasMVscfe-KM",
+      "folderKey": "productivity",
+      "folderId": "1FoLPpFMMTd4a58OWVCVZ_vkHkwXfZktL",
+      "fileName": "SCRUM CERTIFICATE.pdf",
+      "title": "SCRUM CERTIFICATE",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1pydZsgRXAVDuJoK8B7nVqasMVscfe-KM/view?usp=drivesdk"
+    },
+    {
+      "id": "0BwakxtKfmbbzcnYybWt3bWw3WHc",
+      "folderKey": "productivity",
+      "folderId": "1FoLPpFMMTd4a58OWVCVZ_vkHkwXfZktL",
+      "fileName": "SERVICIO AL CLIENTE.pdf",
+      "title": "SERVICIO AL CLIENTE",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/0BwakxtKfmbbzcnYybWt3bWw3WHc/view?usp=drivesdk&resourcekey=0-OKFdl60I7-TBgPanedetEQ"
+    },
+    {
+      "id": "0BwakxtKfmbbzVjA3QzNLbURQaVE",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "CALIDAD EN EL DESARROLLO DE SOFTWARE.pdf",
+      "title": "CALIDAD EN EL DESARROLLO DE SOFTWARE",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/0BwakxtKfmbbzVjA3QzNLbURQaVE/view?usp=drivesdk&resourcekey=0-ufyAVv2XJxF2fyik5oJyOg"
+    },
+    {
+      "id": "1XSYXp3dXvYK5-0xOAOm3tFZQV86Qejl7",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "Curso de Docker Fundamentos.pdf",
+      "title": "Curso de Docker Fundamentos",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1XSYXp3dXvYK5-0xOAOm3tFZQV86Qejl7/view?usp=drivesdk"
+    },
+    {
+      "id": "1tuQ6xsPj0VOZEUb7Q4ok4dmmKgwkOyOt",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "Curso de Flask.pdf",
+      "title": "Curso de Flask",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1tuQ6xsPj0VOZEUb7Q4ok4dmmKgwkOyOt/view?usp=drivesdk"
+    },
+    {
+      "id": "1nWpoc2ZAMoH_iT-cSSeE_iwkCOcUOVAt",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "Curso de Programación Orientada a Objetos POO.pdf",
+      "title": "Curso de Programación Orientada a Objetos POO",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1nWpoc2ZAMoH_iT-cSSeE_iwkCOcUOVAt/view?usp=drivesdk"
+    },
+    {
+      "id": "1xPDOpdWBflmbi6WVST1wLCoUmG7aIhv1",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "Curso de Python.pdf",
+      "title": "Curso de Python",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1xPDOpdWBflmbi6WVST1wLCoUmG7aIhv1/view?usp=drivesdk"
+    },
+    {
+      "id": "1n3PDotlpJN33rBGWptR6XDMLifH_XlhY",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "Curso de Python Comprehensions, Funciones y Manejo de Errores.pdf",
+      "title": "Curso de Python Comprehensions, Funciones y Manejo de Errores",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1n3PDotlpJN33rBGWptR6XDMLifH_XlhY/view?usp=drivesdk"
+    },
+    {
+      "id": "1mqCmbEQEkYO1BECc-63zwph1kDzZYpDW",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "Curso de Python PIP y Entornos Virtuales.pdf",
+      "title": "Curso de Python PIP y Entornos Virtuales",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1mqCmbEQEkYO1BECc-63zwph1kDzZYpDW/view?usp=drivesdk"
+    },
+    {
+      "id": "1iTkKm0k_cY0PKUEt0lQZ5QjUEFUEgJT2",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "Curso Práctico de Python Creación de un CRUD.pdf",
+      "title": "Curso Práctico de Python Creación de un CRUD",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1iTkKm0k_cY0PKUEt0lQZ5QjUEFUEgJT2/view?usp=drivesdk"
+    },
+    {
+      "id": "1ifND0OSElthB9H49P-YGqC-FT4AlLJgv",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "Estructuras de Datos Lineales con Python.pdf",
+      "title": "Estructuras de Datos Lineales con Python",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1ifND0OSElthB9H49P-YGqC-FT4AlLJgv/view?usp=drivesdk"
+    },
+    {
+      "id": "1Qop0mu0LDCJz3XrXqRXfbdgLZaSsyo2t",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "Expresiones Regulares.pdf",
+      "title": "Expresiones Regulares",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1Qop0mu0LDCJz3XrXqRXfbdgLZaSsyo2t/view?usp=drivesdk"
+    },
+    {
+      "id": "174KeU4sWKSYNC1RYaQvTusNasYil6sCF",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "Fundamentos de Ingeniería de Software.pdf",
+      "title": "Fundamentos de Ingeniería de Software",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/174KeU4sWKSYNC1RYaQvTusNasYil6sCF/view?usp=drivesdk"
+    },
+    {
+      "id": "1-LKXCYST8Urd35GIn01Y7l0RBlG2yudE",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "Introducción a la Terminal y Línea de Comandos.pdf",
+      "title": "Introducción a la Terminal y Línea de Comandos",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1-LKXCYST8Urd35GIn01Y7l0RBlG2yudE/view?usp=drivesdk"
+    },
+    {
+      "id": "0BwakxtKfmbbzeE15TEdwSVJOQ2M",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "MODELOS DE CALIDAD DE SOFTWARE.pdf",
+      "title": "MODELOS DE CALIDAD DE SOFTWARE",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/0BwakxtKfmbbzeE15TEdwSVJOQ2M/view?usp=drivesdk&resourcekey=0-wWFfZObUdEJaUnFHA4QPZA"
+    },
+    {
+      "id": "1vSYgeVlV_ITGMf8Q0muVZ5_43_MM1w7E",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "POO y Algoritmos con Python.pdf",
+      "title": "POO y Algoritmos con Python",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1vSYgeVlV_ITGMf8Q0muVZ5_43_MM1w7E/view?usp=drivesdk"
+    },
+    {
+      "id": "1roB2N33dd8kz5nZpGcmU6pPHWX374tvG",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "Profesional de Git y GitHub.pdf",
+      "title": "Profesional de Git y GitHub",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1roB2N33dd8kz5nZpGcmU6pPHWX374tvG/view?usp=drivesdk"
+    },
+    {
+      "id": "1h9wJRAdg8GpMSkyVcyCBDTKYDhDWmQmA",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "Unit Testing en Python.pdf",
+      "title": "Unit Testing en Python",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1h9wJRAdg8GpMSkyVcyCBDTKYDhDWmQmA/view?usp=drivesdk"
+    },
+    {
+      "id": "0BwakxtKfmbbzYzZlZ3kwamVTNG8",
+      "folderKey": "programming",
+      "folderId": "1o6nFBrTdgTIcbMq1r8fz4wYi3mk9rNRk",
+      "fileName": "VARIABLES Y ESTRUCTURAS DE CONTROL EN LA PROGRAMACION ORIENTADA A OBJETOS JAVA.pdf",
+      "title": "VARIABLES Y ESTRUCTURAS DE CONTROL EN LA PROGRAMACION ORIENTADA A OBJETOS JAVA",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/0BwakxtKfmbbzYzZlZ3kwamVTNG8/view?usp=drivesdk&resourcekey=0-r5M-TbTDVbXNwIsBxoMWTw"
+    }
+  ]
+}
