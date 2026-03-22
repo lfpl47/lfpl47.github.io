@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
+import ThemeSwitcher from "../components/ThemeSwitcher.astro";
 import { site } from "../config/site";
 import type { Locale } from "../i18n/locales";
 import { getLocaleFromPathname, withLocale } from "../i18n/routing";
@@ -38,6 +39,21 @@ const alternateEs = Astro.site ? new URL(withLocale(pathname, "es"), Astro.site)
     {alternateEs ? <link rel="alternate" href={alternateEs} hreflang="es" /> : null}
     {alternateEn ? <link rel="alternate" href={alternateEn} hreflang="x-default" /> : null}
 
+    <script is:inline>
+      (() => {
+        const storageKey = "lfpl47-theme";
+        const fallbackTheme = "obsidian";
+        const validThemes = new Set(["obsidian", "reactor", "nocturne"]);
+
+        try {
+          const savedTheme = localStorage.getItem(storageKey);
+          document.documentElement.dataset.theme = validThemes.has(savedTheme) ? savedTheme : fallbackTheme;
+        } catch {
+          document.documentElement.dataset.theme = fallbackTheme;
+        }
+      })();
+    </script>
+
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     {canonical ? <meta property="og:url" content={canonical} /> : null}
@@ -46,23 +62,22 @@ const alternateEs = Astro.site ? new URL(withLocale(pathname, "es"), Astro.site)
     <meta name="twitter:card" content="summary_large_image" />
     <title>{title}</title>
   </head>
-  <body
-    class="min-h-screen bg-slate-950 text-slate-100 selection:bg-sky-500/30 selection:text-slate-50"
-  >
-    <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-slate-900 focus:px-4 focus:py-2 focus:text-slate-50" href="#main">
+  <body class="site-shell min-h-screen">
+    <a class="skip-link" href="#main">
       {t(locale, "skip_to_content")}
     </a>
 
-    <div class="pointer-events-none fixed inset-0 -z-10">
-      <div class="absolute -top-24 left-1/2 h-72 w-[52rem] -translate-x-1/2 rounded-full bg-sky-500/15 blur-3xl" />
-      <div class="absolute -bottom-24 right-[-8rem] h-72 w-96 rounded-full bg-fuchsia-500/10 blur-3xl" />
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.06),transparent_55%)]" />
+    <div class="site-ambient" aria-hidden="true">
+      <div class="site-ambient__orb site-ambient__orb--primary" />
+      <div class="site-ambient__orb site-ambient__orb--secondary" />
+      <div class="site-ambient__mesh" />
     </div>
 
     <SiteHeader />
     <main id="main">
       <slot />
     </main>
+    <ThemeSwitcher />
     <SiteFooter />
   </body>
 </html>

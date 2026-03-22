@@ -1,0 +1,109 @@
+---
+import { getLocaleFromPathname } from "../i18n/routing";
+
+const locale = getLocaleFromPathname(Astro.url.pathname);
+const copy =
+  locale === "es"
+    ? {
+        kicker: "Theme Lab",
+        label: "Selector de temas",
+        themes: [
+          {
+            id: "obsidian",
+            name: "Negro Cobre",
+            note: "editorial, premium, mas calido",
+          },
+          {
+            id: "reactor",
+            name: "Acid Matrix",
+            note: "tecnico, angular, mas agresivo",
+          },
+          {
+            id: "nocturne",
+            name: "Noir Coral",
+            note: "elegante, profundo, mas suave",
+          },
+        ],
+      }
+    : {
+        kicker: "Theme Lab",
+        label: "Theme selector",
+        themes: [
+          {
+            id: "obsidian",
+            name: "Obsidian Copper",
+            note: "editorial, premium, warmer",
+          },
+          {
+            id: "reactor",
+            name: "Acid Matrix",
+            note: "technical, angular, sharper",
+          },
+          {
+            id: "nocturne",
+            name: "Noir Coral",
+            note: "elegant, deep, softer",
+          },
+        ],
+      };
+---
+
+<aside class="theme-lab" aria-label={copy.label}>
+  <p class="theme-lab__eyebrow">{copy.kicker}</p>
+
+  <div class="theme-lab__grid" role="group" aria-label={copy.label}>
+    {
+      copy.themes.map((theme, index) => (
+        <button
+          type="button"
+          class="theme-lab__button"
+          data-theme-choice={theme.id}
+          aria-pressed={index === 0 ? "true" : "false"}
+        >
+          <span class="theme-lab__swatch" data-theme-swatch={theme.id} aria-hidden="true" />
+          <span class="theme-lab__meta">
+            <span class="theme-lab__name">{theme.name}</span>
+            <span class="theme-lab__note">{theme.note}</span>
+          </span>
+        </button>
+      ))
+    }
+  </div>
+</aside>
+
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    const storageKey = "lfpl47-theme";
+    const validThemes = new Set(["obsidian", "reactor", "nocturne"]);
+    const buttons = Array.from(document.querySelectorAll("[data-theme-choice]"));
+
+    function currentTheme() {
+      const theme = root.dataset.theme;
+      return validThemes.has(theme) ? theme : "obsidian";
+    }
+
+    function syncButtons(theme) {
+      for (const button of buttons) {
+        const active = button.getAttribute("data-theme-choice") === theme;
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+      }
+    }
+
+    syncButtons(currentTheme());
+
+    for (const button of buttons) {
+      button.addEventListener("click", () => {
+        const nextTheme = button.getAttribute("data-theme-choice");
+        if (!nextTheme || !validThemes.has(nextTheme)) return;
+
+        root.dataset.theme = nextTheme;
+        syncButtons(nextTheme);
+
+        try {
+          localStorage.setItem(storageKey, nextTheme);
+        } catch {}
+      });
+    }
+  })();
+</script>
