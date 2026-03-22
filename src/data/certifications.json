@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-02T07:09:48.741595+00:00",
+  "generatedAt": "2026-03-22T06:59:13.4216610Z",
   "folders": [
     {
       "key": "productivity",
@@ -434,6 +434,15 @@
       "title": "ChatGPT",
       "mimeType": "application/pdf",
       "url": "https://drive.google.com/file/d/1SGsUWtkv3Uq6szRKvQIQIBpkJ9mgKfUr/view?usp=drivesdk"
+    },
+    {
+      "id": "1jRNolz3wKFeZY8RpAuLmRnmChiF90h33",
+      "folderKey": "productivity",
+      "folderId": "1FoLPpFMMTd4a58OWVCVZ_vkHkwXfZktL",
+      "fileName": "Curso de Claude Code.pdf",
+      "title": "Curso de Claude Code",
+      "mimeType": "application/pdf",
+      "url": "https://drive.google.com/file/d/1jRNolz3wKFeZY8RpAuLmRnmChiF90h33/view?usp=drivesdk"
     },
     {
       "id": "16PPC6BxBp1xi8OFRsbrxlrfkpVHtXAUa",
