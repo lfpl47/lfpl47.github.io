@@ -2,7 +2,6 @@
 import "../styles/global.css";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
-import ThemeSwitcher from "../components/ThemeSwitcher.astro";
 import { site } from "../config/site";
 import type { Locale } from "../i18n/locales";
 import { getLocaleFromPathname, withLocale } from "../i18n/routing";
@@ -27,7 +26,7 @@ const alternateEs = Astro.site ? new URL(withLocale(pathname, "es"), Astro.site)
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={locale} data-theme="nocturne">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -41,16 +40,12 @@ const alternateEs = Astro.site ? new URL(withLocale(pathname, "es"), Astro.site)
 
     <script is:inline>
       (() => {
-        const storageKey = "lfpl47-theme";
-        const fallbackTheme = "obsidian";
-        const validThemes = new Set(["obsidian", "reactor", "nocturne"]);
+        const defaultTheme = "nocturne";
+        document.documentElement.dataset.theme = defaultTheme;
 
         try {
-          const savedTheme = localStorage.getItem(storageKey);
-          document.documentElement.dataset.theme = validThemes.has(savedTheme) ? savedTheme : fallbackTheme;
-        } catch {
-          document.documentElement.dataset.theme = fallbackTheme;
-        }
+          localStorage.setItem("lfpl47-theme", defaultTheme);
+        } catch {}
       })();
     </script>
 
@@ -77,7 +72,6 @@ const alternateEs = Astro.site ? new URL(withLocale(pathname, "es"), Astro.site)
     <main id="main">
       <slot />
     </main>
-    <ThemeSwitcher />
     <SiteFooter />
   </body>
 </html>
