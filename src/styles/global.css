@@ -126,7 +126,7 @@
       rgba(255, 255, 255, 0.012) 89px
     );
   --font-body: "Instrument Sans", sans-serif;
-  --font-display: "Cormorant Garamond", serif;
+  --font-display: "Instrument Sans", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
   --radius-panel: 1.75rem;
   --shadow-soft: rgba(0, 0, 0, 0.34);
