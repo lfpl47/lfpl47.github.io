@@ -18,3 +18,7 @@ pnpm-debug.log*
 # OS / Editor
 .DS_Store
 .vscode/
+
+# Local agent/skill config
+.agents/
+.codex/
