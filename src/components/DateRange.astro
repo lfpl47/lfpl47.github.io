@@ -1,0 +1,24 @@
+---
+import type { Locale } from "../i18n/locales";
+import { t } from "../i18n/ui";
+import { formatMonthYear, toIsoMonth } from "../utils/dates";
+
+type Props = {
+  start: Date;
+  end?: Date;
+  locale: Locale;
+  precision?: "month" | "year";
+  /** Add "date-range--split" for ink start and --ink-3 end (ledger rows, entries). */
+  class?: string;
+};
+
+const { start, end, locale, precision = "month", class: className } = Astro.props;
+const byYear = precision === "year";
+const label = (d: Date) => (byYear ? String(d.getUTCFullYear()) : formatMonthYear(d, locale));
+const iso = (d: Date) => (byYear ? String(d.getUTCFullYear()) : toIsoMonth(d));
+const single = end !== undefined && iso(start) === iso(end);
+// Closed en dash between bare years; spaced when a side has a month or a word. The no-break space keeps the dash off a new line.
+const dash = byYear && end ? "–" : " – ";
+---
+
+<span class:list={["date-range tnum", className]}><time datetime={iso(start)}>{label(start)}</time>{!single && <Fragment>{dash}{end ? <time datetime={iso(end)}>{label(end)}</time> : t(locale, "present")}</Fragment>}</span>

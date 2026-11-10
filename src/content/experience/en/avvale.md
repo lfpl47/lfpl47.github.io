@@ -5,7 +5,7 @@ start: "2023-09-27"
 end: "2024-03-01"
 summary: "Consulting engagement focused on AWS event-driven data pipelines and IaC-driven delivery."
 stack:
-  cloud: ["AWS"]
+  cloud: ["AWS", "Azure"]
   data: ["Data Pipelines", "ETL"]
   streaming: ["Event-driven"]
   iac: ["Terraform"]

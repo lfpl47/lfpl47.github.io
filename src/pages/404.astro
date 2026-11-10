@@ -1,25 +1,60 @@
 ---
+// One neutral page for both languages: GitHub Pages serves this file for every missing path, EN or ES.
 import Container from "../components/Container.astro";
 import Layout from "../layouts/Layout.astro";
+import { site } from "../config/site";
+import { t } from "../i18n/ui";
+
+const copy = {
+  en: { title: "Page not found", text: "The address may have changed." },
+  es: { title: "Página no encontrada", text: "Puede que la dirección haya cambiado." },
+};
 ---
 
-<Layout title="Not found — lfpl47" noIndex={true}>
-  <section class="py-24">
-    <Container class="text-center">
-      <p class="text-sm font-semibold text-sky-300/90">404</p>
-      <h1 class="mt-4 text-3xl font-semibold tracking-tight text-slate-50">Page not found</h1>
-      <p class="mt-4 text-slate-300">
-        The page you’re looking for doesn’t exist (or moved).
-      </p>
-      <div class="mt-10">
-        <a
-          class="rounded-full bg-sky-500 px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-sky-400"
-          href="/"
-        >
-          Go home
-        </a>
+<Layout
+  title={`${copy.en.title} · ${copy.es.title} — ${site.shortName}`}
+  description={`${copy.en.text} ${copy.es.text}`}
+  locale="en"
+  noIndex
+  alternates={false}
+  languageSwitch={false}
+>
+  <Container>
+    <div class="not-found">
+      <h1 class="t-page"><span lang="en">{copy.en.title}</span> <span lang="es">{copy.es.title}</span></h1>
+      <div class="grid-12 rule-heavy not-found__body">
+        <div class="not-found__en">
+          <p class="t-lede">{copy.en.text}</p>
+          <ul class="t-ui not-found__links">
+            <li><a class="link" href="/">{t("en", "nav_home")}</a></li>
+            <li><a class="link" href="/experience/">{t("en", "nav_experience")}</a></li>
+          </ul>
+        </div>
+        <div class="not-found__es" lang="es">
+          <p class="t-lede">{copy.es.text}</p>
+          <ul class="t-ui not-found__links">
+            <li><a class="link" href="/es/">{t("es", "nav_home")}</a></li>
+            <li><a class="link" href="/es/experience/">{t("es", "nav_experience")}</a></li>
+          </ul>
+        </div>
       </div>
-    </Container>
-  </section>
+    </div>
+  </Container>
 </Layout>
 
+<style>
+  .not-found { container-type: inline-size; padding-top: var(--s-7); }
+  .not-found h1 span { display: block; }
+  /* Keeps the two titles apart when each wraps on phones. */
+  .not-found h1 span + span { margin-top: 0.12em; }
+  .not-found__body { row-gap: var(--s-7); margin-top: 20px; padding-top: var(--s-5); }
+  .not-found__links { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); margin-top: var(--s-4); }
+  .not-found__links a { display: inline-flex; align-items: center; min-height: 24px; font-weight: 500; }
+  @media (min-width: 768px) {
+    .not-found__en { grid-column: 1 / span 6; }
+    .not-found__es { grid-column: 7 / span 6; }
+  }
+  @media (max-width: 767px) {
+    .not-found { padding-top: var(--s-6); }
+  }
+</style>

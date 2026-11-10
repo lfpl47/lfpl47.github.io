@@ -5,7 +5,7 @@ start: "2023-09-27"
 end: "2024-03-01"
 summary: "Contrato de consultoría enfocado en pipelines de datos y arquitectura event-driven en AWS, con operación vía IaC."
 stack:
-  cloud: ["AWS"]
+  cloud: ["AWS", "Azure"]
   data: ["Pipelines de datos", "ETL"]
   streaming: ["Event-driven"]
   iac: ["Terraform"]

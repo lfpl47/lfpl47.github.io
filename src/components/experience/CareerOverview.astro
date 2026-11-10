@@ -1,0 +1,103 @@
+---
+// The staircase: one bar per role on a shared time axis, each company name set next to its bar.
+import type { Career } from "../../lib/getCareer";
+import type { Locale } from "../../i18n/locales";
+import { t, type UiKey } from "../../i18n/ui";
+import { formatDateRange, formatMonthYear } from "../../utils/dates";
+
+type Props = { career: Career; locale: Locale; caption: string };
+
+const { career, locale, caption } = Astro.props;
+const axis = career.axis!;
+const edge = (x: number) => (x < 0.04 ? "start" : x > 0.96 ? "end" : undefined);
+// Odd years are gridded and labelled only at desktop width.
+const odd = (year: number) => (year % 2 === 1 ? "" : undefined);
+---
+
+<figure class="tl xp-ov" data-draw="pending" style={`--today:${axis.today}`}>
+  <div class="tl-axis xp-ov__asof" aria-hidden="true">
+    <span class="tl-asof t-meta">{formatMonthYear(career.asOf, locale)}</span>
+    <i class="tl-today"></i>
+  </div>
+  <ol class="xp-ov__rows">
+    {
+      career.roles.map((r) => (
+        <li class="tl-row xp-ov__row" data-label={r.a >= 0.25 ? "before" : "after"} style={`--a:${r.a};--b:${r.b};--n:${r.company.length}`}>
+          <div class="tl-track xp-ov__track" aria-hidden="true">
+            {axis.years.map((y) => <i class="tl-gl" data-odd={odd(y.year)} style={`--x:${y.a}`}></i>)}
+            <i class="tl-bar" data-phase={r.phase}></i>
+            <i class="tl-today"></i>
+          </div>
+          <a class="link-quiet t-ui xp-ov__label" data-side={r.a >= 0.25 ? "before" : "after"} href={`#role-${r.slug}`}>
+            {r.company}<span class="sr-only">, {formatDateRange(r.start, r.end, locale)}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+  <div class="tl-axis xp-ov__axis" aria-hidden="true">
+    {
+      axis.years.map((y) => (
+        <span class="tl-tick t-meta" data-odd={odd(y.year)} data-edge={edge(y.a)} style={`--x:${y.a}`}>
+          {y.year}
+        </span>
+      ))
+    }
+  </div>
+  <figcaption class="xp-ov__caption">
+    <ul class="tl-legend t-meta">
+      {career.phases.map((p) => <li><span class="tl-swatch" data-phase={p.id}></span>{t(locale, `phase_${p.id}` as UiKey)}</li>)}
+    </ul>
+    <p class="t-meta xp-ov__note">{caption}</p>
+  </figcaption>
+</figure>
+
+<style>
+  .xp-ov { container-type: inline-size; }
+  .xp-ov__asof .tl-asof { padding-right: var(--s-2); }
+  .xp-ov__row { height: 32px; }
+  .xp-ov__track { position: absolute; inset: 0; }
+  /* The labels have no box, so the gridlines stop where the label is. --lw is the label box: 0.55em per character
+     is a little wider than every Archivo name here (0.45 to 0.53em), plus the padding. */
+  .xp-ov__row[data-label] .xp-ov__track {
+    --lw: calc(var(--n) * 0.55em + 2 * var(--s-1));
+    -webkit-mask-image: linear-gradient(to right, #000 var(--g0), transparent var(--g0), transparent var(--g1), #000 var(--g1));
+    mask-image: linear-gradient(to right, #000 var(--g0), transparent var(--g0), transparent var(--g1), #000 var(--g1));
+  }
+  .xp-ov__row[data-label="before"] .xp-ov__track { --g0: calc(var(--a) * 100% - 4px - var(--lw)); --g1: calc(var(--a) * 100% - 4px); }
+  .xp-ov__row[data-label="after"] .xp-ov__track { --g0: calc(var(--b) * 100% + 4px); --g1: calc(var(--b) * 100% + 4px + var(--lw)); }
+  .xp-ov .tl-bar { height: 12px; margin-top: -6px; }
+  .xp-ov__label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    padding-inline: var(--s-1);
+    white-space: nowrap;
+    transition: background-color var(--t-fast);
+  }
+  /* The 4px padding plus 4px of offset keep the text 8px from its bar. */
+  .xp-ov__label[data-side="before"] { right: calc((1 - var(--a)) * 100% + 4px); }
+  .xp-ov__label[data-side="after"] { left: calc(var(--b) * 100% + 4px); }
+  .xp-ov__row:is(:hover, :focus-within) .xp-ov__label { background: var(--plate); }
+  .xp-ov__axis { border-top: var(--rule-hair) solid var(--ink); padding-top: var(--s-1); }
+  .xp-ov__caption { margin-top: var(--s-5); }
+  .xp-ov__note { margin-top: var(--s-2); color: var(--ink-3); }
+
+  @media (max-width: 959px) {
+    .xp-ov [data-odd] { display: none; }
+  }
+  @media (max-width: 767px) {
+    .xp-ov__row { height: 28px; }
+  }
+  /* shortcut: 340px keeps the labels beside their bars on a 390px phone (351px plot). Each new axis year
+     narrows the room before «Teleperformance»: it fits through 2027 and crosses the plot edge in January 2028,
+     so raise this width (or derive it from the data) before then. */
+  @container (width < 340px) {
+    .xp-ov__row { height: auto; padding-bottom: 22px; }
+    /* Still positioned, so it paints above the gridlines of the track. */
+    .xp-ov__label[data-side] { position: relative; inset: auto; transform: none; display: inline-block; white-space: normal; }
+    .xp-ov .tl-bar { top: auto; bottom: 6px; margin-top: 0; }
+    /* shortcut: the label sits on its own line here, so the gridlines are not stopped and pass under it (only below 340px). */
+    .xp-ov__row[data-label] .xp-ov__track { -webkit-mask-image: none; mask-image: none; }
+  }
+</style>

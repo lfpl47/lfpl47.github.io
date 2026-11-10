@@ -1,0 +1,138 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Container from "../Container.astro";
+import PageHead from "../PageHead.astro";
+import SectionHead from "../SectionHead.astro";
+import DateRange from "../DateRange.astro";
+import FilterList from "../FilterList.astro";
+import { site } from "../../config/site";
+import { t, type UiKey } from "../../i18n/ui";
+import type { Locale } from "../../i18n/locales";
+import certifications from "../../data/certifications.json";
+import resumeEn from "../../data/resume.en.json";
+import resumeEs from "../../data/resume.es.json";
+
+type Props = { locale: Locale };
+const { locale } = Astro.props;
+
+const copy = {
+  en: {
+    title: "Education and courses",
+    description: "Formal education and {count} courses and certifications of Luis Felipe Peña, with search and filters by area.",
+    lede: "Formal education first, then {count} courses and certifications in {areas} areas. Each one opens its PDF in Google Drive.",
+    education: "Formal education",
+    courses: "Courses and certifications",
+    note: "Course titles are shown in the language of each certificate, mostly Spanish.",
+    searchLabel: "Search courses and certifications",
+    placeholder: "Title or area",
+    groupLabel: "Areas",
+    counter: "{n} of {total} courses and certifications",
+    noMatch: "No course or certification matches this search.",
+    drive: "Folders in Google Drive: {list}.",
+  },
+  es: {
+    title: "Formación y cursos",
+    description: "Formación académica y {count} cursos y certificaciones de Luis Felipe Peña, con búsqueda y filtros por área.",
+    lede: "Primero, la formación académica; después, {count} cursos y certificaciones en {areas} áreas. Cada uno abre su PDF en Google Drive.",
+    education: "Formación académica",
+    courses: "Cursos y certificaciones",
+    note: undefined,
+    searchLabel: "Buscar cursos y certificaciones",
+    placeholder: "Título o área",
+    groupLabel: "Áreas",
+    counter: "{n} de {total} cursos y certificaciones",
+    noMatch: "Ningún curso ni certificación coincide con esta búsqueda.",
+    drive: "Carpetas en Google Drive: {list}.",
+  },
+};
+const c = copy[locale];
+
+const items = certifications.items;
+const count = String(items.length);
+const area = (key: string) => t(locale, `cert_${key}` as UiKey);
+// Toggles and Drive folders share one order: most certificates first.
+const areas = certifications.folders
+  .map((f) => ({ id: f.key, label: area(f.key), url: f.url, count: items.filter((i) => i.folderKey === f.key).length }))
+  .sort((a, b) => b.count - a.count);
+const education = [...(locale === "es" ? resumeEs : resumeEn).education].sort((a, b) => Number(b.startDate) - Number(a.startDate));
+const jan1 = (year: string) => new Date(Date.UTC(Number(year), 0, 1));
+// Most titles are Spanish. shortcut: «AZURE DATA FUNDAMENTALS - DP-900» and «SCRUM CERTIFICATE» are English but get lang="es"; add a lang field to the sync output if this matters.
+const titleLang = locale === "en" ? "es" : undefined;
+const [driveBefore, driveAfter] = c.drive.split("{list}");
+---
+
+<Layout title={`${c.title} — ${site.shortName}`} description={c.description.replace("{count}", count)} locale={locale}>
+  <Container>
+    <PageHead title={c.title} lede={c.lede.replace("{count}", count).replace("{areas}", String(areas.length))} />
+
+    <section class="section" aria-labelledby="education">
+      <SectionHead id="education" title={c.education} />
+      <ol>
+        {
+          education.map((e) => (
+            <li class="edu-row">
+              <span class="t-ui t-ui--dense"><DateRange class="date-range--split" start={jan1(e.startDate)} end={jan1(e.endDate)} locale={locale} precision="year" /></span>
+              <div>
+                <p class="t-co">{e.area}</p>
+                <p class="t-ui edu-inst">{e.institution}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="section" aria-labelledby="courses">
+      <SectionHead id="courses" title={c.courses} note={c.note} />
+      <FilterList
+        mode="any"
+        searchId="search"
+        searchLabel={c.searchLabel}
+        searchPlaceholder={c.placeholder}
+        groupLabel={c.groupLabel}
+        options={areas}
+        counterTemplate={c.counter}
+        total={items.length}
+        clearLabel={t(locale, "filter_clear")}
+        emptyText={c.noMatch}
+      >
+        <ul class="cert-list">
+          {
+            items.map((i) => (
+              <li data-filter-item data-tags={i.folderKey} data-text={`${i.title} ${area(i.folderKey)}`.toLowerCase()}>
+                <a class="link-quiet t-ui" href={i.url} target="_blank" rel="noreferrer"><span lang={titleLang}>{i.title}</span><span class="sr-only"> {t(locale, "pdf_new_tab")}</span></a>
+                <span class="t-meta cert-area">{area(i.folderKey)}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </FilterList>
+      <p class="t-body drive">
+        {driveBefore}{areas.map((a, n) => <Fragment>{n > 0 && ", "}<a class="link" href={a.url} target="_blank" rel="noreferrer">{a.label}<span class="sr-only"> {t(locale, "new_tab")}</span></a></Fragment>)}{driveAfter}
+      </p>
+    </section>
+  </Container>
+</Layout>
+
+<style>
+  .edu-row {
+    display: grid;
+    grid-template-columns: var(--date-col) minmax(0, 1fr);
+    column-gap: var(--gutter);
+    align-items: baseline;
+    padding-block: 14px;
+    border-top: var(--rule-hair) solid var(--rule);
+  }
+  .edu-inst { color: var(--ink-2); }
+  .cert-list { display: grid; column-gap: var(--gutter); }
+  .cert-list li { padding-block: var(--s-3); border-top: var(--rule-hair) solid var(--rule); }
+  .cert-list a { font-weight: 500; }
+  .cert-area { display: block; margin-top: 2px; color: var(--ink-3); }
+  .drive { margin-top: var(--s-6); color: var(--ink-2); }
+  @media (min-width: 960px) {
+    .cert-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 767px) {
+    .edu-row { grid-template-columns: minmax(0, 1fr); row-gap: var(--s-1); }
+  }
+</style>

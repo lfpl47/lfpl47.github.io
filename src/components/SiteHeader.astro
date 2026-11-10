@@ -1,235 +1,172 @@
 ---
+import { getCollection } from "astro:content";
 import Container from "./Container.astro";
 import { site } from "../config/site";
-import { getLocaleFromPathname, otherLocale, withLocale } from "../i18n/routing";
+import { isSlugForLocale } from "../i18n/content";
+import type { Locale } from "../i18n/locales";
+import { otherLocale, withLocale } from "../i18n/routing";
 import { t } from "../i18n/ui";
 
-const pathname = Astro.url.pathname;
-const locale = getLocaleFromPathname(pathname);
-const targetLocale = otherLocale(locale);
-const toggleHref = withLocale(pathname, targetLocale);
+type Props = { locale: Locale; languageSwitch: boolean };
+
+const { locale, languageSwitch } = Astro.props;
+const raw = Astro.url.pathname;
+const pathname = raw.endsWith("/") ? raw : `${raw}/`;
+const other = otherLocale(locale);
+
+// Projects stays out of the nav until the collection has an entry in this language.
+const hasProjects = (await getCollection("projects")).some((p) => isSlugForLocale(p.slug, locale));
 
 const homeHref = withLocale("/", locale);
 const nav = [
-  { href: homeHref, label: t(locale, "home") },
-  { href: withLocale("/experience/", locale), label: t(locale, "experience") },
-  { href: withLocale("/projects/", locale), label: t(locale, "projects") },
-  { href: withLocale("/training/", locale), label: t(locale, "training") },
-  { href: withLocale("/cv/", locale), label: t(locale, "cv") },
+  { href: homeHref, label: t(locale, "nav_home") },
+  { href: withLocale("/experience/", locale), label: t(locale, "nav_experience") },
+  ...(hasProjects ? [{ href: withLocale("/projects/", locale), label: t(locale, "nav_projects") }] : []),
+  { href: withLocale("/training/", locale), label: t(locale, "nav_training") },
+  { href: withLocale("/cv/", locale), label: t(locale, "nav_cv") },
 ];
-
-function isActive(href: string) {
-  if (href === homeHref) return pathname === homeHref;
-  return pathname.startsWith(href);
-}
+const current = (href: string) =>
+  (href === homeHref ? pathname === homeHref : pathname.startsWith(href)) ? "page" : undefined;
+const profiles = [
+  { href: site.links.github, label: t(locale, "github") },
+  { href: site.links.linkedin, label: t(locale, "linkedin") },
+];
+// Day or night view: rendered in the desktop row and in the menu; the script shows it and keeps both in step.
+const schemes = [
+  { value: "light", label: t(locale, "view_day") },
+  { value: "dark", label: t(locale, "view_night") },
+];
 ---
 
-<header class="sticky top-0 z-50 border-b border-slate-800/60 bg-slate-950/70 backdrop-blur">
-  <Container class="flex h-16 items-center justify-between gap-4">
-    <a class="flex items-center gap-2 font-semibold tracking-tight text-slate-100 hover:text-white" href={homeHref}>
-      <img
-        src={site.avatar.src}
-        alt={site.avatar.alt[locale]}
-        width="32"
-        height="32"
-        loading="eager"
-        decoding="async"
-        class="h-8 w-8 rounded-full border border-slate-800 object-cover"
-      />
-      <span>{site.handle}</span>
-    </a>
-
-    <nav class="hidden items-center gap-1 sm:flex" aria-label="Primary">
+<header class="site-header">
+  <Container class="site-header__row">
+    <a class="wordmark" href={homeHref}>{site.shortName}</a>
+    <nav class="site-nav" aria-label={t(locale, "nav_label")}>
+      {nav.map((item) => <a href={item.href} aria-current={current(item.href)}>{item.label}</a>)}
+    </nav>
+    <div class="site-aux">
       {
-        nav.map((item) => (
-          <a
-            class:list={[
-              "rounded-full px-3 py-1.5 text-sm font-medium transition",
-              isActive(item.href)
-                ? "bg-slate-900 text-white"
-                : "text-slate-300 hover:bg-slate-900/60 hover:text-white",
-            ]}
-            href={item.href}
-          >
-            {item.label}
+        languageSwitch && (
+          <a href={withLocale(raw, other)} lang={other} hreflang={other}>
+            {t(locale, other === "es" ? "lang_es" : "lang_en")}
+          </a>
+        )
+      }
+      {
+        profiles.map((p) => (
+          <a class="site-aux__ext" href={p.href} target="_blank" rel="noreferrer">
+            {p.label}<span class="sr-only"> {t(locale, "new_tab")}</span>
           </a>
         ))
       }
-    </nav>
-
-    <div class="hidden items-center gap-2 sm:flex">
-      <a
-        class="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/40 px-3 py-1.5 text-sm font-semibold text-slate-100 hover:bg-slate-900"
-        href={site.links.github}
-        target="_blank"
-        rel="noreferrer"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="h-4 w-4"
-          aria-hidden="true"
-        >
-          <path d="M9 19c-5 1.5-5-2.5-7-3" />
-          <path d="M16 22v-3.87a3.37 3.37 0 0 0-.94-2.61" />
-          <path d="M9 22v-4.5a3.5 3.5 0 0 1 1-2.5c-3.14-.35-6.44-1.54-6.44-7A5.44 5.44 0 0 1 5 4.77 5.07 5.07 0 0 1 5.09 1S6.27.65 9 2.48a13.38 13.38 0 0 1 7 0C18.73.65 19.91 1 19.91 1A5.07 5.07 0 0 1 20 4.77a5.44 5.44 0 0 1 1.5 3.78c0 5.42-3.3 6.61-6.44 7A3.37 3.37 0 0 1 16 18.13V22" />
-        </svg>
-        {t(locale, "github")}
-      </a>
-      {
-        site.links.linkedin ? (
-          <a
-            class="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/40 px-3 py-1.5 text-sm font-semibold text-slate-100 hover:bg-slate-900"
-            href={site.links.linkedin}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="h-4 w-4"
-              aria-hidden="true"
-            >
-              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-              <rect x="2" y="9" width="4" height="12" />
-              <circle cx="4" cy="4" r="2" />
-            </svg>
-            {t(locale, "linkedin")}
-          </a>
-        ) : null
-      }
-      <a
-        class="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/40 px-3 py-1.5 text-sm font-semibold text-slate-100 hover:bg-slate-900"
-        href={toggleHref}
-        aria-label={`${t(locale, "language")}: ${targetLocale === "es" ? t(locale, "language_es") : t(locale, "language_en")}`}
-        lang={targetLocale}
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="h-4 w-4"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <path d="M2 12h20" />
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z" />
-        </svg>
-        {targetLocale.toUpperCase()}
-      </a>
+      <div class="view" role="group" aria-label={t(locale, "view_label")} data-view hidden>
+        {schemes.map((s) => <button type="button" name="scheme" value={s.value} aria-pressed="false">{s.label}</button>)}
+        <button type="button" name="motion" aria-pressed="false">{t(locale, "bg_pause")}</button>
+      </div>
     </div>
-
-    <details class="relative sm:hidden">
-      <summary class="list-none rounded-full border border-slate-800 bg-slate-900/40 px-3 py-1.5 text-sm font-semibold text-slate-100 hover:bg-slate-900">
-        {t(locale, "menu")}
-      </summary>
-      <div class="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-xl">
-        <nav class="flex flex-col p-2" aria-label="Mobile">
+    <details class="menu" data-menu>
+      <summary>{t(locale, "menu")}</summary>
+      <div class="menu__panel">
+        <nav class="menu__nav" aria-label={t(locale, "nav_label")}>
+          {nav.map((item) => <a href={item.href} aria-current={current(item.href)}>{item.label}</a>)}
+        </nav>
+        <div class="menu__ext">
           {
-            nav.map((item) => (
-              <a
-                class:list={[
-                  "rounded-xl px-3 py-2 text-sm font-medium",
-                  isActive(item.href)
-                    ? "bg-slate-900 text-white"
-                    : "text-slate-300 hover:bg-slate-900/60 hover:text-white",
-                ]}
-                href={item.href}
-              >
-                {item.label}
+            profiles.map((p) => (
+              <a href={p.href} target="_blank" rel="noreferrer">
+                {p.label}<span class="sr-only"> {t(locale, "new_tab")}</span>
               </a>
             ))
           }
-          <div class="my-2 h-px bg-slate-800/80" />
-          <a
-            class="rounded-xl px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-900/60 hover:text-white"
-            href={site.links.github}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <span class="inline-flex items-center gap-2">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="h-4 w-4"
-                aria-hidden="true"
-              >
-                <path d="M9 19c-5 1.5-5-2.5-7-3" />
-                <path d="M16 22v-3.87a3.37 3.37 0 0 0-.94-2.61" />
-                <path d="M9 22v-4.5a3.5 3.5 0 0 1 1-2.5c-3.14-.35-6.44-1.54-6.44-7A5.44 5.44 0 0 1 5 4.77 5.07 5.07 0 0 1 5.09 1S6.27.65 9 2.48a13.38 13.38 0 0 1 7 0C18.73.65 19.91 1 19.91 1A5.07 5.07 0 0 1 20 4.77a5.44 5.44 0 0 1 1.5 3.78c0 5.42-3.3 6.61-6.44 7A3.37 3.37 0 0 1 16 18.13V22" />
-              </svg>
-              {t(locale, "github")}
-            </span>
-          </a>
-          {
-            site.links.linkedin ? (
-              <a
-                class="rounded-xl px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-900/60 hover:text-white"
-                href={site.links.linkedin}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span class="inline-flex items-center gap-2">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="h-4 w-4"
-                    aria-hidden="true"
-                  >
-                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                    <rect x="2" y="9" width="4" height="12" />
-                    <circle cx="4" cy="4" r="2" />
-                  </svg>
-                  {t(locale, "linkedin")}
-                </span>
-              </a>
-            ) : null
-          }
-          <a
-            class="rounded-xl px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-900/60 hover:text-white"
-            href={toggleHref}
-            lang={targetLocale}
-          >
-            <span class="inline-flex items-center gap-2">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="h-4 w-4"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M2 12h20" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z" />
-              </svg>
-              {t(locale, "language")}:{" "}
-              {targetLocale === "es" ? t(locale, "language_es") : t(locale, "language_en")}
-            </span>
-          </a>
-        </nav>
+        </div>
+        <div class="view" role="group" aria-label={t(locale, "view_label")} data-view hidden>
+          {schemes.map((s) => <button type="button" name="scheme" value={s.value} aria-pressed="false">{s.label}</button>)}
+          <button type="button" name="motion" aria-pressed="false">{t(locale, "bg_pause")}</button>
+        </div>
       </div>
     </details>
   </Container>
 </header>
+<script is:inline>
+  (() => {
+    const menu = document.querySelector("[data-menu]");
+    if (!menu) return;
+    const summary = menu.querySelector("summary");
+    const close = (refocus) => { if (!menu.open) return; menu.open = false; if (refocus) summary.focus(); };
+    menu.addEventListener("keydown", (e) => { if (e.key === "Escape") close(true); });
+    menu.addEventListener("focusout", (e) => { if (!menu.contains(e.relatedTarget)) close(false); });
+    document.addEventListener("click", (e) => { if (!menu.contains(e.target)) close(false); });
+    for (const a of menu.querySelectorAll("a")) a.addEventListener("click", () => close(false));
+  })();
+</script>
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    const key = "lfpl47-scheme";
+    const system = matchMedia("(prefers-color-scheme: dark)");
+    // Only the scheme buttons: a later button in the same group (the background pause) keeps its own state.
+    const buttons = document.querySelectorAll('[data-view] [name="scheme"]');
+    // Pressed = the scheme in effect: the visitor's choice, else the system setting.
+    const sync = () => {
+      const scheme = root.dataset.theme || (system.matches ? "dark" : "light");
+      for (const b of buttons) b.setAttribute("aria-pressed", String(b.value === scheme));
+      if (root.dataset.theme) for (const m of document.querySelectorAll("meta[data-scheme]")) m.media = m.dataset.scheme === scheme ? "all" : "not all";
+    };
+    // Holds color transitions for two frames (global.css), so the switch is the cross-fade or instant.
+    const hold = () => {
+      root.dataset.switching = "";
+      requestAnimationFrame(() => requestAnimationFrame(() => delete root.dataset.switching));
+    };
+    const choose = (scheme) => {
+      hold();
+      root.dataset.theme = scheme;
+      try { localStorage.setItem(key, scheme); } catch {}
+      sync();
+    };
+    for (const b of buttons) {
+      b.addEventListener("click", () => {
+        const fade = b.getAttribute("aria-pressed") === "false" && document.startViewTransition && matchMedia("(prefers-reduced-motion: no-preference)").matches;
+        if (fade) document.startViewTransition(() => choose(b.value));
+        else choose(b.value);
+      });
+    }
+    // A system switch is instant too; with a stored choice the scheme does not change, so there is nothing to hold.
+    system.addEventListener("change", () => { if (!root.dataset.theme) hold(); sync(); });
+    // A page restored from the back-forward cache keeps the scheme it was left with; take the stored one.
+    addEventListener("pageshow", (e) => {
+      if (!e.persisted) return;
+      try {
+        const stored = localStorage.getItem(key);
+        if ((stored === "light" || stored === "dark") && stored !== root.dataset.theme) { hold(); root.dataset.theme = stored; }
+      } catch {}
+      sync();
+    });
+    sync();
+    for (const g of document.querySelectorAll("[data-view]")) g.hidden = false;
+  })();
+</script>
+<script is:inline>
+  (() => {
+    // Background pause (public/site-bg.js): one fixed label, pressed = paused (WAI-ARIA APG: a toggle's label does not
+    // change), stored in lfpl47-motion. global.css hides the button where the city does not move (reduced motion, forced
+    // colors, more contrast, print).
+    const key = "lfpl47-motion";
+    const buttons = document.querySelectorAll('[data-view] [name="motion"]');
+    const stored = () => { try { return localStorage.getItem(key) === "paused"; } catch { return false; } };
+    // site-bg.js is deferred: on the first call it is not there yet, and it reads the stored state itself.
+    const apply = (paused) => {
+      if (paused) window.siteBg?.pause(); else window.siteBg?.play();
+      for (const b of buttons) b.setAttribute("aria-pressed", String(paused));
+    };
+    for (const b of buttons) {
+      b.addEventListener("click", () => {
+        const paused = b.getAttribute("aria-pressed") === "false";
+        try { if (paused) localStorage.setItem(key, "paused"); else localStorage.removeItem(key); } catch {}
+        apply(paused);
+      });
+    }
+    // A page restored from the back-forward cache keeps its old loop state; take the stored one.
+    addEventListener("pageshow", (e) => { if (e.persisted) apply(stored()); });
+    apply(stored());
+  })();
+</script>

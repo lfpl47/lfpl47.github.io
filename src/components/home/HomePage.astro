@@ -1,0 +1,522 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Container from "../Container.astro";
+import SectionHead from "../SectionHead.astro";
+import ProjectCard from "../ProjectCard.astro";
+import CareerLedger from "./CareerLedger.astro";
+import Icon from "../icons/Icon.astro";
+import ArchitectureExplorer from "./ArchitectureExplorer.astro";
+import certifications from "../../data/certifications.json";
+import resumeEn from "../../data/resume.en.json";
+import resumeEs from "../../data/resume.es.json";
+import { site } from "../../config/site";
+import { getCareer } from "../../lib/getCareer";
+import { isSlugForLocale, stripLocaleFromSlug } from "../../i18n/content";
+import type { Locale } from "../../i18n/locales";
+import { otherLocale, withLocale } from "../../i18n/routing";
+import { t, type UiKey } from "../../i18n/ui";
+import { formatMonthYear, formatYearRange } from "../../utils/dates";
+
+type Props = { locale: Locale };
+const { locale } = Astro.props;
+const other = otherLocale(locale);
+
+const copy = {
+  en: {
+    statement: "I build apps, data pipelines and cloud architectures on GCP, AWS and Azure.",
+    subline:
+      "I have worked in data engineering and software engineering since {deYear}, and with SQL, reporting and data analysis since {firstYear}. My background is in software engineering.",
+    currentRole: "Current role",
+    currentValue: "{company}, since {date}",
+    basedIn: "Based in",
+    timeZone: "Time zone",
+    languages: "Languages",
+    education: "Education",
+    xpTitle: "Experience",
+    xpNote: "Every role since {firstMonthLong}, newest first. Bars are drawn to scale.",
+    xpLink: "Experience in detail",
+    ledger: {
+      dates: "Dates",
+      job: "Company, role and stack",
+      caption:
+        "Data as of {asOf}; the vertical line marks that date. Education is drawn by year. Each role opens its own page.",
+    },
+    workTitle: "What I work on",
+    work: [
+      {
+        head: "Data pipelines and ETL/ELT",
+        text: "Pipelines for structured and unstructured data and ETL/ELT processes on GCP, AWS and Azure, and data lakes on GCP.",
+      },
+      {
+        head: "Apps and APIs",
+        text: "Backend applications, both REST APIs and monoliths, serverless functions on AWS Lambda, and web development with JavaScript, HTML and CSS.",
+      },
+      {
+        head: "Cloud architecture",
+        text: "Analysis, implementation and improvement of cloud architectures on GCP, AWS and Azure.",
+      },
+      {
+        head: "Cost optimization",
+        text: "Shorter load times and lower compute costs, with partitioning, compression and serverless designs.",
+      },
+      {
+        head: "Data modeling",
+        text: "Data models designed from business requirements, for analytics and big data architectures.",
+      },
+      {
+        head: "Database modeling",
+        text: "Database design from business requirements, and SQL in Oracle, PostgreSQL, SQL Server and MySQL.",
+      },
+      {
+        head: "Event-driven architectures",
+        text: "Python, SQL and PL/SQL pipelines with AWS Lambda, SQS and SNS, deployed with Terraform and Git and monitored with CloudWatch.",
+      },
+      {
+        head: "Infrastructure as code",
+        text: "Cloud infrastructure and jobs defined with Terraform, versioned in Git and delivered in Scrum teams.",
+      },
+      {
+        head: "Business analysis and requirements",
+        text: "Business analysis to turn requirements into databases, data models, pipelines and reports, with the KPIs each team tracks.",
+      },
+      {
+        head: "Reports, BI and automation",
+        text: "Dashboards in Power BI, reports and forecasting in Excel and VBA, and process automation (RPA) with Python.",
+      },
+    ],
+    archTitle: "Architectures",
+    archLede: "Common patterns for data platforms and applications, drawn with the equivalent services on GCP, AWS and Azure.",
+    archNote: "Illustrative schemes; they do not represent client systems.",
+    projectsTitle: "Projects",
+    projectsLink: "All projects",
+    coursesTitle: "Courses and certifications",
+    coursesText:
+      "{count} courses and certifications in {areas} areas, besides the formal education above. Each one opens its PDF in Google Drive.",
+    coursesLink: "Browse all courses and certifications",
+    contactTitle: "Contact",
+    profiles: "Profiles",
+    cvAsPdf: "CV as PDF",
+    cvLang: { en: "English", es: "Spanish" },
+  },
+  es: {
+    statement: "Construyo aplicaciones, pipelines de datos y arquitecturas de nube en GCP, AWS y Azure.",
+    subline:
+      "Trabajo en ingeniería de datos e ingeniería de software desde {deYear}, y con SQL, reportes y análisis de datos desde {firstYear}. Mi formación es en Ingeniería de Software.",
+    currentRole: "Cargo actual",
+    currentValue: "{company}, desde {date}",
+    basedIn: "Ubicación",
+    timeZone: "Zona horaria",
+    languages: "Idiomas",
+    education: "Formación",
+    xpTitle: "Experiencia",
+    xpNote: "Todos mis cargos desde {firstMonthLong}, del más reciente al más antiguo. Las barras están a escala.",
+    xpLink: "Experiencia en detalle",
+    ledger: {
+      dates: "Fechas",
+      job: "Empresa, cargo y tecnologías",
+      caption:
+        "Datos a {asOf}; la línea vertical marca esa fecha. La formación se dibuja por año. Cada cargo abre su propia página.",
+    },
+    workTitle: "En qué trabajo",
+    work: [
+      {
+        head: "Pipelines de datos y ETL/ELT",
+        text: "Pipelines para datos estructurados y no estructurados y procesos ETL/ELT en GCP, AWS y Azure, y data lakes en GCP.",
+      },
+      {
+        head: "Aplicaciones y API",
+        text: "Aplicaciones backend, tanto API REST como monolitos, funciones serverless en AWS Lambda y desarrollo web con JavaScript, HTML y CSS.",
+      },
+      {
+        head: "Arquitectura de nube",
+        text: "Análisis, implementación y mejora de arquitecturas de nube en GCP, AWS y Azure.",
+      },
+      {
+        head: "Optimización de costos",
+        text: "Tiempos de carga más cortos y menores costos de cómputo, con particionado, compresión y diseños serverless.",
+      },
+      {
+        head: "Modelado de datos",
+        text: "Modelos de datos diseñados a partir de los requerimientos del negocio, para analítica y arquitecturas de big data.",
+      },
+      {
+        head: "Modelado de bases de datos",
+        text: "Diseño de bases de datos a partir de los requerimientos del negocio, y SQL en Oracle, PostgreSQL, SQL Server y MySQL.",
+      },
+      {
+        head: "Arquitecturas basadas en eventos",
+        text: "Pipelines en Python, SQL y PL/SQL con AWS Lambda, SQS y SNS, desplegados con Terraform y Git y monitoreados con CloudWatch.",
+      },
+      {
+        head: "Infraestructura como código",
+        text: "Infraestructura y jobs en la nube definidos con Terraform, versionados en Git y entregados en equipos Scrum.",
+      },
+      {
+        head: "Análisis de negocio y requerimientos",
+        text: "Análisis de negocio para convertir requerimientos en bases de datos, modelos de datos, pipelines y reportes, con los KPI que sigue cada equipo.",
+      },
+      {
+        head: "Reportes, BI y automatización",
+        text: "Dashboards en Power BI, reportes y forecasting en Excel y VBA, y automatización de procesos (RPA) con Python.",
+      },
+    ],
+    archTitle: "Arquitecturas",
+    archLede: "Patrones comunes de plataformas de datos y aplicaciones, dibujados con los servicios equivalentes de GCP, AWS y Azure.",
+    archNote: "Esquemas ilustrativos; no representan sistemas de clientes.",
+    projectsTitle: "Proyectos",
+    projectsLink: "Todos los proyectos",
+    coursesTitle: "Cursos y certificaciones",
+    coursesText:
+      "{count} cursos y certificaciones en {areas} áreas, además de la formación académica de arriba. Cada uno abre su PDF en Google Drive.",
+    coursesLink: "Ver todos los cursos y certificaciones",
+    contactTitle: "Contacto",
+    profiles: "Perfiles",
+    cvAsPdf: "CV en PDF",
+    cvLang: { es: "español", en: "inglés" },
+  },
+}[locale];
+
+// shortcut: icons follow the order of copy.work (the same in both languages); move an icon with its item.
+const workIcons = ["pipeline", "apps", "cloud", "cost", "data-model", "database", "events", "iac", "requirements", "reports"];
+if (workIcons.length !== copy.work.length) throw new Error("HomePage: one icon per «What I work on» item");
+
+const fill = (text: string, vars: Record<string, string | number>) =>
+  text.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
+
+const career = await getCareer(locale);
+const firstStart = career.firstStart!;
+const deStart = career.phases.find((p) => p.id === "engineering")!.start;
+const current = career.current;
+const latest = career.education[0];
+
+const resume = locale === "es" ? resumeEs : resumeEn;
+// The Spanish list reads «Español, inglés (B2)»: names after the first are common nouns.
+const languages = resume.languages
+  .map((l, i) => `${locale === "es" && i > 0 ? l.name.toLowerCase() : l.name}${l.level ? ` (${l.level})` : ""}`)
+  .join(", ");
+
+const courseAreas = certifications.folders
+  .map((f) => ({
+    label: t(locale, `cert_${f.key}` as UiKey),
+    count: certifications.items.filter((i) => i.folderKey === f.key).length,
+  }))
+  .sort((a, b) => b.count - a.count);
+
+const projects = (await getCollection("projects"))
+  .filter((p) => isSlugForLocale(p.slug, locale))
+  .sort(
+    (a, b) =>
+      Number(b.data.featured ?? false) - Number(a.data.featured ?? false) ||
+      b.data.date.valueOf() - a.data.date.valueOf(),
+  )
+  .slice(0, 3);
+
+const email = site.links.email.replace("mailto:", "");
+const newTab = t(locale, "new_tab");
+const profiles = [
+  { href: site.links.linkedin, label: t(locale, "linkedin") },
+  { href: site.links.github, label: t(locale, "github") },
+];
+---
+
+<Layout title={site.titles[locale]} description={site.descriptions[locale]} locale={locale}>
+  <Container>
+    <header class="mast">
+      <h1 class="t-display">{site.shortName}</h1>
+      <div class="rule-heavy rule-draw mast__rule" aria-hidden="true"></div>
+      <div class="mast__body">
+        <div class="mast__id">
+          <p class="t-roleline mast__role">{site.roles[locale]}</p>
+          <dl class="particulars mast__parts">
+            {
+              current && (
+                <div>
+                  <dt>{copy.currentRole}</dt>
+                  <dd class="tnum">
+                    {fill(copy.currentValue, { company: current.company, date: formatMonthYear(current.start, locale) })}
+                  </dd>
+                </div>
+              )
+            }
+            <div class="mast__pair"><dt>{copy.basedIn}</dt><dd>{site.location}</dd></div>
+            <div class="mast__pair"><dt>{copy.timeZone}</dt><dd>{site.timeZone}</dd></div>
+            <div><dt>{copy.languages}</dt><dd>{languages}</dd></div>
+            {
+              latest && (
+                <div>
+                  <dt>{copy.education}</dt>
+                  <dd class="tnum">{latest.area}, {latest.institution}, <span class="nobr">{formatYearRange(latest.startYear, latest.endYear, locale)}</span></dd>
+                </div>
+              )
+            }
+          </dl>
+        </div>
+        <div class="mast__main">
+          <p class="t-statement">{copy.statement}</p>
+          <p class="t-body mast__sub">
+            {fill(copy.subline, { deYear: deStart.getUTCFullYear(), firstYear: firstStart.getUTCFullYear() })}
+          </p>
+          <div class="mast__actions">
+            <a class="btn" href={site.cvPdf[locale]} type="application/pdf" hreflang={locale}>{t(locale, "cv_download")}</a>
+            <a class="link t-ui" href={site.cvPdf[other]} type="application/pdf" hreflang={other}>{t(locale, "cv_other_version")}</a>
+            <a class="link t-ui" href={site.links.email}>{email}</a>
+          </div>
+        </div>
+        <img
+          class="mast__photo"
+          src={site.avatar.src}
+          width="720"
+          height="720"
+          alt={site.avatar.alt[locale]}
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+    </header>
+
+    {
+      career.axis && (
+        <section class="section" aria-labelledby="experience">
+          <SectionHead
+            id="experience"
+            title={copy.xpTitle}
+            note={fill(copy.xpNote, { firstMonthLong: formatMonthYear(firstStart, locale, "long") })}
+            link={{ href: withLocale("/experience/", locale), label: copy.xpLink }}
+          />
+          <CareerLedger locale={locale} career={career} labels={copy.ledger} />
+        </section>
+      )
+    }
+
+    <section class="section rule-section work" aria-labelledby="work">
+      <h2 class="t-h2 work__title" id="work">{copy.workTitle}</h2>
+      <ul class="work__blocks">
+        {
+          copy.work.map((block, i) => (
+            <li class="work__block">
+              <h3 class="t-h3 work__head"><Icon name={workIcons[i]} class="work__icon" /><span>{block.head}</span></h3>
+              <p class="t-body work__text">{block.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <ArchitectureExplorer locale={locale} title={copy.archTitle} lede={copy.archLede} note={copy.archNote} />
+
+    {
+      projects.length > 0 && (
+        <section class="section" aria-labelledby="projects">
+          <SectionHead
+            id="projects"
+            title={copy.projectsTitle}
+            link={{ href: withLocale("/projects/", locale), label: copy.projectsLink }}
+          />
+          <ul>
+            {projects.map((p) => (
+              <li>
+                <ProjectCard
+                  href={withLocale(`/projects/${stripLocaleFromSlug(p.slug, locale)}/`, locale)}
+                  title={p.data.title}
+                  date={p.data.date}
+                  locale={locale}
+                  type={p.data.type}
+                  status={p.data.status}
+                  highlights={p.data.highlights}
+                  stack={p.data.stack}
+                  headingLevel={3}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <div class="section duo">
+      <section class="rule-section" aria-labelledby="courses">
+        <h2 class="t-h2" id="courses">{copy.coursesTitle}</h2>
+        <p class="t-body duo__text">
+          {fill(copy.coursesText, { count: certifications.items.length, areas: courseAreas.length })}
+        </p>
+        <ul class="courses t-ui">
+          {
+            courseAreas.map((a) => (
+              <li>
+                <span>{a.label}</span>
+                <span class="courses__leader" aria-hidden="true" />
+                <span class="tnum">{a.count}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <a class="link t-ui duo__link" href={withLocale("/training/", locale)}>{copy.coursesLink}</a>
+      </section>
+      <section class="rule-section" aria-labelledby="contact">
+        <h2 class="t-h2" id="contact">{copy.contactTitle}</h2>
+        <a class="link-quiet contact__email" href={site.links.email}>{email}</a>
+        <dl class="particulars contact__list">
+          <div>
+            <dt>{copy.profiles}</dt>
+            <dd>{profiles.map((p, i) => <Fragment>{i > 0 && ", "}<a class="link" href={p.href} target="_blank" rel="noreferrer">{p.label}<span class="sr-only"> {newTab}</span></a></Fragment>)}</dd>
+          </div>
+          <div>
+            <dt>{copy.cvAsPdf}</dt>
+            <dd>{[locale, other].map((l, i) => <Fragment>{i > 0 && ", "}<a class="link" href={site.cvPdf[l]} type="application/pdf" hreflang={l}>{copy.cvLang[l]}</a></Fragment>)}</dd>
+          </div>
+          <div><dt>{copy.basedIn}</dt><dd>{site.location} ({site.timeZone})</dd></div>
+        </dl>
+      </section>
+    </div>
+  </Container>
+</Layout>
+
+<style>
+  .mast { container-type: inline-size; padding-top: var(--s-6); }
+  .mast__rule { margin-top: 20px; }
+  .mast__body { margin-top: var(--s-5); }
+  .mast__parts { margin-top: var(--s-4); }
+  .mast__sub { margin-top: var(--s-4); max-width: var(--measure); color: var(--ink-2); }
+  .mast__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-5);
+    margin-top: var(--s-5);
+  }
+  /* 44 px hit area for the text links next to the button. */
+  .mast__actions .link { display: inline-flex; align-items: center; min-height: 44px; }
+  .mast__photo { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 25%; }
+  /* A closed year range («2018–2021») must not break at its dash. */
+  .nobr { white-space: nowrap; }
+
+  @media (min-width: 960px) {
+    .mast__body {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--gutter);
+      align-items: start;
+    }
+    .mast__id { grid-column: 1 / span 3; }
+    .mast__main { grid-column: 4 / span 6; }
+    .mast__photo { grid-column: 10 / span 3; }
+  }
+  @media (min-width: 768px) and (max-width: 959px) {
+    .mast__body {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-template-rows: auto 1fr auto;
+      column-gap: var(--gutter);
+    }
+    .mast__id { display: contents; }
+    .mast__role { grid-column: 1 / span 7; grid-row: 1; }
+    .mast__main { grid-column: 1 / span 7; grid-row: 2; margin-top: var(--s-4); }
+    .mast__photo { grid-column: 8 / span 5; grid-row: 1 / span 2; }
+    .mast__parts {
+      grid-column: 1 / -1;
+      grid-row: 3;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--gutter);
+      margin-top: var(--s-6);
+    }
+  }
+  /* The phone band is set tighter so the CV button stays in the first screen at 390 × 844 (measured: it ends at 836 px in ES, 802 px in EN). */
+  @media (max-width: 767px) {
+    .mast { padding-top: var(--s-5); }
+    .mast__rule { margin-top: var(--s-4); }
+    .mast__body {
+      display: grid;
+      grid-template-columns: 104px minmax(0, 1fr);
+      column-gap: var(--s-4);
+      margin-top: var(--s-3);
+    }
+    .mast__photo { grid-column: 1; grid-row: 1; }
+    .mast__id { grid-column: 2; grid-row: 1; }
+    /* Based in and Time zone share a row when both fit. */
+    .mast__parts { display: flex; flex-wrap: wrap; column-gap: var(--s-3); margin-top: var(--s-2); }
+    .mast__parts > div { flex: 1 1 100%; padding-block: 3px; }
+    .mast__parts > .mast__pair { flex-basis: auto; }
+    .mast__parts :is(dt, dd) { line-height: 1.25; }
+    /* Under about 262 px «Grancolombiano,» is wider than the column; break it rather than scroll sideways. */
+    .mast__parts dd { overflow-wrap: anywhere; }
+    .mast__main { grid-column: 1 / -1; grid-row: 2; margin-top: var(--s-3); }
+    .mast__sub, .mast__actions { margin-top: var(--s-3); }
+  }
+  /* Under 360 the band column is too narrow for the role line («de», «e» or «and» alone on a line), so it spans the width above the band. */
+  @media (max-width: 359px) {
+    .mast__id { display: contents; }
+    .mast__role { grid-column: 1 / -1; grid-row: 1; margin-bottom: var(--s-3); text-wrap: balance; }
+    .mast__photo { grid-row: 2; }
+    .mast__parts { grid-column: 2; grid-row: 2; align-self: start; margin-top: 0; }
+    .mast__main { grid-row: 3; }
+  }
+
+  .work__title { margin-bottom: var(--s-5); }
+  .work__blocks { display: grid; row-gap: var(--s-5); column-gap: var(--gutter); }
+  .work__block { border-top: 1px solid var(--rule); padding-top: var(--s-3); }
+  /* The icon stands from the baseline to the cap height (its drawing fills 20 of its 24 units); a second line of the heading aligns with the first. */
+  .work__head { display: flex; align-items: baseline; gap: 0.32em; }
+  .work__head span { text-wrap: balance; }
+  .work__head :global(.work__icon) { flex: none; width: 1.2cap; height: 1.2cap; translate: 0 0.1cap; }
+  .work__text { margin-top: var(--s-2); max-width: var(--measure); color: var(--ink-2); }
+  /* These paragraphs are mostly tool names, which never hyphenate (spec 3.4). */
+  .work__text { hyphens: manual; }
+  @media (min-width: 640px) {
+    .work__blocks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 960px) {
+    .work {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--gutter);
+      align-items: baseline;
+    }
+    .work__title { grid-column: 1 / span 3; margin-bottom: 0; }
+    .work__blocks { grid-column: 4 / -1; }
+  }
+
+  .duo__text { margin-top: var(--s-5); max-width: var(--measure); color: var(--ink-2); }
+  .courses { margin-top: var(--s-5); border-top: 1px solid var(--rule); }
+  .courses li {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    padding-block: 10px;
+    border-bottom: 1px solid var(--rule);
+    font-weight: 500;
+  }
+  .courses__leader { flex: 1; border-bottom: 1px dotted var(--ink-3); }
+  .duo__link { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--s-3); }
+  .contact__email {
+    display: inline-block;
+    margin-top: var(--s-5);
+    font-family: var(--font-sans);
+    font-size: clamp(1.75rem, 3vw, 2.75rem);
+    line-height: 1.1;
+    font-weight: 650;
+    font-stretch: 108%;
+    overflow-wrap: anywhere;
+  }
+  .contact__list { margin-top: var(--s-5); }
+  .contact__list > div {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    column-gap: var(--s-4);
+    align-items: baseline;
+  }
+  @media (min-width: 960px) {
+    .duo {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--gutter);
+      align-items: start;
+    }
+    .duo > :first-child { grid-column: 1 / span 5; }
+    .duo > :last-child { grid-column: 7 / -1; }
+  }
+  @media (max-width: 959px) {
+    .duo > * + * { margin-top: var(--section-gap); }
+  }
+</style>

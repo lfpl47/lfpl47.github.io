@@ -1,52 +1,72 @@
 ---
-import Chip from "./Chip.astro";
-import { getLocaleFromPathname } from "../i18n/routing";
-import { t } from "../i18n/ui";
+// One role on the Experience index. The company is the only link to the role page.
+import DateRange from "./DateRange.astro";
+import StackLine from "./StackLine.astro";
+import type { CareerRole } from "../lib/getCareer";
+import type { Locale } from "../i18n/locales";
+import { t, type UiKey } from "../i18n/ui";
+import { orderedStack } from "../utils/stack";
 
-type Props = {
-  href: string;
-  company: string;
-  role: string;
-  dateRange: string;
-  location?: string;
-  highlights: string[];
-  tags: string[];
-};
+type Props = { role: CareerRole; locale: Locale };
 
-const { href, company, role, dateRange, location, highlights, tags } = Astro.props;
-const visibleTags = tags.slice(0, 8);
-const moreCount = Math.max(0, tags.length - visibleTags.length);
-const locale = getLocaleFromPathname(Astro.url.pathname);
+const { role, locale } = Astro.props;
+const shown = role.highlights.slice(0, 4);
+const more = role.highlights.length - shown.length;
 ---
 
-<a
-  class="group block rounded-3xl border border-slate-800 bg-slate-950/30 p-6 shadow-sm transition hover:border-slate-700 hover:bg-slate-900/30"
-  href={href}
->
-  <div class="flex flex-wrap items-baseline justify-between gap-3">
-    <div>
-      <h3 class="text-lg font-semibold text-slate-50">
-        <span class="text-slate-300">{company}</span> · {role}
-      </h3>
-      <p class="mt-1 text-sm text-slate-400">
-        {dateRange}{location ? ` · ${location}` : ""}
-      </p>
-    </div>
-    <span class="text-sm font-semibold text-sky-300 opacity-0 transition group-hover:opacity-100">
-      {t(locale, "view")} →
-    </span>
+<article class="xp-entry" id={`role-${role.slug}`}>
+  <p class="t-ui t-ui--dense xp-entry__date">
+    <DateRange class="date-range--split" start={role.start} end={role.end} locale={locale} />
+  </p>
+  <div class="xp-entry__main">
+    <h3 class="t-h3"><a class="link-quiet" href={role.href}>{role.company}</a></h3>
+    <p class="xp-entry__role">
+      {role.role}{role.employmentType && <span class="t-meta xp-entry__flag"> · {t(locale, `emp_${role.employmentType}` as UiKey)}</span>}
+    </p>
+    {role.location && <p class="t-meta xp-entry__flag">{role.location}</p>}
+    <ul class="t-body xp-entry__hl">
+      {shown.map((h) => <li>{h}</li>)}
+    </ul>
+    {more > 0 && <p class="xp-entry__more"><a class="link t-ui" href={role.href}>{t(locale, "highlights_more", { n: more })}</a></p>}
   </div>
+  {
+    orderedStack(role.stack).length > 0 && (
+      <div class="xp-entry__stack">
+        <p class="t-meta xp-entry__label">{t(locale, "stack")}</p>
+        <StackLine stack={role.stack} locale={locale} />
+      </div>
+    )
+  }
+</article>
 
-  <ul class="mt-4 list-disc space-y-1 pl-5 text-sm text-slate-300">
-    {highlights.slice(0, 4).map((item) => <li>{item}</li>)}
-  </ul>
+<style>
+  .xp-entry { padding-block: var(--s-5); }
+  .xp-entry + .xp-entry { border-top: var(--rule-hair) solid var(--rule); }
+  .xp-entry__main { margin-top: var(--s-1); }
+  .xp-entry__role {
+    margin-top: var(--s-1);
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    line-height: 1.35;
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+  .xp-entry__flag { color: var(--ink-3); }
+  p.xp-entry__flag { margin-top: var(--s-1); }
+  .xp-entry__hl { margin-top: var(--s-4); max-width: var(--measure); padding-left: 1.25rem; list-style: "– "; }
+  .xp-entry__hl li + li { margin-top: var(--s-2); }
+  .xp-entry__more { margin-top: var(--s-3); }
+  .xp-entry__stack { margin-top: var(--s-5); }
+  .xp-entry__label { margin-bottom: var(--s-1); color: var(--ink-3); }
 
-  {tags.length ? (
-    <div class="mt-5 flex flex-wrap gap-2">
-      {visibleTags.map((t) => (
-        <Chip label={t} />
-      ))}
-      {moreCount ? <Chip label={`+${moreCount}`} title={t(locale, "more")} /> : null}
-    </div>
-  ) : null}
-</a>
+  @media (min-width: 960px) {
+    .xp-entry {
+      display: grid;
+      grid-template-columns: var(--date-col) minmax(0, 1.6fr) minmax(0, 1fr);
+      column-gap: var(--gutter);
+      align-items: baseline;
+    }
+    .xp-entry__main, .xp-entry__stack { margin-top: 0; }
+    .xp-entry__stack { border-top: var(--rule-hair) solid var(--rule); padding-top: var(--s-2); }
+  }
+</style>

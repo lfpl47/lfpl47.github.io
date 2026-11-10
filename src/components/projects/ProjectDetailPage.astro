@@ -1,0 +1,184 @@
+---
+// Same frame as the role pages, so both kinds of detail page read alike.
+import { getCollection, type CollectionEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Breadcrumb from "../Breadcrumb.astro";
+import Container from "../Container.astro";
+import DateRange from "../DateRange.astro";
+import { site } from "../../config/site";
+import { stripLocaleFromSlug } from "../../i18n/content";
+import type { Locale } from "../../i18n/locales";
+import { otherLocale, withLocale } from "../../i18n/routing";
+import { t, type UiKey } from "../../i18n/ui";
+import { stackGroups } from "../../utils/stack";
+
+type Props = { entry: CollectionEntry<"projects">; locale: Locale };
+const { entry, locale } = Astro.props;
+const { title, date, type, status, tags, nda, repo, cover, highlights, results, learnings, stack } = entry.data;
+const { Content } = await entry.render();
+
+const copy = {
+  en: {
+    highlights: "Highlights",
+    writeUp: "Write-up",
+    results: "Results",
+    learnings: "Learnings",
+    nda: "Some details are left out because of a confidentiality agreement.",
+    repo: "Source code",
+    tags: "Tags",
+  },
+  es: {
+    highlights: "Logros",
+    writeUp: "Descripción",
+    results: "Resultados",
+    learnings: "Aprendizajes",
+    nda: "Algunos detalles se omiten por un acuerdo de confidencialidad.",
+    repo: "Código fuente",
+    tags: "Etiquetas",
+  },
+};
+const c = copy[locale];
+
+const kind = [type && t(locale, `ptype_${type}` as UiKey), status && t(locale, `pstatus_${status}` as UiKey)].filter(
+  Boolean,
+);
+const groups = stackGroups(stack, locale);
+// The Markdown body is optional; without it the Write-up heading would stand alone.
+const hasBody = Boolean(entry.body?.trim());
+// EN and ES entries are separate files: without the other one, the language link and hreflang would 404.
+const otherSlug = `${otherLocale(locale)}/${stripLocaleFromSlug(entry.slug, locale)}`;
+const translated = (await getCollection("projects")).some((p) => p.slug === otherSlug);
+---
+
+<Layout
+  title={`${title} — ${site.shortName}`}
+  description={highlights[0]}
+  locale={locale}
+  alternates={translated}
+  languageSwitch={translated}
+>
+  <Container>
+    <header class="project-head">
+      <Breadcrumb
+        items={[{ label: t(locale, "nav_projects"), href: withLocale("/projects/", locale) }, { label: title }]}
+        locale={locale}
+      />
+      <h1 class="t-page--detail">{title}</h1>
+      <p class="t-ui project-head__meta">
+        {/* start = end prints one month, not a range */}
+        <DateRange start={date} end={date} locale={locale} />
+        {kind.map((k) => <Fragment><span class="project-head__sep"> · </span>{k}</Fragment>)}
+      </p>
+      {
+        tags && tags.length > 0 && (
+          <p class="t-ui t-ui--dense project-head__tags">
+            <span class="project-head__label">{c.tags}:</span> {tags.join(", ")}
+          </p>
+        )
+      }
+      {nda && <p class="t-body project-head__nda">{c.nda}</p>}
+      {
+        repo && (
+          <p class="project-head__repo">
+            <a class="link t-ui" href={repo} target="_blank" rel="noreferrer">
+              {c.repo}
+              <span class="sr-only"> {t(locale, "new_tab")}</span>
+            </a>
+          </p>
+        )
+      }
+      <div class="rule-heavy project-head__rule"></div>
+    </header>
+
+    {
+      cover && (
+        <figure class="project-cover">
+          <img src={cover} alt="" decoding="async" />
+        </figure>
+      )
+    }
+
+    <div class="grid-12 project-body">
+      <div class="project-main">
+        <h2 class="t-h2 t-h2--compact">{c.highlights}</h2>
+        <div class="prose">
+          <ul>{highlights.map((h) => <li>{h}</li>)}</ul>
+        </div>
+        {
+          hasBody && (
+            <Fragment>
+              <h2 class="t-h2 t-h2--compact">{c.writeUp}</h2>
+              <div class="prose">
+                <Content />
+              </div>
+            </Fragment>
+          )
+        }
+        {
+          results && results.length > 0 && (
+            <Fragment>
+              <h2 class="t-h2 t-h2--compact">{c.results}</h2>
+              <div class="prose">
+                <ul>{results.map((r) => <li>{r}</li>)}</ul>
+              </div>
+            </Fragment>
+          )
+        }
+        {
+          learnings && learnings.length > 0 && (
+            <Fragment>
+              <h2 class="t-h2 t-h2--compact">{c.learnings}</h2>
+              <div class="prose">
+                <ul>{learnings.map((l) => <li>{l}</li>)}</ul>
+              </div>
+            </Fragment>
+          )
+        }
+      </div>
+      {
+        groups.length > 0 && (
+          <aside class="project-aside" aria-labelledby="project-stack">
+            <h2 class="t-h2 t-h2--compact" id="project-stack">{t(locale, "stack")}</h2>
+            <dl class="particulars">
+              {groups.map((g) => (
+                <div>
+                  <dt>{g.label}</dt>
+                  <dd>{g.items.join(", ")}</dd>
+                </div>
+              ))}
+            </dl>
+          </aside>
+        )
+      }
+    </div>
+  </Container>
+</Layout>
+
+<style>
+  .project-head { container-type: inline-size; padding-top: var(--s-7); }
+  .project-head h1 { margin-top: var(--s-5); }
+  .project-head__meta { margin-top: var(--s-4); color: var(--ink-2); }
+  .project-head__sep { color: var(--ink-3); }
+  .project-head__tags { margin-top: var(--s-2); color: var(--ink-2); }
+  .project-head__label { color: var(--ink-3); }
+  .project-head__nda {
+    max-width: var(--measure);
+    margin-top: var(--s-5);
+    padding-left: var(--s-4);
+    border-left: var(--rule-section) solid var(--ink-3);
+  }
+  .project-head__repo { margin-top: var(--s-4); }
+  .project-head__repo a { display: inline-flex; align-items: center; min-height: 24px; font-weight: 500; }
+  .project-head__rule { margin-top: var(--s-6); }
+  .project-cover { margin-top: var(--s-6); }
+  .project-body { row-gap: var(--s-8); margin-top: var(--s-6); }
+  .project-main > * + h2 { margin-top: 40px; }
+  .project-main > h2 + *, .project-aside > h2 + * { margin-top: var(--s-3); }
+  @media (min-width: 960px) {
+    .project-main { grid-column: 1 / span 8; }
+    .project-aside { grid-column: 10 / span 3; align-self: start; }
+  }
+  @media (max-width: 767px) {
+    .project-head { padding-top: var(--s-6); }
+  }
+</style>

@@ -1,0 +1,17 @@
+---
+type Props = {
+  title: string;
+  id?: string;
+  as?: "h2" | "h3";
+  note?: string;
+  link?: { href: string; label: string };
+};
+
+const { title, id, as: Heading = "h2", note, link } = Astro.props;
+---
+
+<div class="section-head">
+  <Heading class="t-h2 section-head__title" id={id}>{title}</Heading>
+  {note && <p class="t-body section-head__note">{note}</p>}
+  {link && <a class="link t-ui section-head__link" href={link.href}>{link.label}</a>}
+</div>

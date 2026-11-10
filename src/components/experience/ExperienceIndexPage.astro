@@ -1,0 +1,70 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Container from "../Container.astro";
+import PageHead from "../PageHead.astro";
+import ExperienceTimelineByYear from "../ExperienceTimelineByYear.astro";
+import CareerOverview from "./CareerOverview.astro";
+import { site } from "../../config/site";
+import { getCareer } from "../../lib/getCareer";
+import type { Locale } from "../../i18n/locales";
+import { otherLocale } from "../../i18n/routing";
+import { t } from "../../i18n/ui";
+import { formatMonthYear } from "../../utils/dates";
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const other = otherLocale(locale);
+const career = await getCareer(locale, { education: false });
+const firstYear = career.firstStart?.getUTCFullYear();
+const deYear = career.phases.find((p) => p.id === "engineering")?.start.getUTCFullYear();
+const asOf = t(locale, "data_as_of", { date: formatMonthYear(career.asOf, locale) });
+// With no roles there is no year to cite, so the sentences that need one are left out.
+const hasYears = firstYear !== undefined && deYear !== undefined;
+
+const copy = {
+  en: {
+    title: `Experience — ${site.shortName}`,
+    description: `Every role of ${site.shortName}${firstYear ? ` since ${firstYear}` : ""}: dates, highlights and the stack of each job.`,
+    h1: "Experience",
+    lede: `I started in ${firstYear} with Access, SQL and Excel/VBA reports. Since ${deYear} I have worked as a data engineer: event-driven pipelines on AWS, data lakes on GCP and infrastructure as code with Terraform.`,
+    caption: `Each bar runs from the start to the end of a role. ${asOf}.`,
+    navLabel: "Jump to year",
+    empty: "No roles to show yet.",
+  },
+  es: {
+    title: `Experiencia — ${site.shortName}`,
+    description: `Todos los cargos de ${site.shortName}${firstYear ? ` desde ${firstYear}` : ""}: fechas, logros y tecnologías de cada empleo.`,
+    h1: "Experiencia",
+    lede: `Empecé en ${firstYear} con Access, SQL y reportes en Excel/VBA. Desde ${deYear} trabajo como ingeniero de datos: pipelines basados en eventos en AWS, data lakes en GCP e infraestructura como código con Terraform.`,
+    caption: `Cada barra va del inicio al fin de un cargo. ${asOf}.`,
+    navLabel: "Ir al año",
+    empty: "Todavía no hay cargos para mostrar.",
+  },
+}[locale];
+---
+
+<Layout title={copy.title} description={copy.description} locale={locale}>
+  <Container>
+    <PageHead title={copy.h1} lede={hasYears ? copy.lede : undefined}>
+      <div slot="aside" class="xp-actions">
+        <a class="btn" href={site.cvPdf[locale]} type="application/pdf" hreflang={locale}>{t(locale, "cv_download")}</a>
+        <a class="link t-ui" href={site.cvPdf[other]} type="application/pdf" hreflang={other}>{t(locale, "cv_other_version")}</a>
+      </div>
+    </PageHead>
+
+    {career.axis && (
+      <div class="section">
+        <CareerOverview career={career} locale={locale} caption={copy.caption} />
+      </div>
+    )}
+
+    <div class="section">
+      <ExperienceTimelineByYear roles={career.roles} locale={locale} navLabel={copy.navLabel} emptyText={copy.empty} />
+    </div>
+  </Container>
+</Layout>
+
+<style>
+  .xp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-5); }
+</style>

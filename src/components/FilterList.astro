@@ -1,0 +1,66 @@
+---
+// Search and filter toggles for Training ("any": OR across toggles) and Projects ("all": AND).
+// Default slot: the list. Every row carries data-filter-item, data-tags="id id" and a lower-case data-text.
+type Props = {
+  mode: "any" | "all";
+  searchId: string;
+  searchLabel: string;
+  searchPlaceholder?: string;
+  groupLabel: string;
+  options: { id: string; label: string; count?: number }[];
+  counterTemplate: string;
+  total: number;
+  clearLabel: string;
+  emptyText: string;
+  hint?: string;
+};
+
+const p = Astro.props;
+const groupId = `${p.searchId}-group`;
+const template = p.counterTemplate.replace("{total}", String(p.total));
+---
+
+<div class="filter-list" data-filter-root data-mode={p.mode}>
+  <div class="filter-list__bar">
+    <div class="search-field">
+      <label for={p.searchId}>{p.searchLabel}</label>
+      <input id={p.searchId} type="search" data-filter-search placeholder={p.searchPlaceholder} autocomplete="off" />
+    </div>
+    <div class="filter-list__status">
+      <p class="counter" data-filter-count aria-live="polite" data-template={template}>{template.replace("{n}", String(p.total))}</p>
+      <button type="button" class="link t-ui filter-list__clear" data-filter-clear>{p.clearLabel}</button>
+    </div>
+  </div>
+  {
+    p.options.length > 0 && (
+      <div class="filter-list__group">
+        <p class="filter-list__label" id={groupId}>{p.groupLabel}</p>
+        <div class="filter-list__toggles" role="group" aria-labelledby={groupId}>
+          {p.options.map((o) => (
+            <button type="button" class="toggle" data-filter-tag={o.id} aria-pressed="false">
+              <span>{o.label}{o.count !== undefined && <Fragment> <span class="toggle__count">{o.count}</span></Fragment>}</span>
+            </button>
+          ))}
+        </div>
+        {p.hint && <p class="t-meta filter-list__hint">{p.hint}</p>}
+      </div>
+    )
+  }
+  <div class="filter-list__items">
+    <slot />
+  </div>
+  <p class="t-body filter-list__empty" data-filter-empty hidden>{p.emptyText}</p>
+</div>
+
+<script>
+  import { initFilterList } from "../scripts/filter-list.mjs";
+
+  document.querySelectorAll<HTMLElement>("[data-filter-root]").forEach((root) => initFilterList(root));
+</script>
+
+<style>
+  /* Search and toggles need JavaScript; without it every item stays listed and the counter stays true. */
+  :root:not([data-js]) .search-field,
+  :root:not([data-js]) .filter-list__clear,
+  :root:not([data-js]) .filter-list__group { display: none; }
+</style>

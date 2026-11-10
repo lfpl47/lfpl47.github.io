@@ -1,0 +1,19 @@
+---
+import type { Locale } from "../i18n/locales";
+import { t } from "../i18n/ui";
+import { orderedStack, type Stack } from "../utils/stack";
+
+type Props = { stack: Stack; locale: Locale; limit?: number; moreHref?: string };
+
+const { stack, locale, limit, moreHref } = Astro.props;
+const items = orderedStack(stack);
+const shown = limit === undefined ? items : items.slice(0, limit);
+const rest = items.length - shown.length;
+const more = rest > 0 ? t(locale, "stack_more", { n: rest }) : "";
+---
+
+{
+  items.length > 0 && (
+    <p class="stack-line t-ui t-ui--dense">{shown.join(", ")}{more && " "}{more && (moreHref ? <a class="link" href={moreHref}>{more}</a> : more)}</p>
+  )
+}

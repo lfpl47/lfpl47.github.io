@@ -4,74 +4,91 @@ import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import { site } from "../config/site";
 import type { Locale } from "../i18n/locales";
-import { getLocaleFromPathname, withLocale } from "../i18n/routing";
+import { getLocaleFromPathname, otherLocale, withLocale } from "../i18n/routing";
 import { t } from "../i18n/ui";
 
 type Props = {
-  title?: string;
-  description?: string;
-  noIndex?: boolean;
+  title: string;
+  description: string;
   locale?: Locale;
+  noIndex?: boolean;
+  alternates?: boolean;
+  languageSwitch?: boolean;
 };
 
-const pathname = Astro.url.pathname;
+const { pathname } = Astro.url;
 const locale = Astro.props.locale ?? getLocaleFromPathname(pathname);
-const title = Astro.props.title ?? site.titles[locale];
-const description = Astro.props.description ?? site.descriptions[locale];
-const noIndex = Astro.props.noIndex ?? false;
+const { title, description, noIndex = false, alternates = true, languageSwitch = true } = Astro.props;
 
-const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
-const alternateEn = Astro.site ? new URL(withLocale(pathname, "en"), Astro.site).toString() : undefined;
-const alternateEs = Astro.site ? new URL(withLocale(pathname, "es"), Astro.site).toString() : undefined;
+const absolute = (path: string) => new URL(path, Astro.site).toString();
+const ogLocale = { en: "en_US", es: "es_CO" } as const;
 ---
 
 <!doctype html>
-<html lang={locale} data-theme="nocturne">
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#F6F6F3" media="(prefers-color-scheme: light)" data-scheme="light" />
+    <meta name="theme-color" content="#151514" media="(prefers-color-scheme: dark)" data-scheme="dark" />
+    <link rel="preload" href="/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.ico" sizes="any" />
-    {noIndex ? <meta name="robots" content="noindex,nofollow" /> : null}
-    {canonical ? <link rel="canonical" href={canonical} /> : null}
-    {alternateEn ? <link rel="alternate" href={alternateEn} hreflang="en" /> : null}
-    {alternateEs ? <link rel="alternate" href={alternateEs} hreflang="es" /> : null}
-    {alternateEn ? <link rel="alternate" href={alternateEn} hreflang="x-default" /> : null}
-
-    <script is:inline>
-      (() => {
-        const defaultTheme = "nocturne";
-        document.documentElement.dataset.theme = defaultTheme;
-
-        try {
-          localStorage.setItem("lfpl47-theme", defaultTheme);
-        } catch {}
-      })();
-    </script>
-
+    {noIndex && <meta name="robots" content="noindex,nofollow" />}
+    {
+      alternates && (
+        <>
+          <link rel="canonical" href={absolute(pathname)} />
+          <link rel="alternate" href={absolute(withLocale(pathname, "en"))} hreflang="en" />
+          <link rel="alternate" href={absolute(withLocale(pathname, "es"))} hreflang="es" />
+          <link rel="alternate" href={absolute(withLocale(pathname, "en"))} hreflang="x-default" />
+        </>
+      )
+    }
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    {canonical ? <meta property="og:url" content={canonical} /> : null}
+    {alternates && <meta property="og:url" content={absolute(pathname)} />}
     <meta property="og:type" content="website" />
-
+    <meta property="og:locale" content={ogLocale[locale]} />
+    {alternates && <meta property="og:locale:alternate" content={ogLocale[otherLocale(locale)]} />}
+    <meta property="og:image" content={absolute(site.ogImage)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t(locale, "og_image_alt")} />
     <meta name="twitter:card" content="summary_large_image" />
-    <title>{title}</title>
+    <script is:inline>
+      document.documentElement.dataset.motion = "on";
+      // JavaScript runs, so the day or night control is shown from the first paint (global.css, @layer reset).
+      document.documentElement.dataset.js = "";
+      // The visitor's day or night choice, applied before the stylesheet so the first paint is right.
+      try {
+        const scheme = localStorage.getItem("lfpl47-scheme");
+        if (scheme === "light" || scheme === "dark") document.documentElement.dataset.theme = scheme;
+      } catch {}
+    </script>
+    {/* The background city (C3), one cached file. Render-blocking, so the first paint and the view-transition snapshot already show the city. */}
+    <script is:inline src="/site-bg.js" defer blocking="render"></script>
   </head>
-  <body class="site-shell min-h-screen">
-    <a class="skip-link" href="#main">
-      {t(locale, "skip_to_content")}
-    </a>
-
-    <div class="site-ambient" aria-hidden="true">
-      <div class="site-ambient__orb site-ambient__orb--primary" />
-      <div class="site-ambient__orb site-ambient__orb--secondary" />
-      <div class="site-ambient__mesh" />
-    </div>
-
-    <SiteHeader />
+  <body>
+    <canvas id="site-bg" aria-hidden="true"></canvas>
+    <a class="skip-link" href="#main">{t(locale, "skip_to_content")}</a>
+    <SiteHeader locale={locale} languageSwitch={languageSwitch} />
     <main id="main">
       <slot />
     </main>
-    <SiteFooter />
+    <SiteFooter locale={locale} languageSwitch={languageSwitch} />
+    <script is:inline>
+      (() => {
+        const charts = document.querySelectorAll('.tl[data-draw="pending"]');
+        if (!charts.length) return;
+        if (!("IntersectionObserver" in window)) { charts.forEach((c) => (c.dataset.draw = "done")); return; }
+        const io = new IntersectionObserver((entries) => {
+          for (const e of entries) if (e.isIntersecting) { e.target.dataset.draw = "done"; io.unobserve(e.target); }
+        }, { threshold: 0.15 });
+        charts.forEach((c) => io.observe(c));
+      })();
+    </script>
   </body>
 </html>

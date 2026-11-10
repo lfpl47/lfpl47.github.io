@@ -1,0 +1,23 @@
+---
+// Inner-page H1 block. Slots: default (under the lede), "aside" (actions).
+type Props = { title: string; lede?: string };
+
+const { title, lede } = Astro.props;
+---
+
+<header class="page-head">
+  <h1 class="t-page">{title}</h1>
+  <div class="page-head__body rule-heavy">
+    <div class="page-head__main">
+      {lede && <p class="t-lede page-head__lede">{lede}</p>}
+      <slot />
+    </div>
+    {
+      Astro.slots.has("aside") && (
+        <div class="page-head__aside">
+          <slot name="aside" />
+        </div>
+      )
+    }
+  </div>
+</header>

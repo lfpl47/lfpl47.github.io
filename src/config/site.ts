@@ -1,34 +1,28 @@
 export const site = {
   name: "Luis Felipe Peña Lozano",
-  handle: "lfpl47",
+  shortName: "Luis Felipe Peña",
   titles: {
-    en: "Luis Felipe Peña — Data & Software Engineer",
-    es: "Luis Felipe Peña — Ingeniero de Datos y Software",
+    en: "Luis Felipe Peña — Data and software engineer",
+    es: "Luis Felipe Peña — Ingeniero de datos y de software",
   },
   descriptions: {
-    en: "Luis Felipe Peña Lozano — Data & Software Engineer portfolio: timeline, case studies, and CV.",
-    es: "Portafolio de Luis Felipe Peña Lozano — Ingeniero de Datos y Software: experiencia, casos de estudio y CV.",
+    en: "Luis Felipe Peña, data and software engineer in Bogotá, Colombia. Experience, education and CV in English and Spanish.",
+    es: "Luis Felipe Peña, ingeniero de datos y de software en Bogotá, Colombia. Experiencia, formación y hoja de vida en español e inglés.",
   },
   roles: {
-    en: "Data Engineer",
-    es: "Ingeniero de Datos",
-  },
-  roleDeck: {
-    en: "Software Engineer · Python Backend Developer · Senior Data Developer · Data Analyst",
-    es: "Ingeniero de Software · Desarrollador Backend Python · Desarrollador Senior de Datos · Analista de Datos",
+    en: "Data engineering and software engineering",
+    es: "Ingeniería de datos e ingeniería de software",
   },
   location: "Bogotá, Colombia",
-  summaries: {
-    en: "Data Engineer (8+ years) with a strong software engineering background, designing and operating cloud data platforms on AWS, GCP, and Azure. I build batch/streaming pipelines with Python, SQL, and Spark — shipping reliable, measurable data products.",
-    es: "Ingeniero de Datos con 8+ años y un fuerte enfoque en ingeniería de software, diseñando y operando plataformas de datos en AWS, GCP y Azure. Construyo pipelines batch y streaming con Python, SQL y Spark — entregando productos de datos confiables y medibles.",
-  },
+  timeZone: "UTC−5",
   avatar: {
     src: "/img/profile.jpg",
     alt: {
-      en: "Profile photo",
-      es: "Foto de perfil",
+      en: "Portrait of Luis Felipe Peña",
+      es: "Retrato de Luis Felipe Peña",
     },
   },
+  ogImage: "/img/og-card.png",
   links: {
     github: "https://github.com/lfpl47",
     linkedin: "https://www.linkedin.com/in/luis-felipe-pena/",

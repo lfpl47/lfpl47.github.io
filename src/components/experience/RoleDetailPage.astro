@@ -1,0 +1,160 @@
+---
+import type { CollectionEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Breadcrumb from "../Breadcrumb.astro";
+import Container from "../Container.astro";
+import DateRange from "../DateRange.astro";
+import { site } from "../../config/site";
+import { getCareer } from "../../lib/getCareer";
+import { stripLocaleFromSlug } from "../../i18n/content";
+import type { Locale } from "../../i18n/locales";
+import { otherLocale, withLocale } from "../../i18n/routing";
+import { t, type UiKey } from "../../i18n/ui";
+import { formatDateRange, formatYearRange } from "../../utils/dates";
+import { stackGroups } from "../../utils/stack";
+
+type Props = { entry: CollectionEntry<"experience">; locale: Locale };
+
+const { entry, locale } = Astro.props;
+const { Content } = await entry.render();
+const d = entry.data;
+const other = otherLocale(locale);
+const range = formatDateRange(d.start, d.end, locale);
+const stack = stackGroups(d.stack, locale);
+
+// Neighbours by start date; roles come newest first.
+const roles = (await getCareer(locale, { education: false })).roles;
+const index = roles.findIndex((r) => r.slug === stripLocaleFromSlug(entry.slug, locale));
+const later = roles[index - 1];
+const earlier = roles[index + 1];
+const years = (r: (typeof roles)[number]) => formatYearRange(r.start.getUTCFullYear(), r.end?.getUTCFullYear(), locale);
+
+const copy = {
+  en: {
+    description: `${d.role} at ${d.company}, ${range}: highlights, details and stack.`,
+    highlights: "Highlights",
+    impact: "Impact",
+    all: "All experience",
+  },
+  es: {
+    description: `${d.role} en ${d.company}, ${range}: logros, detalles y tecnologías.`,
+    highlights: "Logros",
+    impact: "Impacto",
+    all: "Toda la experiencia",
+  },
+}[locale];
+const experienceHref = withLocale("/experience/", locale);
+---
+
+<Layout title={`${d.company}, ${d.role} — ${site.shortName}`} description={copy.description} locale={locale}>
+  <Container>
+    <header class="role-head">
+      <Breadcrumb items={[{ label: t(locale, "nav_experience"), href: experienceHref }, { label: d.company }]} locale={locale} />
+      <h1 class="t-page--detail role-head__title">{d.company}</h1>
+      <p class="t-roleline role-head__role">{d.role}</p>
+      <p class="t-ui role-head__meta">
+        <DateRange start={d.start} end={d.end} locale={locale} />
+        {d.employmentType && <Fragment><span class="role-head__sep"> · </span>{t(locale, `emp_${d.employmentType}` as UiKey)}</Fragment>}
+        {d.location && <Fragment><span class="role-head__sep"> · </span>{d.location}</Fragment>}
+      </p>
+      {d.summary && <p class="t-lede role-head__summary">{d.summary}</p>}
+    </header>
+
+    <div class="grid-12 rule-heavy role-body">
+      <div class="role-main">
+        {
+          d.impact?.length ? (
+            <section class="role-block" aria-labelledby="impact-h">
+              <h2 class="t-h2 t-h2--compact" id="impact-h">{copy.impact}</h2>
+              <dl class="particulars role-impact">
+                {d.impact.map((m) => (
+                  <div>
+                    <dt>{m.label}</dt>
+                    <dd>{m.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          ) : null
+        }
+        <section class="role-block" aria-labelledby="highlights-h">
+          <h2 class="t-h2 t-h2--compact" id="highlights-h">{copy.highlights}</h2>
+          <ul class="t-body role-hl">
+            {d.highlights.map((h) => <li>{h}</li>)}
+          </ul>
+        </section>
+        {
+          entry.body?.trim() && (
+            <div class="prose role-block">
+              <Content />
+            </div>
+          )
+        }
+      </div>
+
+      {
+        stack.length > 0 && (
+          <aside class="role-aside" aria-labelledby="stack-h">
+            <h2 class="t-h2 t-h2--compact" id="stack-h">{t(locale, "stack")}</h2>
+            <dl class="particulars role-stack">
+              {stack.map((g) => (
+                <div>
+                  <dt>{g.label}</dt>
+                  <dd>{g.items.join(", ")}</dd>
+                </div>
+              ))}
+            </dl>
+          </aside>
+        )
+      }
+    </div>
+
+    <div class="role-foot rule-section">
+      {
+        (earlier || later) && (
+          <nav class="role-pn" aria-label={t(locale, "more_roles")}>
+            {earlier && <a class="link-quiet t-ui role-pn__earlier" href={earlier.href}>{t(locale, "earlier_role", { company: earlier.company, years: years(earlier) })}</a>}
+            {later && <a class="link-quiet t-ui role-pn__later" href={later.href}>{t(locale, "later_role", { company: later.company, years: years(later) })}</a>}
+          </nav>
+        )
+      }
+      <p class="role-links">
+        <a class="link t-ui" href={experienceHref}>{copy.all}</a>
+        <a class="link t-ui" href={site.cvPdf[locale]} type="application/pdf" hreflang={locale}>{t(locale, "cv_download")}</a>
+        <a class="link t-ui" href={site.cvPdf[other]} type="application/pdf" hreflang={other}>{t(locale, "cv_other_version")}</a>
+      </p>
+    </div>
+  </Container>
+</Layout>
+
+<style>
+  .role-head { container-type: inline-size; padding-top: var(--s-7); }
+  .role-head__title { margin-top: var(--s-5); }
+  .role-head__role { margin-top: var(--s-3); }
+  .role-head__meta { margin-top: var(--s-3); color: var(--ink-2); }
+  .role-head__sep { color: var(--ink-3); }
+  .role-head__summary { margin-top: var(--s-4); max-width: var(--measure); color: var(--ink-2); }
+
+  .role-body { margin-top: var(--s-6); padding-top: var(--s-6); row-gap: var(--s-8); }
+  .role-block + .role-block { margin-top: 40px; }
+  .role-main h2, .role-aside h2 { margin-bottom: var(--s-3); }
+  .role-hl { max-width: var(--measure); padding-left: 1.25rem; list-style: "– "; }
+  .role-hl li + li { margin-top: var(--s-2); }
+
+  .role-foot { margin-top: var(--section-gap); }
+  .role-pn { display: flex; flex-wrap: wrap; gap: var(--s-3) var(--s-6); }
+  .role-pn a { display: inline-flex; align-items: center; min-height: 24px; }
+  .role-pn__later { margin-left: auto; text-align: right; }
+  .role-links { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); margin-top: var(--s-5); }
+  .role-links a { display: inline-flex; align-items: center; min-height: 24px; }
+
+  @media (min-width: 960px) {
+    .role-main { grid-column: 1 / span 8; }
+    .role-aside { grid-column: 10 / span 3; align-self: start; }
+  }
+  @media (max-width: 767px) {
+    .role-head { padding-top: var(--s-6); }
+    .role-pn { flex-direction: column; }
+    .role-pn__later { margin-left: 0; text-align: left; }
+  }
+</style>

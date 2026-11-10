@@ -8,7 +8,6 @@ const Tag = Astro.props.as ?? "div";
 const className = Astro.props.class ?? "";
 ---
 
-<Tag class:list={["mx-auto w-full max-w-6xl px-6", className]}>
+<Tag class:list={["wrap", className]}>
   <slot />
 </Tag>
-

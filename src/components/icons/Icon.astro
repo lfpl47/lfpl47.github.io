@@ -1,0 +1,16 @@
+---
+// Decorative icon from icons.mjs: hidden from assistive technology, so the text next to it carries the meaning.
+import { ICONS } from "./icons.mjs";
+
+type Props = { name: string; class?: string; [attr: string]: unknown };
+const { name, class: className, ...rest } = Astro.props;
+const body = ICONS[name as keyof typeof ICONS];
+if (!body) throw new Error(`Icon: no icon named «${name}»`);
+---
+
+<svg class:list={["icon", className]} viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" {...rest} set:html={body} />
+
+<style>
+  /* One stroke weight in CSS pixels at every icon size. */
+  .icon :global(*) { vector-effect: non-scaling-stroke; }
+</style>

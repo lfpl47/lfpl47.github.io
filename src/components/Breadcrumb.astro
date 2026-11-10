@@ -1,0 +1,26 @@
+---
+import type { Locale } from "../i18n/locales";
+import { t } from "../i18n/ui";
+
+type Props = { items: { label: string; href?: string }[]; locale: Locale };
+
+const { items, locale } = Astro.props;
+---
+
+<nav class="breadcrumb t-meta" aria-label={t(locale, "breadcrumb")}>
+  <ol>
+    {
+      items.map((item) => (
+        <li>
+          {item.href ? (
+            <a class="link-quiet" href={item.href}>
+              {item.label}
+            </a>
+          ) : (
+            <span aria-current="page">{item.label}</span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>

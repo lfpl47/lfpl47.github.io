@@ -1,52 +1,60 @@
 ---
-import Chip from "./Chip.astro";
-import { getLocaleFromPathname } from "../i18n/routing";
-import { t } from "../i18n/ui";
+// Home lists these under its own H2, so it passes headingLevel={3}.
+import DateRange from "./DateRange.astro";
+import StackLine from "./StackLine.astro";
+import type { Locale } from "../i18n/locales";
+import { t, type UiKey } from "../i18n/ui";
+import type { Stack } from "../utils/stack";
 
 type Props = {
   href: string;
   title: string;
-  dateLabel: string;
-  type?: string;
-  status?: string;
+  date: Date;
+  locale: Locale;
+  type?: "Case Study" | "Project" | "Open Source" | "Talk";
+  status?: "Active" | "Completed" | "Paused";
   highlights: string[];
-  tags: string[];
+  stack?: Stack;
+  headingLevel?: 2 | 3;
 };
 
-const { href, title, dateLabel, type, status, highlights, tags } = Astro.props;
-const visibleTags = tags.slice(0, 8);
-const moreCount = Math.max(0, tags.length - visibleTags.length);
-const locale = getLocaleFromPathname(Astro.url.pathname);
+const { href, title, date, locale, type, status, highlights, stack, headingLevel = 2 } = Astro.props;
+const Heading = headingLevel === 3 ? "h3" : "h2";
+const meta = [type && t(locale, `ptype_${type}` as UiKey), status && t(locale, `pstatus_${status}` as UiKey)]
+  .filter(Boolean)
+  .join(" · ");
 ---
 
-<a
-  class="group block rounded-3xl border border-slate-800 bg-slate-950/30 p-6 shadow-sm transition hover:border-slate-700 hover:bg-slate-900/30"
-  href={href}
->
-  <div class="flex flex-wrap items-baseline justify-between gap-3">
-    <div>
-      <h3 class="text-lg font-semibold text-slate-50">{title}</h3>
-      <p class="mt-1 text-sm text-slate-400">
-        {dateLabel}
-        {type ? ` · ${type}` : ""}
-        {status ? ` · ${status}` : ""}
-      </p>
-    </div>
-    <span class="text-sm font-semibold text-sky-300 opacity-0 transition group-hover:opacity-100">
-      {t(locale, "read")} →
-    </span>
+<article class="project-row">
+  <p class="t-ui t-ui--dense">
+    {/* start = end prints one month, not a range */}
+    <DateRange class="date-range--split" start={date} end={date} locale={locale} />
+  </p>
+  <div>
+    <Heading class="t-h3"><a class="link-quiet" href={href}>{title}</a></Heading>
+    {meta && <p class="t-meta project-row__meta">{meta}</p>}
+    <ul class="t-body project-row__highlights">
+      {highlights.slice(0, 2).map((h) => <li>{h}</li>)}
+    </ul>
   </div>
+  {stack && <StackLine stack={stack} locale={locale} limit={4} moreHref={href} />}
+</article>
 
-  <ul class="mt-4 list-disc space-y-1 pl-5 text-sm text-slate-300">
-    {highlights.slice(0, 3).map((item) => <li>{item}</li>)}
-  </ul>
-
-  {tags.length ? (
-    <div class="mt-5 flex flex-wrap gap-2">
-      {visibleTags.map((t) => (
-        <Chip label={t} />
-      ))}
-      {moreCount ? <Chip label={`+${moreCount}`} title={t(locale, "more")} /> : null}
-    </div>
-  ) : null}
-</a>
+<style>
+  .project-row {
+    display: grid;
+    row-gap: var(--s-2);
+    padding-block: var(--s-5);
+    border-top: var(--rule-hair) solid var(--rule);
+  }
+  .project-row__meta { margin-top: var(--s-1); color: var(--ink-3); }
+  .project-row__highlights { margin-top: var(--s-3); padding-left: 1.25em; list-style: "– "; }
+  .project-row__highlights li + li { margin-top: var(--s-2); }
+  @media (min-width: 960px) {
+    .project-row {
+      grid-template-columns: var(--date-col) minmax(0, 1.6fr) minmax(0, 1fr);
+      column-gap: var(--gutter);
+      align-items: baseline;
+    }
+  }
+</style>

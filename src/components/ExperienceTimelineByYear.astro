@@ -1,103 +1,51 @@
 ---
-import type { CollectionEntry } from "astro:content";
-import type { Locale } from "../i18n/locales";
-import { stripLocaleFromSlug } from "../i18n/content";
-import { withLocale } from "../i18n/routing";
-import { formatDateRange } from "../utils/dates";
-import { flattenStack } from "../utils/stack";
 import ExperienceCard from "./ExperienceCard.astro";
+import type { CareerRole } from "../lib/getCareer";
+import type { Locale } from "../i18n/locales";
 
 type Props = {
   locale: Locale;
-  entries: CollectionEntry<"experience">[];
+  /** Newest first. */
+  roles: CareerRole[];
+  navLabel: string;
+  emptyText: string;
 };
 
-const { locale, entries } = Astro.props;
+const { locale, roles, navLabel, emptyText } = Astro.props;
 
-const entriesByYear = new Map<number, CollectionEntry<"experience">[]>();
-for (const entry of entries) {
-  const year = entry.data.start.getFullYear();
-  const group = entriesByYear.get(year) ?? [];
-  group.push(entry);
-  entriesByYear.set(year, group);
+const rolesByYear = new Map<number, CareerRole[]>();
+for (const role of roles) {
+  const year = role.start.getUTCFullYear();
+  rolesByYear.set(year, [...(rolesByYear.get(year) ?? []), role]);
 }
-
-const years = [...entriesByYear.keys()].sort((a, b) => b - a);
-
-const yearsLabel = locale === "es" ? "Años" : "Years";
-const emptyTitle = locale === "es" ? "Aún no hay experiencia" : "No experience yet";
-const emptyDescription =
-  locale === "es"
-    ? "Cuando agregues entradas, aparecerán aquí en una línea de tiempo por año."
-    : "Once you add entries, they will show up here in a year-based timeline.";
+const years = [...rolesByYear.keys()].sort((a, b) => b - a);
 ---
 
 {
   years.length ? (
-    <div data-experience-timeline class="mt-10 grid gap-8 lg:grid-cols-[10rem_1fr]">
-      <nav
-        class="flex gap-2 overflow-x-auto pb-2 lg:sticky lg:top-24 lg:block lg:space-y-2 lg:pb-0"
-        aria-label={yearsLabel}
-      >
-        {years.map((year, index) => (
-          <a
-            href={`#y-${year}`}
-            data-year-link={String(year)}
-            aria-current={index === 0 ? "true" : undefined}
-            class:list={[
-              "inline-flex items-center whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-sky-400/40",
-              index === 0
-                ? "border-sky-400 bg-sky-500 text-slate-950 hover:bg-sky-400"
-                : "border-slate-800 bg-slate-900/30 text-slate-200 hover:bg-slate-900 hover:text-white",
-            ]}
-          >
-            {year}
-          </a>
-        ))}
+    <div class="grid-12 xp-tl" data-experience-timeline>
+      <nav class="xp-years" aria-labelledby="xp-years-label">
+        <p class="t-meta xp-years__label" id="xp-years-label">{navLabel}</p>
+        <ol class="xp-years__list">
+          {years.map((year, index) => (
+            <li>
+              <a href={`#y-${year}`} data-year-link={String(year)} aria-current={index === 0 ? "true" : undefined}>
+                {year}
+              </a>
+            </li>
+          ))}
+        </ol>
       </nav>
 
-      <div class="relative">
-        <div class="pointer-events-none absolute bottom-0 left-4 top-0 w-px bg-gradient-to-b from-sky-500/20 via-slate-800/70 to-fuchsia-500/10" />
-
-        <div class="space-y-10">
-          {years.map((year) => (
-            <section id={`y-${year}`} class="relative scroll-mt-28">
-              <div data-year-marker={String(year)} class="relative">
-                <span
-                  aria-hidden="true"
-                  class="absolute left-2 top-0.5 h-4 w-4 rounded-full border border-slate-700 bg-slate-950 ring-4 ring-slate-950"
-                />
-                <h3 class="pl-10 text-xs font-semibold uppercase tracking-wide text-slate-400">{year}</h3>
-              </div>
-
-              <ul class="mt-6 grid gap-4">
-                {(entriesByYear.get(year) ?? []).map((entry) => {
-                  const slug = stripLocaleFromSlug(entry.slug, locale);
-                  const href = withLocale(`/experience/${slug}/`, locale);
-                  const tags = [...(entry.data.tags ?? []), ...flattenStack(entry.data.stack)];
-
-                  return (
-                    <li class="relative pl-10">
-                      <span
-                        aria-hidden="true"
-                        class="absolute left-2.5 top-7 h-3 w-3 rounded-full bg-sky-400 ring-4 ring-slate-950"
-                      />
-                      <ExperienceCard
-                        href={href}
-                        company={entry.data.company}
-                        role={entry.data.role}
-                        dateRange={formatDateRange(entry.data.start, entry.data.end, locale)}
-                        location={entry.data.location}
-                        highlights={entry.data.highlights}
-                        tags={tags}
-                      />
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          ))}
-        </div>
+      <div class="xp-tl__years">
+        {years.map((year) => (
+          <section id={`y-${year}`} class="xp-year rule-section" aria-labelledby={`y-${year}-h`} data-year-marker={String(year)}>
+            <h2 class="t-year tnum" id={`y-${year}-h`}>{year}</h2>
+            {(rolesByYear.get(year) ?? []).map((role) => (
+              <ExperienceCard role={role} locale={locale} />
+            ))}
+          </section>
+        ))}
       </div>
 
       <script is:inline>
@@ -109,59 +57,99 @@ const emptyDescription =
           const markers = Array.from(root.querySelectorAll("[data-year-marker]"));
           if (!links.length || !markers.length) return;
 
-          const inactiveClasses = [
-            "bg-slate-900/30",
-            "text-slate-200",
-            "border-slate-800",
-            "hover:bg-slate-900",
-            "hover:text-white",
-          ];
-          const activeClasses = ["bg-sky-500", "text-slate-950", "border-sky-400", "hover:bg-sky-400"];
-
+          // Only the attribute changes; CSS styles [aria-current="true"].
+          let current = links[0].getAttribute("data-year-link");
           function setActive(year) {
+            if (!year || year === current) return;
+            current = year;
             for (const link of links) {
-              const active = link.getAttribute("data-year-link") === year;
-              if (active) link.setAttribute("aria-current", "true");
+              if (link.getAttribute("data-year-link") === year) link.setAttribute("aria-current", "true");
               else link.removeAttribute("aria-current");
-
-              for (const c of inactiveClasses) link.classList.toggle(c, !active);
-              for (const c of activeClasses) link.classList.toggle(c, active);
             }
           }
 
-          const initial =
-            links.find((l) => l.hasAttribute("aria-current"))?.getAttribute("data-year-link") ||
-            links[0]?.getAttribute("data-year-link");
-          if (initial) setActive(initial);
-
           for (const link of links) {
-            link.addEventListener("click", () => {
-              const year = link.getAttribute("data-year-link");
-              if (year) setActive(year);
-            });
+            link.addEventListener("click", () => setActive(link.getAttribute("data-year-link")));
           }
 
           if (!("IntersectionObserver" in window)) return;
 
+          // Year sections inside the band at 25-35% of the viewport; the top-most one is current.
+          const inBand = new Set();
+          const last = markers[markers.length - 1].getAttribute("data-year-marker");
+          function update() {
+            // A short last year can stay below the band at the page end, so it wins there.
+            if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2) return setActive(last);
+            const top = [...inBand].sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)[0];
+            if (top) setActive(top.getAttribute("data-year-marker"));
+          }
+
           const observer = new IntersectionObserver(
             (entries) => {
-              const visible = entries.filter((e) => e.isIntersecting);
-              if (!visible.length) return;
-              visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-              const year = visible[0].target.getAttribute("data-year-marker");
-              if (year) setActive(year);
+              for (const e of entries) e.isIntersecting ? inBand.add(e.target) : inBand.delete(e.target);
+              update();
             },
             { root: null, rootMargin: "-25% 0px -65% 0px", threshold: 0 },
           );
 
           for (const marker of markers) observer.observe(marker);
+          addEventListener("scroll", update, { passive: true });
         })();
       </script>
     </div>
   ) : (
-    <div class="mt-10 rounded-3xl border border-slate-800 bg-slate-950/30 p-6 text-slate-300">
-      <p class="text-sm font-semibold text-slate-200">{emptyTitle}</p>
-      <p class="mt-2 text-sm text-slate-400">{emptyDescription}</p>
-    </div>
+    <p class="t-body xp-empty">{emptyText}</p>
   )
 }
+
+<style>
+  .xp-years__label { color: var(--ink-3); }
+  .xp-years__list { display: flex; flex-wrap: wrap; gap: 0 var(--s-4); }
+  .xp-years a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.2;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  .xp-years a:hover { color: var(--ink); }
+  .xp-years a[aria-current="true"] {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 0.3em;
+  }
+  .xp-tl__years { margin-top: var(--s-6); }
+  .xp-year + .xp-year { margin-top: var(--s-8); }
+  .xp-year h2 { margin-bottom: var(--s-1); }
+  .xp-empty { color: var(--ink-2); }
+
+  @media (max-width: 959px) {
+    /* The row gap keeps a focus ring off the label when the years wrap under it. */
+    .xp-years { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-4); }
+  }
+
+  @media (min-width: 960px) {
+    .xp-years {
+      grid-column: 1 / span 2;
+      align-self: start;
+      position: sticky;
+      top: calc(var(--header-h) + 24px);
+    }
+    .xp-years__label { padding-bottom: var(--s-2); border-bottom: var(--rule-hair) solid var(--ink); }
+    .xp-years__list { display: grid; gap: var(--s-2); margin-top: var(--s-3); }
+    .xp-years a {
+      display: flex;
+      min-height: 24px;
+      padding-left: 12px;
+      font-size: 1.25rem;
+    }
+    .xp-years a[aria-current="true"] { text-decoration: none; box-shadow: inset 3px 0 0 var(--ink); }
+    .xp-tl__years { grid-column: 3 / -1; margin-top: 0; }
+  }
+</style>

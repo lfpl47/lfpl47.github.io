@@ -1,0 +1,391 @@
+---
+import fs from "node:fs";
+import path from "node:path";
+import Layout from "../../layouts/Layout.astro";
+import Container from "../Container.astro";
+import DateRange from "../DateRange.astro";
+import { site } from "../../config/site";
+import certifications from "../../data/certifications.json";
+import resumeEn from "../../data/resume.en.json";
+import resumeEs from "../../data/resume.es.json";
+import { getCareer } from "../../lib/getCareer";
+import type { Locale } from "../../i18n/locales";
+import { otherLocale, withLocale } from "../../i18n/routing";
+import { t, type UiKey } from "../../i18n/ui";
+import { formatYearRange } from "../../utils/dates";
+import { orderedStack } from "../../utils/stack";
+
+type Props = { locale: Locale };
+const { locale } = Astro.props;
+
+const copy = {
+  en: {
+    title: "CV — Luis Felipe Peña",
+    description:
+      "CV of Luis Felipe Peña, data and software engineer in Bogotá, Colombia: profile, experience, education and PDF downloads in English and Spanish.",
+    filesHeading: "CV as PDF",
+    fileLanguage: { en: "English", es: "Spanish" },
+    download: "Download",
+    profile: "Profile",
+    profileText: (deYear: number, firstYear: number) =>
+      `Data and software engineer in Bogotá, Colombia. Since ${deYear} I have built batch and event-driven data pipelines on AWS and GCP with Python and SQL, and deployed them with Terraform and Git. Before that, I worked in reporting and data analysis, starting in ${firstYear}.`,
+    path: "Path",
+    experience: "Experience",
+    education: "Education",
+    languages: "Languages",
+    skills: "Skills",
+    skillsUsed: "Used in my roles",
+    skillsOther: "Other skills",
+    additionalStudies: "Additional studies",
+    courses: "Courses and certifications",
+    coursesText: (count: number) => `${count} courses and certifications.`,
+    coursesLink: "Browse all courses and certifications",
+  },
+  es: {
+    title: "Hoja de vida — Luis Felipe Peña",
+    description:
+      "Hoja de vida de Luis Felipe Peña, ingeniero de datos y de software en Bogotá, Colombia: perfil, experiencia, formación y descargas en PDF en español e inglés.",
+    filesHeading: "CV en PDF",
+    fileLanguage: { en: "Inglés", es: "Español" },
+    download: "Descargar",
+    profile: "Perfil",
+    profileText: (deYear: number, firstYear: number) =>
+      `Ingeniero de datos y de software en Bogotá, Colombia. Desde ${deYear} construyo pipelines de datos batch y basados en eventos en AWS y GCP con Python y SQL, y los despliego con Terraform y Git. Antes trabajé en reportes y análisis de datos, desde ${firstYear}.`,
+    path: "Trayectoria",
+    experience: "Experiencia",
+    education: "Formación",
+    languages: "Idiomas",
+    skills: "Habilidades",
+    skillsUsed: "Usadas en mis cargos",
+    skillsOther: "Otras habilidades",
+    additionalStudies: "Estudios complementarios",
+    courses: "Cursos y certificaciones",
+    coursesText: (count: number) => `${count} cursos y certificaciones.`,
+    coursesLink: "Ver todos los cursos y certificaciones",
+  },
+}[locale];
+
+const resume = locale === "es" ? resumeEs : resumeEn;
+const career = await getCareer(locale, { education: false });
+const engineering = career.phases.find((p) => p.id === "engineering")!;
+const firstYear = career.firstStart!.getUTCFullYear();
+
+// Oldest phase first, as one sentence: «Back office and reporting (2016–2020), data analysis (…), …».
+const pathText =
+  [...career.phases]
+    .reverse()
+    .map((p, i) => {
+      const name = t(locale, `phase_${p.id}` as UiKey);
+      const span = formatYearRange(p.start.getUTCFullYear(), p.end?.getUTCFullYear(), locale);
+      return `${i ? name[0].toLowerCase() + name.slice(1) : name} (${span})`;
+    })
+    .join(", ") + ".";
+
+// Read from the files at build, so the sizes cannot drift from the PDFs.
+const files = [locale, otherLocale(locale)].map((l) => ({
+  locale: l,
+  href: site.cvPdf[l],
+  kb: Math.round(fs.statSync(path.join(process.cwd(), "public", site.cvPdf[l])).size / 1000),
+}));
+
+// A skill counts as used when a role's stack lists it (case-insensitive, whole item).
+const stackItems = new Set(career.roles.flatMap((r) => orderedStack(r.stack)).map((s) => s.toLowerCase()));
+const keywords = resume.skills.flatMap((g) => g.keywords);
+const skillsUsed = keywords.filter((k) => stackItems.has(k.toLowerCase()));
+const skillsOther = keywords.filter((k) => !stackItems.has(k.toLowerCase()));
+
+const education = [...resume.education].sort((a, b) => Number(b.startDate) - Number(a.startDate));
+const jan1 = (year: string) => new Date(Date.UTC(Number(year), 0, 1));
+const additionalStudies = (resume as { additionalStudies?: string[] }).additionalStudies ?? [];
+const email = site.links.email.replace("mailto:", "");
+---
+
+<Layout title={copy.title} description={copy.description} locale={locale}>
+  <Container>
+    <header class="cv-head">
+      <div class="cv-head__name">
+        <h1 class="t-page">{site.name}</h1>
+      </div>
+      <div class="cv-head__info">
+        <p class="t-roleline">{site.roles[locale]}</p>
+        <ul class="t-ui cv-head__contact">
+          <li><a class="link-quiet" href={site.links.email}>{email}</a></li>
+          <li>
+            <a class="link-quiet" href={site.links.linkedin} target="_blank" rel="noreferrer"
+              >{t(locale, "linkedin")}<span class="sr-only"> {t(locale, "new_tab")}</span></a
+            >
+          </li>
+          <li>
+            <a class="link-quiet" href={site.links.github} target="_blank" rel="noreferrer"
+              >{t(locale, "github")}<span class="sr-only"> {t(locale, "new_tab")}</span></a
+            >
+          </li>
+          <li>{site.location} ({site.timeZone})</li>
+        </ul>
+      </div>
+      <img
+        class="cv-head__photo"
+        src={site.avatar.src}
+        width="720"
+        height="720"
+        alt={site.avatar.alt[locale]}
+        loading="eager"
+        decoding="async"
+      />
+    </header>
+
+    <section class="cv-files rule-heavy" aria-labelledby="cv-files-h">
+      <h2 class="sr-only" id="cv-files-h">{copy.filesHeading}</h2>
+      <ul class="files">
+        {
+          files.map((f, i) => (
+            <li class="files__row">
+              <span class="t-ui files__lang">{copy.fileLanguage[f.locale]}</span>
+              <span class="t-ui tnum files__meta">PDF <span aria-hidden="true">·</span> {f.kb}&nbsp;KB</span>
+              {i === 0 ? (
+                <a class="btn files__action" href={f.href} type="application/pdf" hreflang={f.locale}>{t(locale, "cv_download")}</a>
+              ) : (
+                <a class="link t-ui files__action" href={f.href} type="application/pdf" hreflang={f.locale}>{copy.download}</a>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="sidehead section" aria-labelledby="cv-profile">
+      <h2 class="t-h2 t-h2--compact" id="cv-profile">{copy.profile}</h2>
+      <div>
+        <p class="t-body">{copy.profileText(engineering.start.getUTCFullYear(), firstYear)}</p>
+      </div>
+    </section>
+
+    <section class="sidehead section" aria-labelledby="cv-path">
+      <h2 class="t-h2 t-h2--compact" id="cv-path">{copy.path}</h2>
+      <div>
+        <p class="t-body tnum">{pathText}</p>
+      </div>
+    </section>
+
+    <section class="sidehead section" aria-labelledby="cv-experience">
+      <h2 class="t-h2 t-h2--compact" id="cv-experience">{copy.experience}</h2>
+      <ol>
+        {
+          career.roles.map((r) => (
+            <li class="row row--split">
+              <span class="t-ui t-ui--dense">
+                <DateRange class="date-range--split" start={r.start} end={r.end} locale={locale} />
+              </span>
+              <div>
+                <a class="t-co link-quiet" href={r.href}>{r.role}</a>
+                <p class="t-ui row__sub">
+                  {r.company}{r.employmentType && ` · ${t(locale, `emp_${r.employmentType}` as UiKey)}`}
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="sidehead section" aria-labelledby="cv-education">
+      <h2 class="t-h2 t-h2--compact" id="cv-education">{copy.education}</h2>
+      <ol>
+        {
+          education.map((e) => (
+            <li class="row row--split">
+              <span class="t-ui t-ui--dense">
+                <DateRange
+                  class="date-range--split"
+                  start={jan1(e.startDate)}
+                  end={jan1(e.endDate)}
+                  locale={locale}
+                  precision="year"
+                />
+              </span>
+              <div>
+                <p class="t-co">{e.area}</p>
+                <p class="t-ui row__sub">{e.institution}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="sidehead section" aria-labelledby="cv-languages">
+      <h2 class="t-h2 t-h2--compact" id="cv-languages">{copy.languages}</h2>
+      <ul>
+        {
+          resume.languages.map((l) => (
+            <li class="row t-ui row__strong">{l.level ? `${l.name} (${l.level})` : l.name}</li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="sidehead section" aria-labelledby="cv-skills">
+      <h2 class="t-h2 t-h2--compact" id="cv-skills">{copy.skills}</h2>
+      <dl>
+        {
+          skillsUsed.length > 0 && (
+            <div class="row row--split">
+              <dt class="t-ui t-ui--dense row__label">{copy.skillsUsed}</dt>
+              <dd class="t-ui row__strong">{skillsUsed.join(", ")}</dd>
+            </div>
+          )
+        }
+        {
+          skillsOther.length > 0 && (
+            <div class="row row--split">
+              <dt class="t-ui t-ui--dense row__label">{copy.skillsOther}</dt>
+              <dd class="t-ui row__strong">{skillsOther.join(", ")}</dd>
+            </div>
+          )
+        }
+      </dl>
+    </section>
+
+    {
+      additionalStudies.length > 0 && (
+        <section class="sidehead section" aria-labelledby="cv-additional">
+          <h2 class="t-h2 t-h2--compact" id="cv-additional">
+            {copy.additionalStudies}
+          </h2>
+          <ul>
+            {additionalStudies.map((s) => (
+              <li class="row t-ui row__strong">{s}</li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <section class="sidehead section" aria-labelledby="cv-courses">
+      <h2 class="t-h2 t-h2--compact" id="cv-courses">{copy.courses}</h2>
+      <div>
+        <p class="t-body tnum">{copy.coursesText(certifications.items.length)}</p>
+        <p class="courses-link"><a class="link t-ui" href={withLocale("/training/", locale)}>{copy.coursesLink}</a></p>
+      </div>
+    </section>
+  </Container>
+</Layout>
+
+<style>
+  /* Header: below 768 a band (portrait beside role and contact), as on Home; from 768 the portrait sits right. */
+  .cv-head {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr);
+    column-gap: var(--s-4);
+    row-gap: var(--s-5);
+    padding-top: var(--s-6);
+  }
+  .cv-head__name {
+    grid-column: 1 / -1;
+    container-type: inline-size; /* .t-page sizes against this column */
+  }
+  .cv-head__info {
+    grid-column: 2;
+    align-self: start;
+  }
+  .cv-head__contact {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: var(--s-2);
+  }
+  .cv-head__contact li:not(:last-child)::after {
+    content: "·";
+    content: "·" / "";
+    margin-inline: 0.5em;
+    color: var(--ink-3);
+  }
+  .cv-head__contact a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    overflow-wrap: anywhere; /* under about 265 px the email is wider than the column */
+  }
+  .cv-head__photo {
+    grid-row: 2;
+    align-self: start;
+    width: 104px;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 50% 25%;
+  }
+  @media (min-width: 768px) {
+    .cv-head {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-template-rows: auto 1fr; /* a taller portrait grows the last row, never the gap under the name */
+      column-gap: var(--gutter);
+      row-gap: var(--s-4);
+      padding-top: var(--s-7);
+    }
+    .cv-head__name,
+    .cv-head__info { grid-column: 1 / span 9; }
+    .cv-head__photo {
+      grid-column: 10 / -1;
+      grid-row: 1 / -1;
+      justify-self: end;
+      width: 144px;
+    }
+  }
+  /* Under 360 the band column is too narrow for the role line («de», «e» or «and» alone on a line), so it spans the width above the band, as on Home. */
+  /* Between 960 and 1099 px the side column is too narrow for «certificaciones» at 28 px. */
+  @media (min-width: 960px) and (max-width: 1099px) {
+    .sidehead > h2 { font-size: 1.5rem; }
+  }
+  @media (max-width: 359px) {
+    .cv-head__info { display: contents; }
+    .cv-head__info > .t-roleline { grid-column: 1 / -1; grid-row: 2; text-wrap: balance; }
+    .cv-head__photo { grid-row: 3; }
+    .cv-head__contact { grid-column: 2; grid-row: 3; align-self: start; margin-top: 0; }
+  }
+
+  /* PDF file records */
+  .cv-files { margin-top: var(--s-6); }
+  .files__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-4);
+    padding-block: 14px;
+    border-bottom: var(--rule-hair) solid var(--rule);
+  }
+  .files__lang { font-weight: 600; }
+  .files__meta { color: var(--ink-2); }
+  @media (min-width: 768px) {
+    .files__row {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--gutter);
+    }
+    .files__lang { grid-column: 1 / span 3; }
+    .files__meta { grid-column: 4 / span 3; }
+    .files__action { grid-column: 7 / -1; justify-self: start; }
+  }
+
+  /* Rows: the same rhythm as the ledger; split rows put the date (or label) on the date track */
+  .row {
+    padding-block: 14px;
+    border-bottom: var(--rule-hair) solid var(--rule);
+  }
+  .row:first-child { padding-top: 0; }
+  .row--split {
+    display: grid;
+    grid-template-columns: var(--date-col) minmax(0, 1fr);
+    column-gap: var(--gutter);
+    align-items: baseline;
+  }
+  .row__sub { color: var(--ink-2); }
+  .row__label { color: var(--ink-3); font-weight: 500; }
+  .row__strong { font-weight: 500; }
+  @media (max-width: 767px) {
+    .row--split {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--s-1);
+    }
+  }
+
+  .courses-link { margin-top: var(--s-3); }
+</style>

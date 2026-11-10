@@ -1,0 +1,280 @@
+---
+import DateRange from "../DateRange.astro";
+import Icon from "../icons/Icon.astro";
+import type { Career } from "../../lib/getCareer";
+import { groupSummary, keepShown, mergeStacks } from "../../lib/ledger-summary.mjs";
+import type { Locale } from "../../i18n/locales";
+import { t, type UiKey } from "../../i18n/ui";
+import { formatMonthYear } from "../../utils/dates";
+import { orderedStack, type Stack } from "../../utils/stack";
+
+type Props = {
+  locale: Locale;
+  career: Career;
+  labels: { dates: string; job: string; caption: string };
+};
+const { locale, career, labels } = Astro.props;
+const axis = career.axis!;
+const even = axis.years.filter((y) => y.year % 2 === 0);
+// Gridlines: even years, plus the start of the axis, so a bar that starts there has a reference at every width.
+const grid = axis.years.filter((y) => y.year % 2 === 0 || y.a === 0);
+const edge = (x: number) => (x < 0.04 ? "start" : x > 0.96 ? "end" : undefined);
+const jan1 = (year: number) => new Date(Date.UTC(year, 0, 1));
+const phaseName = (id: string) => t(locale, `phase_${id}` as UiKey);
+const asOf = formatMonthYear(career.asOf, locale);
+const edu = career.education;
+const toggleAll = {
+  en: { expand: "Expand all", collapse: "Collapse all" },
+  es: { expand: "Desplegar todo", collapse: "Agrupar todo" },
+}[locale];
+
+// A Home row shows the first four tools of its role (spec 5.11).
+const shown = (stack: Stack) => orderedStack(stack).slice(0, 4);
+
+// Phase groups, then Education. A collapsed group shows one summary row: its span, the companies (or institutions),
+// the tools its rows show (or the areas studied) and one bar from its first start to its last end (C8).
+type Group = {
+  id: string;
+  precision: "month" | "year";
+  roles: Career["roles"];
+  education: Career["education"];
+  sum: ReturnType<typeof groupSummary>;
+  detail: string[];
+};
+const groups: Group[] = career.phases.map((p) => {
+  const stacks = p.roles.map((r) => r.stack);
+  return {
+    id: p.id,
+    precision: "month",
+    roles: p.roles,
+    education: [],
+    sum: groupSummary(p.roles.map((r) => ({ name: r.company, start: r.start, end: r.end, a: r.a, b: r.b }))),
+    detail: keepShown(orderedStack(mergeStacks(stacks)), stacks.map(shown)),
+  };
+});
+if (edu.length > 0) {
+  groups.push({
+    id: "education",
+    precision: "year",
+    roles: [],
+    education: edu,
+    sum: groupSummary(edu.map((e) => ({ name: e.institution, start: jan1(e.startYear), end: jan1(e.endYear), a: e.a, b: e.b }))),
+    detail: [...new Set(edu.map((e) => e.area))],
+  });
+}
+---
+
+<div class="tl lg" data-draw="pending" data-lg style={`--today:${axis.today}`}>
+  <div class="lg-row lg-head">
+    <button
+      type="button"
+      class="link t-ui t-ui--dense lg-all"
+      data-lg-all
+      data-expand={toggleAll.expand}
+      data-collapse={toggleAll.collapse}
+    >{toggleAll.collapse}</button>
+    <span class="t-meta lg-head__label" aria-hidden="true">{labels.dates}</span>
+    <span class="t-meta lg-head__label" aria-hidden="true">{labels.job}</span>
+    <div class="lg-axes" aria-hidden="true">
+      <div class="tl-axis">
+        <span class="tl-tick t-meta lg-first" style="--x:0" data-edge="start">{axis.firstYear}</span>
+        <span class="tl-asof t-meta">{asOf}</span>
+      </div>
+      <div class="tl-axis lg-ticks">
+        {even.map((y) => <span class="tl-tick t-meta" style={`--x:${y.a}`} data-edge={edge(y.a)}>{y.year}</span>)}
+      </div>
+    </div>
+  </div>
+  <ol>
+    {
+      groups.map((g) => (
+        <li data-lg-group>
+          <h3 class="lg-phase t-ui t-ui--dense">
+            <span class="lg-phase__in" data-lg-label>
+              <span class="lg-phase__text">
+                <Icon name={`phase-${g.id}`} class="lg-icon" data-phase={g.id} />
+                <span class="lg-phase__words">
+                  <span class="lg-phase__name">{phaseName(g.id)}</span>
+                  <DateRange start={g.sum.start} end={g.sum.end} locale={locale} precision={g.precision} />
+                </span>
+              </span>
+              <span class="lg-sign" aria-hidden="true" />
+            </span>
+          </h3>
+          <div class="lg-body" id={`ledger-${g.id}`} data-lg-body>
+            <div class="lg-row tl-row lg-sum" data-lg-sum>
+              <span class="t-ui t-ui--dense lg-date">
+                <DateRange class="date-range--split" start={g.sum.start} end={g.sum.end} locale={locale} precision={g.precision} />
+              </span>
+              <div>
+                <p class="t-co">{g.sum.names.map((n, i, all) => <Fragment>{i > 0 ? " " : ""}<span class="lg-name">{i < all.length - 1 ? `${n},` : n}</span></Fragment>)}</p>
+                {g.detail.length > 0 && <p class="t-ui t-ui--dense stack-line">{g.detail.join(", ")}</p>}
+              </div>
+              <div class="tl-track lg-track" aria-hidden="true">
+                {grid.map((y) => <i class="tl-gl" style={`--x:${y.a}`} />)}
+                <i class="tl-bar" data-phase={g.id} style={`--a:${g.sum.a};--b:${g.sum.b}`} />
+                <i class="tl-today" />
+              </div>
+            </div>
+            <ol data-lg-rows>
+              {g.roles.map((r) => {
+                const stack = shown(r.stack).join(", ");
+                return (
+                  <li class="lg-row tl-row">
+                    <span class="t-ui t-ui--dense lg-date">
+                      <DateRange class="date-range--split" start={r.start} end={r.end} locale={locale} />
+                    </span>
+                    <div>
+                      <a class="t-co link-quiet lg-link" href={r.href}>{r.company}</a>
+                      <p class="t-ui lg-sub">{r.role}{r.employmentType && <span class="t-meta"> · {t(locale, `emp_${r.employmentType}` as UiKey)}</span>}</p>
+                      {stack && <p class="t-ui t-ui--dense stack-line">{stack}</p>}
+                    </div>
+                    <div class="tl-track lg-track" aria-hidden="true">
+                      {grid.map((y) => <i class="tl-gl" style={`--x:${y.a}`} />)}
+                      <i class="tl-bar" data-phase={r.phase} style={`--a:${r.a};--b:${r.b}`} />
+                      <i class="tl-today" />
+                    </div>
+                  </li>
+                );
+              })}
+              {g.education.map((e) => (
+                <li class="lg-row tl-row">
+                  <span class="t-ui t-ui--dense lg-date">
+                    <DateRange
+                      class="date-range--split"
+                      start={jan1(e.startYear)}
+                      end={jan1(e.endYear)}
+                      locale={locale}
+                      precision="year"
+                    />
+                  </span>
+                  <div>
+                    <p class="t-co">{e.area}</p>
+                    <p class="t-ui lg-sub">{e.institution}</p>
+                  </div>
+                  <div class="tl-track lg-track" aria-hidden="true">
+                    {grid.map((y) => <i class="tl-gl" style={`--x:${y.a}`} />)}
+                    <i class="tl-bar" data-phase="education" style={`--a:${e.a};--b:${e.b}`} />
+                    <i class="tl-today" />
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+  <div class="lg-foot">
+    <ul class="tl-legend t-meta">
+      {
+        (["engineering", "analysis", "backoffice", "education"] as const).map((id) => (
+          <li>
+            <Icon name={`phase-${id}`} class="lg-icon" data-phase={id} />
+            {phaseName(id)}
+          </li>
+        ))
+      }
+    </ul>
+    <p class="t-meta lg-caption">{labels.caption.replace("{asOf}", asOf)}</p>
+  </div>
+</div>
+
+<script>
+  import { initLedger } from "../../scripts/ledger-phases.mjs";
+
+  document.querySelectorAll<HTMLElement>("[data-lg]").forEach((root) => initLedger(root));
+</script>
+
+<style>
+  .lg-row {
+    display: grid;
+    grid-template-columns: var(--date-col) minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: var(--gutter);
+    align-items: baseline;
+    padding-block: 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .lg-head { padding-block: 0 6px; border-bottom-color: var(--ink); align-items: end; }
+  .lg-head__label { grid-row: 2; color: var(--ink-3); }
+  .lg-axes { grid-column: 3; grid-row: 1 / 3; }
+  /* Expand or collapse all, on the baseline of the as-of label. It shows from the first paint when JavaScript runs
+     (data-js, set in <head>), so revealing it moves nothing; without JavaScript it is not shown.
+     The padding puts its baseline there: the as-of line starts 3rem (the two axis rows) above the end of the label row
+     (1.4 × 0.875rem), and Archivo sets the baseline about 1em below the top of a line in both type styles. */
+  .lg-all { grid-column: 1 / 3; grid-row: 1; justify-self: start; display: inline-flex; align-items: flex-end; min-height: 44px; padding-bottom: 0.48rem; }
+  :root:not([data-js]) .lg-all { display: none; }
+  .lg-first { display: none; }
+
+  /* Group heading: a span without JavaScript, a disclosure button with it (same look, plus the sign). */
+  .lg-phase { border-bottom: 1px solid var(--ink); font-weight: 600; }
+  .lg-phase__in { display: flex; column-gap: var(--s-3); width: 100%; padding: 22px 0 6px; text-align: start; }
+  /* The icon keeps its own column; the name and the range wrap after it, and the icon stays centered on the first line (line height 1.45). */
+  .lg-phase__text { flex: 1; display: flex; align-items: flex-start; column-gap: var(--s-2); }
+  .lg-phase__text > :global(.lg-icon) { margin-top: calc((1.45em - 18px) / 2); }
+  .lg-phase__words { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; column-gap: var(--s-2); }
+  .lg-phase :global(.date-range) { color: var(--ink-3); font-weight: 400; }
+  .lg :global(.lg-icon) { flex: none; width: 18px; height: 18px; color: var(--ph-eng); }
+  .lg :global(.lg-icon[data-phase="analysis"]) { color: var(--ph-ana); }
+  .lg :global(.lg-icon[data-phase="backoffice"]) { color: var(--ph-bo); }
+  .lg :global(.lg-icon[data-phase="education"]) { color: var(--ink-3); }
+  .tl-legend :global(.lg-icon) { margin-right: var(--s-2); }
+  /* As the swatches and bars in global.css: one system color in forced colors. */
+  @media (forced-colors: active) {
+    .lg :global(.lg-icon), .lg :global(.lg-icon[data-phase]) { color: CanvasText; }
+  }
+  .lg-sign { display: none; }
+  /* Centered on the first line of the heading (line height 1.45). Shown from the first paint when JavaScript runs, so the heading does not reflow when it becomes a button. */
+  :root[data-js] .lg-sign { display: block; position: relative; flex: none; width: 12px; height: 12px; margin-top: calc((1.45em - 12px) / 2); color: var(--ink-3); }
+  .lg-sign::before, .lg-sign::after { content: ""; position: absolute; }
+  .lg-sign::before { inset: 5px 0 auto; border-top: 2px solid; }
+  .lg-sign::after { inset: 0 auto 0 5px; border-left: 2px solid; transform: scaleY(0); }
+  [aria-expanded="false"] > .lg-sign::after { transform: none; }
+  button:hover > .lg-sign { color: var(--accent); }
+  button:hover .lg-phase__name { text-decoration: underline 1px var(--accent); text-underline-offset: 0.2em; }
+  @media (prefers-reduced-motion: no-preference) {
+    .lg-sign::after { transition: transform var(--t-fast) var(--ease-out); }
+  }
+  /* The summary row shows only on screen, while its group is collapsed (.lg-closed) or moving. Without JavaScript and
+     on paper every group is open (spec 9.1), and paper has no controls: no control, no signs. A collapsed heading leaves
+     its range to the summary row, so the range shows once. A click on the summary row opens the group (ledger-phases.mjs). */
+  .lg-sum { display: none; cursor: pointer; }
+  @media screen {
+    .lg-closed > .lg-sum, .lg-moving > .lg-sum { display: grid; }
+    .lg-closed:not(.lg-moving) > [data-lg-rows] { display: none; }
+    .lg-phase [aria-expanded="false"] :global(.date-range) { display: none; }
+  }
+  @media print {
+    .lg-all, :root[data-js] .lg-sign { display: none; }
+  }
+  /* A name breaks only after its comma; a name wider than the column still wraps inside. */
+  .lg-name { display: inline-block; max-width: 100%; }
+  /* While a group opens or closes, its summary row lies over the first role rows and the group clips as it folds.
+     hidden first: browsers without overflow: clip (Safari before 16) still clip. */
+  .lg-moving { position: relative; overflow: hidden; overflow: clip; }
+  .lg-moving > .lg-sum { position: absolute; inset: 0 0 auto; }
+
+  .lg-sub { color: var(--ink-2); }
+  /* The company link covers the whole row; the track sits above it, so it lets clicks through. */
+  .lg-link::after { content: ""; position: absolute; inset: 0; }
+  /* The focus ring is drawn on the whole row: Tab and Shift+Tab scroll the rest of the row into view too (up to 36px
+     above the link and 113px below it, at 390px and in ES at 960px, plus the 4px ring). */
+  .lg-link { scroll-margin-block: 2.5rem 7.5rem; }
+  .lg-track { align-self: stretch; margin-block: -14px; pointer-events: none; }
+  @supports selector(:has(*)) {
+    .lg-row:has(.lg-link:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .lg-link:focus-visible { outline: none; }
+  }
+  .lg-foot { display: grid; row-gap: var(--s-2); margin-top: var(--s-4); }
+  .lg-caption { color: var(--ink-3); }
+
+  @media (max-width: 959px) {
+    .lg-row { grid-template-columns: minmax(0, 1fr); }
+    .lg-head__label, .lg-ticks { display: none; }
+    .lg-axes { grid-column: 1; grid-row: 2; }
+    .lg-all { grid-column: 1; }
+    .lg-first { display: block; }
+    .lg-date { font-size: 0.875rem; }
+    .lg-track { margin-block: var(--s-2) 0; min-height: 20px; }
+  }
+</style>

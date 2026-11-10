@@ -1,0 +1,145 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Container from "../Container.astro";
+import FilterList from "../FilterList.astro";
+import PageHead from "../PageHead.astro";
+import ProjectCard from "../ProjectCard.astro";
+import { site } from "../../config/site";
+import { isSlugForLocale, stripLocaleFromSlug } from "../../i18n/content";
+import type { Locale } from "../../i18n/locales";
+import { withLocale } from "../../i18n/routing";
+import { t } from "../../i18n/ui";
+import { orderedStack } from "../../utils/stack";
+import { toTagId } from "../../utils/tags";
+
+type Props = { locale: Locale };
+const { locale } = Astro.props;
+
+const copy = {
+  en: {
+    title: "Projects",
+    description: "Projects of Luis Felipe Peña, with their stack, search and tag filters.",
+    descriptionEmpty:
+      "Projects of Luis Felipe Peña. No public case studies yet; his work is described role by role in Experience.",
+    emptyText: "No public case studies yet. My work is described role by role in Experience.",
+    viewExperience: "View experience",
+    searchLabel: "Search projects",
+    searchPlaceholder: "Title, tool or tag",
+    groupLabel: "Tags",
+    hint: "A project must have every selected tag.",
+    counter: "{n} of {total} projects",
+    noMatch: "No projects match this search.",
+  },
+  es: {
+    title: "Proyectos",
+    description: "Proyectos de Luis Felipe Peña, con sus tecnologías, búsqueda y filtros por etiqueta.",
+    descriptionEmpty:
+      "Proyectos de Luis Felipe Peña. Todavía no hay casos publicados; su trabajo está descrito cargo por cargo en Experiencia.",
+    emptyText: "Todavía no hay casos publicados. Mi trabajo está descrito, cargo por cargo, en Experiencia.",
+    viewExperience: "Ver experiencia",
+    searchLabel: "Buscar proyectos",
+    searchPlaceholder: "Título, herramienta o etiqueta",
+    groupLabel: "Etiquetas",
+    hint: "Se muestran los proyectos que tienen todas las etiquetas elegidas.",
+    counter: "{n} de {total} proyectos",
+    noMatch: "Ningún proyecto coincide con esta búsqueda.",
+  },
+};
+const c = copy[locale];
+
+const rows = (await getCollection("projects"))
+  .filter((p) => isSlugForLocale(p.slug, locale))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .map((entry) => {
+    const labels = [...(entry.data.tags ?? []), ...orderedStack(entry.data.stack)];
+    return {
+      entry,
+      labels,
+      tagIds: [...new Set(labels.map(toTagId).filter(Boolean))].join(" "),
+      text: [entry.data.title, ...labels, ...entry.data.highlights].join(" ").toLowerCase(),
+    };
+  });
+
+// Toggles: tags and stack items as one set, deduplicated by id; the first spelling wins.
+const labelById = new Map<string, string>();
+for (const label of rows.flatMap((r) => r.labels)) {
+  const id = toTagId(label);
+  if (id && !labelById.has(id)) labelById.set(id, label.trim());
+}
+const options = [...labelById]
+  .map(([id, label]) => ({ id, label }))
+  .sort((a, b) => a.label.localeCompare(b.label, locale));
+---
+
+<Layout
+  title={`${c.title} — ${site.shortName}`}
+  description={rows.length > 0 ? c.description : c.descriptionEmpty}
+  locale={locale}
+>
+  <Container>
+    <PageHead title={c.title}>
+      {
+        rows.length === 0 && (
+          <Fragment>
+            <p class="t-lede">{c.emptyText}</p>
+            <div class="empty-actions">
+              <a class="btn" href={withLocale("/experience/", locale)}>{c.viewExperience}</a>
+              <a class="link t-ui empty-actions__cv" href={site.cvPdf[locale]} type="application/pdf" hreflang={locale}>
+                {t(locale, "cv_download")}
+              </a>
+            </div>
+          </Fragment>
+        )
+      }
+    </PageHead>
+    {
+      rows.length > 0 && (
+        <div class="project-filter">
+          <FilterList
+            mode="all"
+            searchId="project-search"
+            searchLabel={c.searchLabel}
+            searchPlaceholder={c.searchPlaceholder}
+            groupLabel={c.groupLabel}
+            options={options}
+            counterTemplate={c.counter}
+            total={rows.length}
+            clearLabel={t(locale, "filter_clear")}
+            emptyText={c.noMatch}
+            hint={c.hint}
+          >
+            <ul>
+              {rows.map(({ entry, tagIds, text }) => (
+                <li data-filter-item data-tags={tagIds} data-text={text}>
+                  <ProjectCard
+                    href={withLocale(`/projects/${stripLocaleFromSlug(entry.slug, locale)}/`, locale)}
+                    title={entry.data.title}
+                    date={entry.data.date}
+                    locale={locale}
+                    type={entry.data.type}
+                    status={entry.data.status}
+                    highlights={entry.data.highlights}
+                    stack={entry.data.stack}
+                  />
+                </li>
+              ))}
+            </ul>
+          </FilterList>
+        </div>
+      )
+    }
+  </Container>
+</Layout>
+
+<style>
+  .empty-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-4) var(--s-6);
+    margin-top: var(--s-6);
+  }
+  .empty-actions__cv { display: inline-flex; align-items: center; min-height: 44px; font-weight: 500; }
+  .project-filter { margin-top: var(--s-5); }
+</style>

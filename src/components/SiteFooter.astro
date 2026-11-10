@@ -1,40 +1,35 @@
 ---
 import Container from "./Container.astro";
 import { site } from "../config/site";
-import { getLocaleFromPathname } from "../i18n/routing";
+import type { Locale } from "../i18n/locales";
+import { otherLocale, withLocale } from "../i18n/routing";
 import { t } from "../i18n/ui";
 
-const year = new Date().getFullYear();
-const locale = getLocaleFromPathname(Astro.url.pathname);
+type Props = { locale: Locale; languageSwitch: boolean };
+
+const { locale, languageSwitch } = Astro.props;
+const other = otherLocale(locale);
+const year = new Date().getUTCFullYear();
 ---
 
-<footer class="border-t border-slate-800/60">
-  <Container class="py-10 text-sm text-slate-400">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <p>
-        © {year} {site.name}. {t(locale, "built_with")}{" "}
-        <span class="text-slate-300">Astro</span> {t(locale, "and")}{" "}
-        <span class="text-slate-300">Tailwind</span>.
-      </p>
-      <div class="flex flex-wrap items-center gap-3">
-        <a class="hover:text-slate-200" href="/admin/">{t(locale, "admin")}</a>
-        <a class="hover:text-slate-200" href={site.links.github} target="_blank" rel="noreferrer">
-          {t(locale, "github")}
-        </a>
-        {
-          site.links.linkedin ? (
-            <a
-              class="hover:text-slate-200"
-              href={site.links.linkedin}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {t(locale, "linkedin")}
-            </a>
-          ) : null
-        }
-        <a class="hover:text-slate-200" href={site.links.email}>{t(locale, "email")}</a>
-      </div>
-    </div>
+<footer class="site-footer">
+  <Container class="site-footer__row">
+    <p class="t-meta site-footer__copy">© {year} {site.name}</p>
+    <nav class="t-meta site-footer__nav" aria-label={t(locale, "footer_label")}>
+      <a class="link-quiet" href={site.links.email}>{t(locale, "email")}</a>
+      <a class="link-quiet" href={site.links.linkedin} target="_blank" rel="noreferrer">
+        {t(locale, "linkedin")}<span class="sr-only"> {t(locale, "new_tab")}</span>
+      </a>
+      <a class="link-quiet" href={site.links.github} target="_blank" rel="noreferrer">
+        {t(locale, "github")}<span class="sr-only"> {t(locale, "new_tab")}</span>
+      </a>
+      {
+        languageSwitch && (
+          <a class="link-quiet" href={withLocale(Astro.url.pathname, other)} lang={other} hreflang={other}>
+            {t(locale, other === "es" ? "lang_es" : "lang_en")}
+          </a>
+        )
+      }
+    </nav>
   </Container>
 </footer>

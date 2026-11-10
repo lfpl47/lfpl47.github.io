@@ -1,0 +1,247 @@
+---
+import { CLOUDS, DEFAULT, FAMILIES, TEXT, describe, scene, svgMarkup } from "../../lib/architectures.mjs";
+import type { Locale } from "../../i18n/locales";
+
+type Props = { locale: Locale; title: string; lede: string; note: string };
+const { locale, title, lede, note } = Astro.props;
+
+const t = TEXT[locale];
+const ui = {
+  en: { family: "Discipline", cloud: "Cloud", pattern: "Pattern", replay: "Replay the flow" },
+  es: { family: "Disciplina", cloud: "Nube", pattern: "Patrón", replay: "Repetir el recorrido" },
+}[locale];
+const families = Object.keys(FAMILIES) as (keyof typeof FAMILIES)[];
+const text = describe(DEFAULT, locale);
+// Both layouts are drawn at their natural height; a container query shows the one that fits. Without JavaScript this is the whole explorer.
+const views = (["wide", "narrow"] as const).map((layout) => {
+  const sc = scene(DEFAULT, locale, layout);
+  const ids = { title: `ax-${layout}-title`, desc: `ax-${layout}-desc` };
+  return { layout, sc, ids, markup: svgMarkup(sc, ids, text) };
+});
+---
+
+<section class="section rule-section ax" aria-labelledby="architectures" data-ax data-locale={locale}>
+  <h2 class="t-h2 ax__title" id="architectures">{title}</h2>
+  <p class="t-body ax__lede">{lede}</p>
+  <div class="ax__controls" data-ax-controls>
+    <div>
+      <p class="ax__label" id="ax-family">{ui.family}</p>
+      <div class="ax__options" role="group" aria-labelledby="ax-family">
+        {
+          families.map((f) => (
+            <button type="button" class="ax__opt" data-ax-family={f} aria-pressed={String(f === DEFAULT.family)}>
+              {t.families[f]}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+    <div>
+      <p class="ax__label" id="ax-cloud">{ui.cloud}</p>
+      <div class="ax__options ax__options--3" role="group" aria-labelledby="ax-cloud">
+        {
+          Object.entries(CLOUDS).map(([id, c]) => (
+            <button type="button" class="ax__opt" data-ax-cloud={id} aria-pressed={String(id === DEFAULT.cloud)}>
+              {c.label}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+    <div>
+      <p class="ax__label" id="ax-pattern">{ui.pattern}</p>
+      {
+        families.map((f) => (
+          <div class="ax__options ax__options--patterns" role="group" aria-labelledby="ax-pattern" data-ax-patterns={f} hidden={f !== DEFAULT.family}>
+            {FAMILIES[f].map((p) => (
+              <button type="button" class="ax__opt" data-ax-pattern={p} aria-pressed={String(p === DEFAULT.pattern)}>
+                {t.patterns[p as keyof typeof t.patterns][0]}
+              </button>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+  <figure class="ax__figure">
+    <div class="ax__stage" data-ax-stage>
+      {
+        views.map((v) => (
+          <svg
+            class={`ax-svg ax-svg--${v.layout}`}
+            data-ax-svg={v.layout}
+            viewBox={v.sc.natural.join(" ")}
+            role="img"
+            aria-labelledby={v.ids.title}
+            aria-describedby={v.ids.desc}
+            set:html={v.markup}
+          />
+        ))
+      }
+    </div>
+    <figcaption class="ax__caption">
+      <p class="ax__name" data-ax-name>{text.label}</p>
+      <p class="t-ui ax__summary" data-ax-summary>{text.summary}</p>
+      <p class="t-body ax__desc" data-ax-desc aria-live="polite">{text.desc}</p>
+      <button type="button" class="link t-ui ax__replay" data-ax-replay>{ui.replay}</button>
+      <p class="t-meta ax__note">{note}</p>
+    </figcaption>
+  </figure>
+</section>
+
+<script>
+  import { initArchitectureExplorer } from "../../scripts/architecture-explorer.mjs";
+
+  document.querySelectorAll<HTMLElement>("[data-ax]").forEach((root) => initArchitectureExplorer(root));
+</script>
+
+<style>
+  .ax__lede { margin-top: var(--s-3); max-width: var(--measure); color: var(--ink-2); }
+
+  /* Controls and replay need JavaScript. data-js is set in <head>, so they show from the first paint and move nothing;
+     the replay only where motion is allowed. Without JavaScript only the default scheme shows. */
+  .ax__controls { display: none; row-gap: var(--s-5); margin-top: var(--s-6); }
+  :root[data-js] .ax__controls { display: grid; }
+  @media (prefers-reduced-motion: no-preference) {
+    :root[data-js] .ax__replay { display: inline-flex; }
+  }
+  /* Paper has no controls (as the ledger): it prints the scheme on screen, its caption and the note. */
+  @media print {
+    :root[data-js] .ax__controls, :root[data-js] .ax__replay { display: none; }
+  }
+
+  /* Toggles: text on hairlines; the pressed one gets the 3 px ink rule of the header's current item. */
+  .ax__label {
+    margin-bottom: var(--s-2);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    line-height: 1.4;
+    font-weight: 500;
+    color: var(--ink-3);
+  }
+  .ax__options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    border-top: 1px solid var(--rule);
+  }
+  .ax__options--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ax__opt {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 44px;
+    padding-block: 10px;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.25;
+    font-weight: 500;
+    color: var(--ink-2);
+    text-align: left;
+    scroll-margin-block: 8px; /* the 2 + 3 px focus ring stays in view when focus scrolls a toggle to the viewport edge */
+  }
+  .ax__opt:hover { color: var(--ink); }
+  .ax__opt[aria-pressed="true"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); box-shadow: inset 0 -2px 0 var(--ink); }
+
+  .ax__figure { margin: var(--s-6) 0 0; }
+  .ax__stage { container-type: inline-size; }
+  .ax__caption { margin-top: var(--s-5); max-width: var(--measure); }
+  .ax__name { font-family: var(--font-sans); font-size: 1.1875rem; line-height: 1.3; font-weight: 650; }
+  .ax__summary { color: var(--ink-2); }
+  /* Mostly service names, which never hyphenate (spec 3.4). */
+  .ax__desc { margin-top: var(--s-3); color: var(--ink-2); hyphens: manual; }
+  .ax__replay { display: none; align-items: center; min-height: 44px; margin-top: var(--s-2); scroll-margin-block: 8px; }
+  .ax__note { margin-top: var(--s-3); color: var(--ink-3); }
+
+  @media (min-width: 640px) {
+    .ax__options--patterns { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (min-width: 960px) {
+    .ax {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--gutter);
+      align-items: start;
+    }
+    .ax__title { grid-column: 1 / span 3; }
+    .ax__lede { grid-column: 4 / span 6; margin-top: 0; }
+    .ax__controls { grid-column: 1 / span 3; grid-row: 2; }
+    .ax__figure { grid-column: 4 / -1; grid-row: 2; }
+    .ax .ax__options { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (forced-colors: active) {
+    .ax__opt[aria-pressed="true"] { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 0.3em; }
+  }
+
+  /* ---------- The drawing (made by architectures.mjs, so global under .ax) ---------- */
+  /* Wide needs 600 px and narrow 288 px of stage, so no label renders under 14 px. */
+  .ax :global(.ax-svg) { display: block; width: 100%; height: auto; overflow: visible; font-family: var(--font-sans); }
+  .ax :global(.ax-svg--wide) { display: none; max-width: 720px; }
+  .ax :global(.ax-svg--narrow) { max-width: 340px; }
+  @container (min-width: 600px) {
+    .ax :global(.ax-svg--wide) { display: block; }
+    .ax :global(.ax-svg--narrow) { display: none; }
+  }
+  .ax :global(:is(.ax-top, .ax-side-l, .ax-side-r)) {
+    stroke: var(--ink-2);
+    stroke-width: 1;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .ax :global(.ax-top) { fill: var(--plate); }
+  .ax :global(.ax-side-l) { fill: var(--grid); fill: color-mix(in srgb, var(--ink) 12%, var(--paper)); }
+  .ax :global(.ax-side-r) { fill: var(--rule); fill: color-mix(in srgb, var(--ink) 22%, var(--paper)); }
+  .ax :global(.ax-hit) { fill: var(--accent); opacity: 0; }
+  .ax :global(.ax-tile) {
+    fill: #fff;
+    fill: color-mix(in srgb, #fff 90%, var(--paper));
+    stroke: var(--rule);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+  .ax :global(.ax-tile--own) { fill: var(--paper); stroke: var(--ink-3); }
+  .ax :global(.ax-glyph) {
+    fill: none;
+    stroke: var(--ink-2);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .ax :global(.ax-role) { fill: var(--ink-3); }
+  .ax :global(:is(.ax-name, .ax-zone)) { fill: var(--ink); font-weight: 600; }
+  .ax :global(.ax-group-label) { fill: var(--ink-2); font-weight: 500; }
+  .ax :global(.ax-zonebox) {
+    fill: none;
+    stroke: var(--ink-3);
+    stroke-width: 1;
+    stroke-dasharray: 3 4;
+    vector-effect: non-scaling-stroke;
+  }
+  .ax :global(.ax-line) { fill: none; stroke: var(--ink-2); stroke-width: 1.25; vector-effect: non-scaling-stroke; }
+  .ax :global(.ax-arrow) { fill: var(--ink-2); }
+  .ax :global(.ax-link--relation .ax-line) { stroke: var(--ink-3); stroke-width: 1; }
+  .ax :global(.ax-link--control .ax-line) { stroke: var(--ink-3); stroke-dasharray: 4 4; }
+  .ax :global(.ax-link--control .ax-arrow) { fill: var(--ink-3); }
+  /* A packet is a zero-length dash with round caps, moved along the link by its offset. */
+  .ax :global(.ax-pk) {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 9;
+    stroke-linecap: round;
+    stroke-dasharray: 0.001 199.999;
+    opacity: 0;
+  }
+  .ax :global(.ax-pk--hole) { stroke: var(--paper); stroke-width: 4.5; }
+  @media screen {
+    .ax[data-play="pending"] :global(:is(.ax-node, .ax-link, .ax-group)) { opacity: 0; }
+  }
+  @media (forced-colors: active) {
+    .ax :global(:is(.ax-top, .ax-side-l, .ax-side-r, .ax-tile--own)) { fill: Canvas; stroke: CanvasText; }
+    .ax :global(.ax-tile:not(.ax-tile--own)) { forced-color-adjust: none; fill: #fff; stroke: CanvasText; }
+    .ax :global(:is(.ax-line, .ax-glyph, .ax-zonebox)) { stroke: CanvasText; }
+    .ax :global(:is(.ax-arrow, .ax-role, .ax-name, .ax-zone, .ax-group-label)) { fill: CanvasText; }
+    .ax :global(.ax-pk) { stroke: Highlight; }
+  }
+</style>
