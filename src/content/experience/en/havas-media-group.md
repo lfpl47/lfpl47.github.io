@@ -24,4 +24,4 @@ featured: true
 
 - AWS-based pipelines and event-driven architectures
 - Serverless backend with AWS Lambda
-- Delivery practices: Scrum and technical documentation
+- Delivery with Scrum and technical documentation

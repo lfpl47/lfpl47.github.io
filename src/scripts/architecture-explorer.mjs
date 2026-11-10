@@ -5,7 +5,7 @@ const EASE = "cubic-bezier(.2, .7, .2, 1)";
 const STEP = { data: 760, software: 560 };
 const SVG_NS = "http://www.w3.org/2000/svg";
 
-/** Wires one explorer: the three toggle groups, both SVG layouts, the live description and the replay. */
+/** Wires one explorer: the three radio groups, both SVG layouts, the live description and the replay. */
 export function initArchitectureExplorer(root) {
   const locale = root.dataset.locale;
   const svgs = [...root.querySelectorAll("[data-ax-svg]")];
@@ -18,7 +18,7 @@ export function initArchitectureExplorer(root) {
   const state = { ...DEFAULT };
   const last = { data: DEFAULT.pattern, software: "rest" };
   const scenes = new Map();
-  const buttons = [...root.querySelectorAll("[data-ax-family], [data-ax-cloud], [data-ax-pattern]")].map((el) => {
+  const options = [...root.querySelectorAll("input[data-ax-family], input[data-ax-cloud], input[data-ax-pattern]")].map((el) => {
     const field = "axFamily" in el.dataset ? "family" : "axCloud" in el.dataset ? "cloud" : "pattern";
     return { el, field, value: el.dataset[{ family: "axFamily", cloud: "axCloud", pattern: "axPattern" }[field]] };
   });
@@ -45,7 +45,7 @@ export function initArchitectureExplorer(root) {
     name.textContent = text.label;
     summary.textContent = text.summary;
     desc.textContent = text.desc;
-    for (const b of buttons) b.el.setAttribute("aria-pressed", String(state[b.field] === b.value));
+    for (const o of options) o.el.checked = state[o.field] === o.value;
     for (const g of root.querySelectorAll("[data-ax-patterns]")) g.hidden = g.dataset.axPatterns !== state.family;
   };
 
@@ -133,7 +133,7 @@ export function initArchitectureExplorer(root) {
     draw(true);
     owe();
   };
-  for (const b of buttons) b.el.addEventListener("click", () => select(b.field, b.value));
+  for (const o of options) o.el.addEventListener("change", () => select(o.field, o.value));
   replay.addEventListener("click", go);
   // Reduced motion turned on mid-visit: stop and show the scheme at once (CSS hides the replay).
   reduce.addEventListener("change", () => reduce.matches && go());

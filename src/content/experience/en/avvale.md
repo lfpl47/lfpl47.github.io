@@ -30,6 +30,7 @@ tags: ["aws", "data-pipelines", "etl", "event-driven", "lambda", "sqs", "sns", "
 
 ## Environment
 
-- Languages: Python, SQL, PL/SQL
-- Databases: Oracle, PostgreSQL
-- Tools: AWS Lambda, S3, SQS, SNS, CloudWatch; Terraform, Docker, Git
+- Python, SQL and PL/SQL
+- Oracle and PostgreSQL
+- AWS Lambda, S3, SQS, SNS and CloudWatch
+- Terraform, Docker and Git
