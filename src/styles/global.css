@@ -188,7 +188,7 @@
   /* ---------- Type ---------- */
   .t-display {
     font-family: var(--font-sans);
-    font-size: min(9.375rem, 100cqi / 8.7);
+    font-size: min(5.5rem, 100cqi / 9.5); /* one line that fills a phone, capped at 88 px on wide screens */
     line-height: .9;
     font-weight: 700;
     font-stretch: 112%;
@@ -290,7 +290,6 @@
     .t-co { font-size: 1.25rem; }
   }
   @media (max-width: 767px) {
-    .t-display { font-size: calc(100cqi / 5.85); }
     .t-body { font-size: 1.0625rem; }
     .t-body, .t-lede, .prose p, .prose li { hyphens: auto; hyphenate-limit-chars: 8 4 4; }
   }
