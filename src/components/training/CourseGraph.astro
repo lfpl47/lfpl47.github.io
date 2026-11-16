@@ -1,0 +1,243 @@
+---
+import { buildGraph, layout, radius } from "../../lib/course-graph.mjs";
+import { ICONS } from "../icons/icons.mjs";
+import certifications from "../../data/certifications.json";
+import titlesEn from "../../data/certification-titles.en.json";
+import { t, type UiKey } from "../../i18n/ui";
+import type { Locale } from "../../i18n/locales";
+
+type Props = { locale: Locale };
+const { locale } = Astro.props;
+
+const ui = {
+  en: {
+    label: "Courses and certifications as a graph, by area and topic",
+    title: "{n} courses and certifications",
+    hint: "Point at a node or select it to see its courses. Each course opens its PDF in Google Drive.",
+    one: "1 course",
+    many: "{n} courses",
+    kArea: "Area",
+    kTopic: "Topic",
+    kCourse: "Course",
+    open: "Open the PDF in Google Drive",
+  },
+  es: {
+    label: "Cursos y certificaciones como grafo, por área y tema",
+    title: "{n} cursos y certificaciones",
+    hint: "Pasa el cursor por un nodo o selecciónalo para ver sus cursos. Cada curso abre su PDF en Google Drive.",
+    one: "1 curso",
+    many: "{n} cursos",
+    kArea: "Área",
+    kTopic: "Tema",
+    kCourse: "Curso",
+    open: "Abrir el PDF en Google Drive",
+  },
+}[locale];
+
+// The English page shows the translated title; topics always come from the title on the certificate.
+const en = titlesEn as Record<string, string>;
+const items = certifications.items.map((i) => ({ ...i, label: (locale === "en" && en[i.title]) || i.title }));
+const g = buildGraph(items, certifications.folders, locale, (k: string) => t(locale, `cert_${k}` as UiKey));
+const hubs = g.nodes.filter((n) => n.kind !== "course");
+const courses = g.nodes.filter((n) => n.kind === "course");
+// Both layouts are drawn at build time; a container query shows the one that fits. Without JavaScript this is a still picture.
+const views = ([["wide", 880, 560], ["narrow", 340, 760]] as const).map(([name, W, H]) => ({ name, W, H, pos: layout(g, W, H) }));
+const areaKeys = certifications.folders.map((f) => f.key);
+const at = (pos: Record<string, number[]>, id: string) => ({ "data-x": pos[id][0], "data-y": pos[id][1], transform: `translate(${pos[id][0]} ${pos[id][1]})` });
+---
+
+<figure class="cg" data-cg data-one={ui.one} data-many={ui.many} data-k-area={ui.kArea} data-k-topic={ui.kTopic} data-k-course={ui.kCourse} data-open={ui.open}>
+  <div class="cg__stage" data-cg-stage>
+    {
+      views.map((v) => (
+        <svg class={`cg-svg cg-svg--${v.name}`} viewBox={`0 0 ${v.W} ${v.H}`} data-cg-svg role="group" aria-label={ui.label}>
+          <defs>
+            {/* One glow per area: a stop takes the color of its own gradient, not of the node that uses it. */}
+            {areaKeys.map((k) => (
+              <radialGradient id={`cg-glow-${v.name}-${k}`} data-area={k}><stop offset="0.35" stop-opacity="0.5" /><stop offset="1" stop-opacity="0" /></radialGradient>
+            ))}
+            <radialGradient id={`cg-shine-${v.name}`} cx="0.32" cy="0.28" r="0.75"><stop offset="0" stop-color="#fff" stop-opacity="0.55" /><stop offset="0.6" stop-color="#fff" stop-opacity="0" /></radialGradient>
+          </defs>
+          <g class="cg-links" aria-hidden="true">
+            {g.links.map((l) => <line data-a={l.a} data-b={l.b} data-area={g.nodes.find((n) => n.id === l.b)!.area} x1={v.pos[l.a][0]} y1={v.pos[l.a][1]} x2={v.pos[l.b][0]} y2={v.pos[l.b][1]} />)}
+          </g>
+          {/* Course dots are for the pointer only: the same links are in the panel and in the list below. */}
+          {courses.map((c) => (
+            <a class="cg-node cg-course" data-id={c.id} data-area={c.area} data-title={c.title} href={c.url} target="_blank" rel="noreferrer" tabindex="-1" aria-hidden="true" {...at(v.pos, c.id)}>
+              <circle class="cg-halo" r={radius(c) + 8} fill={`url(#cg-glow-${v.name}-${c.area})`} />
+              <circle class="cg-dot" r={radius(c)} />
+            </a>
+          ))}
+          {hubs.map((h) => {
+            const r = radius(h), s = r * 1.2;
+            return (
+              <g class={`cg-node cg-hub cg-hub--${h.kind}`} data-id={h.id} data-area={h.area} data-title={h.label} {...at(v.pos, h.id)}>
+                <g class="cg-body">
+                  <circle class="cg-halo" r={r + 18} fill={`url(#cg-glow-${v.name}-${h.area})`} />
+                  <circle class="cg-plate" r={r} />
+                  {h.kind === "area" && <circle r={r} fill={`url(#cg-shine-${v.name})`} />}
+                  {h.logo ? (
+                    <image href={h.logo} x={-s / 2} y={-s / 2} width={s} height={s} />
+                  ) : h.icon ? (
+                    <g class="cg-glyph" transform={`translate(${-s / 2} ${-s / 2}) scale(${s / 24})`} set:html={ICONS[h.icon as keyof typeof ICONS]} />
+                  ) : (
+                    <text class="cg-mark" dy="0.36em">{h.mark}</text>
+                  )}
+                </g>
+                <text class="cg-name" y={r + 15}>{h.label}</text>
+              </g>
+            );
+          })}
+        </svg>
+      ))
+    }
+  </div>
+  <figcaption class="cg__panel" data-cg-card aria-live="polite">
+    <p class="cg__kicker" data-cg-kicker hidden></p>
+    <div class="cg__head">
+      <span class="cg__badge" data-cg-badge aria-hidden="true" hidden></span>
+      <p class="cg__title" data-cg-title>{ui.title.replace("{n}", String(courses.length))}</p>
+      <p class="cg__count" data-cg-count hidden></p>
+    </div>
+    <p class="cg__hint" data-cg-hint>{ui.hint}</p>
+    <div class="cg__chips" data-cg-chips hidden></div>
+    <ul class="cg__list" data-cg-list></ul>
+  </figcaption>
+</figure>
+
+<script>
+  import { initCourseGraph } from "../../scripts/course-graph.mjs";
+
+  document.querySelectorAll<HTMLElement>("[data-cg]").forEach((root) => initCourseGraph(root));
+</script>
+
+<style>
+  /* The graph has no ground of its own: it sits on the page, over the city, with the page's ink and paper.
+     Every node has a glow, so the picture has depth. The area colors (--c, --ci) come from global.css. */
+  .cg {
+    --cg-bg: var(--paper);
+    --cg-text: var(--ink);
+    --cg-dim: var(--ink-3);
+    --cg-line: var(--rule);
+    display: grid;
+    margin: var(--s-5) 0 var(--s-6);
+    color: var(--cg-text);
+    container-type: inline-size;
+  }
+
+  .cg__stage { min-width: 0; }
+  .cg :global(.cg-svg) { display: block; width: 100%; height: auto; margin-inline: auto; font-family: var(--font-sans); }
+  .cg :global(.cg-svg--wide) { display: none; max-width: 880px; }
+  .cg :global(.cg-svg--narrow) { max-width: 340px; }
+
+  /* The card needs JavaScript; without it the graph is a still picture over the full list. Under the graph, the card
+     stays at the bottom of the window while the graph is in view, so a chosen node shows its courses at once.
+     One flat tone of the chosen node's area, an ink rule under the head and hairlines between rows, as the rest of the site. */
+  .cg__panel {
+    display: none;
+    position: sticky;
+    bottom: var(--s-2);
+    max-height: 45vh;
+    overflow-y: auto;
+    padding: var(--s-4) var(--s-4) var(--s-3);
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--c, var(--plate)) 14%, var(--plate));
+    font-family: var(--font-sans);
+    transition: background-color 0.2s;
+  }
+  :root[data-js] .cg__panel { display: block; }
+  .cg__kicker { margin-bottom: var(--s-2); font-size: 0.75rem; line-height: 1; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+  .cg__head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; column-gap: 12px; padding-bottom: var(--s-3); border-bottom: var(--rule-section) solid var(--ink); }
+  .cg__badge { width: 46px; height: 46px; }
+  .cg__badge :global(svg) { display: block; width: 100%; height: 100%; overflow: visible; }
+  .cg__title { grid-column: 2; font-size: 1.25rem; line-height: 1.2; font-weight: 650; text-wrap: balance; }
+  .cg__badge[hidden] + .cg__title { grid-column: 1 / -1; }
+  /* The number of courses, set as a figure: a large numeral over its word. */
+  .cg__count { grid-column: 3; text-align: right; font-size: 0.75rem; line-height: 1.2; font-weight: 500; color: var(--ink-2); }
+  .cg__count :global(b) { display: block; font-size: 2rem; line-height: 1; font-weight: 650; font-stretch: 108%; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .cg__hint { margin-top: var(--s-3); font-size: 0.875rem; line-height: 1.45; color: var(--ink-2); }
+  .cg__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--s-3); }
+  .cg__chips :global(.cg__chip) {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 36px;
+    padding: 4px 12px 4px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--c) 24%, transparent);
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    font-weight: 500;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+  }
+  .cg__chips :global(.cg__chip)::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+  .cg__chips :global(.cg__chip:hover) { background: color-mix(in srgb, var(--c) 38%, transparent); }
+  .cg__list :global(li + li) { border-top: var(--rule-hair) solid color-mix(in srgb, var(--ink) 18%, transparent); }
+  .cg__list :global(a) {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding-block: 9px;
+    font-size: 0.875rem;
+    line-height: 1.35;
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .cg__list :global(a:hover span:first-child) { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 0.2em; }
+  .cg__list :global(a:focus-visible), .cg__chips :global(.cg__chip:focus-visible) { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .cg__list :global(.cg__go) { flex: none; color: var(--ink-2); transition: translate 0.15s; }
+  .cg__list :global(a:hover .cg__go) { color: var(--ink); translate: 2px -2px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .cg__panel.is-in > * { animation: cg-in 0.24s ease both; }
+  }
+  @keyframes cg-in { from { opacity: 0; transform: translateY(6px); } }
+
+  @container (min-width: 700px) {
+    .cg :global(.cg-svg--wide) { display: block; }
+    .cg :global(.cg-svg--narrow) { display: none; }
+  }
+  @media (min-width: 1100px) {
+    .cg { grid-template-columns: minmax(0, 1fr) 320px; column-gap: var(--s-4); }
+    .cg__panel { position: static; align-self: start; margin-top: var(--s-4); max-height: 520px; }
+  }
+
+  /* ---------- The drawing ---------- */
+  .cg :global(stop:not([stop-color])) { stop-color: var(--c); }
+  .cg :global(.cg-links line) { stroke: var(--cg-dim); stroke-width: 0.8; opacity: 0.32; }
+  .cg :global(.cg-node) { cursor: pointer; outline: none; }
+  .cg :global(.cg-dot) { fill: var(--c); }
+  /* Topics are light plates in both themes, so a logo always sits on the ground it was drawn for. */
+  .cg :global(.cg-plate) { fill: #FBFBFD; stroke: var(--c); stroke-width: 2; filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.3)); }
+  .cg :global(.cg-hub--area .cg-plate) { fill: var(--c); stroke: none; }
+  .cg :global(.cg-glyph) { fill: none; stroke: var(--ci); color: var(--ci); stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+  .cg :global(.cg-glyph *) { vector-effect: non-scaling-stroke; }
+  .cg :global(.cg-hub image) { pointer-events: none; }
+  .cg :global(.cg-mark) { fill: var(--ci); font-family: var(--font-mono); font-size: 11px; font-weight: 700; text-anchor: middle; pointer-events: none; }
+  .cg :global(.cg-hub--area .cg-mark) { fill: var(--cg-bg); font-size: 15px; }
+  .cg :global(.cg-hub--area .cg-glyph) { stroke: var(--cg-bg); color: var(--cg-bg); }
+  .cg :global(.cg-name) { fill: var(--cg-text); font-size: 11.5px; font-weight: 500; text-anchor: middle; pointer-events: none; paint-order: stroke; stroke: var(--cg-bg); stroke-width: 3px; }
+  .cg :global(.cg-hub--area .cg-name) { font-weight: 650; }
+  .cg :global(.cg-body) { transition: transform 0.2s; }
+  .cg :global(.cg-hub[aria-pressed="true"] .cg-body) { transform: scale(1.18); }
+  .cg :global(.cg-hub:focus-visible .cg-plate), .cg :global(.cg-hub[aria-pressed="true"] .cg-plate) { stroke: var(--cg-text); stroke-width: 3; }
+  /* A chosen node keeps its neighbors lit, and dashes run along its links to it; the rest steps back. */
+  .cg :global(.is-active .cg-node:not(.on)) { opacity: 0.16; }
+  .cg :global(.is-active .cg-links line) { opacity: 0.05; }
+  .cg :global(.is-active .cg-links line.on) { stroke: var(--c); stroke-width: 1.5; stroke-dasharray: 3 5; opacity: 1; }
+  .cg :global(.cg-node), .cg :global(.cg-links line) { transition: opacity 0.2s; }
+  @media (prefers-reduced-motion: no-preference) {
+    .cg :global(.is-active .cg-links line.on) { animation: cg-flow 0.8s linear infinite; }
+  }
+  @keyframes cg-flow { to { stroke-dashoffset: -8; } }
+  @media (forced-colors: active) {
+    .cg :global(.cg-halo) { display: none; }
+    .cg :global(:is(.cg-dot, .cg-plate)) { fill: Canvas; stroke: CanvasText; }
+    .cg :global(.cg-links line) { stroke: CanvasText; }
+    .cg :global(:is(.cg-mark, .cg-name)) { fill: CanvasText; stroke: none; }
+    .cg :global(.cg-glyph) { stroke: CanvasText; }
+  }
+</style>

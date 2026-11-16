@@ -5,10 +5,13 @@ import PageHead from "../PageHead.astro";
 import SectionHead from "../SectionHead.astro";
 import DateRange from "../DateRange.astro";
 import FilterList from "../FilterList.astro";
+import CourseGraph from "./CourseGraph.astro";
+import { AREA_ICONS } from "../../lib/course-graph.mjs";
 import { site } from "../../config/site";
 import { t, type UiKey } from "../../i18n/ui";
 import type { Locale } from "../../i18n/locales";
 import certifications from "../../data/certifications.json";
+import titlesEn from "../../data/certification-titles.en.json";
 import resumeEn from "../../data/resume.en.json";
 import resumeEs from "../../data/resume.es.json";
 
@@ -22,7 +25,7 @@ const copy = {
     lede: "Formal education first, then {count} courses and certifications in {areas} areas. Each one opens its PDF in Google Drive.",
     education: "Formal education",
     courses: "Courses and certifications",
-    note: "Course titles are shown in the language of each certificate, mostly Spanish.",
+    note: "Course titles are translated. Each certificate is in its original language, mostly Spanish.",
     searchLabel: "Search courses and certifications",
     placeholder: "Title or area",
     groupLabel: "Areas",
@@ -52,12 +55,14 @@ const count = String(items.length);
 const area = (key: string) => t(locale, `cert_${key}` as UiKey);
 // Toggles and Drive folders share one order: most certificates first.
 const areas = certifications.folders
-  .map((f) => ({ id: f.key, label: area(f.key), url: f.url, count: items.filter((i) => i.folderKey === f.key).length }))
+  .map((f) => ({ id: f.key, label: area(f.key), url: f.url, icon: AREA_ICONS[f.key as keyof typeof AREA_ICONS], area: f.key, count: items.filter((i) => i.folderKey === f.key).length }))
   .sort((a, b) => b.count - a.count);
 const education = [...(locale === "es" ? resumeEs : resumeEn).education].sort((a, b) => Number(b.startDate) - Number(a.startDate));
 const jan1 = (year: string) => new Date(Date.UTC(Number(year), 0, 1));
-// Most titles are Spanish. shortcut: «AZURE DATA FUNDAMENTALS - DP-900» and «SCRUM CERTIFICATE» are English but get lang="es"; add a lang field to the sync output if this matters.
-const titleLang = locale === "en" ? "es" : undefined;
+// The English page shows the translated title; a course without a translation keeps the title on its certificate, marked as Spanish.
+const en = titlesEn as Record<string, string>;
+const shown = (title: string) => (locale === "en" && en[title]) || title;
+const titleLang = (title: string) => (locale === "en" && !en[title] ? "es" : undefined);
 const [driveBefore, driveAfter] = c.drive.split("{list}");
 ---
 
@@ -84,6 +89,7 @@ const [driveBefore, driveAfter] = c.drive.split("{list}");
 
     <section class="section" aria-labelledby="courses">
       <SectionHead id="courses" title={c.courses} note={c.note} />
+      <CourseGraph locale={locale} />
       <FilterList
         mode="any"
         searchId="search"
@@ -99,8 +105,8 @@ const [driveBefore, driveAfter] = c.drive.split("{list}");
         <ul class="cert-list">
           {
             items.map((i) => (
-              <li data-filter-item data-tags={i.folderKey} data-text={`${i.title} ${area(i.folderKey)}`.toLowerCase()}>
-                <a class="link-quiet t-ui" href={i.url} target="_blank" rel="noreferrer"><span lang={titleLang}>{i.title}</span><span class="sr-only"> {t(locale, "pdf_new_tab")}</span></a>
+              <li data-filter-item data-tags={i.folderKey} data-text={`${shown(i.title)} ${i.title} ${area(i.folderKey)}`.toLowerCase()}>
+                <a class="link-quiet t-ui" href={i.url} target="_blank" rel="noreferrer"><span lang={titleLang(i.title)}>{shown(i.title)}</span><span class="sr-only"> {t(locale, "pdf_new_tab")}</span></a>
                 <span class="t-meta cert-area">{area(i.folderKey)}</span>
               </li>
             ))

@@ -1,5 +1,6 @@
 ---
 // Search and filter toggles for Training ("any": OR across toggles) and Projects ("all": AND).
+import Icon from "./icons/Icon.astro";
 // Default slot: the list. Every row carries data-filter-item, data-tags="id id" and a lower-case data-text.
 type Props = {
   mode: "any" | "all";
@@ -7,7 +8,7 @@ type Props = {
   searchLabel: string;
   searchPlaceholder?: string;
   groupLabel: string;
-  options: { id: string; label: string; count?: number }[];
+  options: { id: string; label: string; count?: number; icon?: string; area?: string }[];
   counterTemplate: string;
   total: number;
   clearLabel: string;
@@ -37,7 +38,8 @@ const template = p.counterTemplate.replace("{total}", String(p.total));
         <p class="filter-list__label" id={groupId}>{p.groupLabel}</p>
         <div class="filter-list__toggles" role="group" aria-labelledby={groupId}>
           {p.options.map((o) => (
-            <button type="button" class="toggle" data-filter-tag={o.id} aria-pressed="false">
+            <button type="button" class="toggle" data-filter-tag={o.id} data-area={o.area} aria-pressed="false">
+              {o.icon && <Icon name={o.icon} class="toggle__icon" />}
               <span>{o.label}{o.count !== undefined && <Fragment> <span class="toggle__count">{o.count}</span></Fragment>}</span>
             </button>
           ))}

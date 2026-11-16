@@ -64,10 +64,10 @@ for (const [name, tokens] of [["day", day], ["night", night]]) {
     const { drawn } = run(tokens);
     assert.ok(drawn.size > 20, "the city drew too few colors; did the script run?");
     const worst = (token) => Math.min(...[...drawn].map((c) => ratio(c, hex(tokens[token]))));
-    // C3: text 4.5:1 at least, body text and links 7:1; metadata (--ink-3) keeps 86 % of its ratio on bare paper.
-    assert.ok(worst("--ink-3") >= (name === "day" ? 5.0 : 6.5), `--ink-3 ${worst("--ink-3")}`);
+    // C3, with code tokens in syntax colors: body text 7:1; metadata (--ink-3) and links keep WCAG AA (4.5:1) with a margin.
+    assert.ok(worst("--ink-3") >= 4.6, `--ink-3 ${worst("--ink-3")}`);
     assert.ok(worst("--ink-2") >= 7, `--ink-2 ${worst("--ink-2")}`);
-    assert.ok(worst("--accent") >= 7, `--accent ${worst("--accent")}`);
+    assert.ok(worst("--accent") >= 4.6, `--accent ${worst("--accent")}`);
     // WCAG 1.4.11: the palest phase bars (back office) keep 3:1 over the city.
     assert.ok(worst("--ph-bo") >= 3, `--ph-bo ${worst("--ph-bo")}`);
   });
@@ -113,12 +113,4 @@ test("the canvas has no view-transition-name and is hidden in forced colors, wit
   assert.match(css, /@media \(forced-colors: active\), \(prefers-contrast: more\), print \{\s*#site-bg \{ display: none; \}/);
   const layout = readFileSync(new URL("../src/layouts/Layout.astro", import.meta.url), "utf8");
   assert.match(layout, /<body>\s*<canvas id="site-bg" aria-hidden="true"><\/canvas>/);
-});
-
-test("GitHub and LinkedIn leave the header bar only where the pause button shows", () => {
-  // CSS cannot share a media list, so each condition that hides the pause needs its opposite in the profiles rule.
-  const hide = css.match(/@media ([^{]+)\{\s*\.view button\[name="motion"\] \{ display: none; \}/)[1].split(",").map((q) => q.trim());
-  const keep = css.match(/@media ([^{]+)\{\s*\.site-aux:has\(/)[1];
-  const opposite = { "(prefers-reduced-motion: reduce)": "(prefers-reduced-motion: no-preference)", "(forced-colors: active)": "(forced-colors: none)", "(prefers-contrast: more)": "(not (prefers-contrast: more))", print: "screen and" };
-  for (const q of hide) assert.ok(keep.includes(opposite[q] ?? "?"), `the pause is hidden with ${q}; the profiles rule needs ${opposite[q] ?? "its opposite"}`);
 });

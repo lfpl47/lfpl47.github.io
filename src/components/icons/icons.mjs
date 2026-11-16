@@ -20,6 +20,8 @@ export const ICONS = {
   iac: `<path d="M6 3C4.6 3 4 3.75 4 5v4c0 1.4-.7 2.3-2 3 1.3.7 2 1.6 2 3v4c0 1.25.6 2 2 2M18 3c1.4 0 2 .75 2 2v4c0 1.4.7 2.3 2 3-1.3.7-2 1.6-2 3v4c0 1.25-.6 2-2 2"/><rect x="8.5" y="5" width="7" height="6"/><rect x="8.5" y="13" width="7" height="6"/>`,
   // A clipboard with checked items.
   requirements: `<path d="M8.5 4.5H4.5v17h15v-17h-4"/><rect x="8.5" y="2.5" width="7" height="4"/><path d="M7.5 11.75l2 2 3.25-4M14.75 12.5h2.25M7.5 17.75l2 2 3.25-4"/>`,
+  // Code: two angle brackets and a slash.
+  code: `<path d="M8 6 2.5 12 8 18M16 6l5.5 6-5.5 6M14 4l-4 16"/>`,
   // A pie chart with one slice pulled out.
   reports: `<path d="M10.5 4.5a8 8 0 1 0 8 8h-8v-8Z"/><path d="M13.5 2a8.5 8.5 0 0 1 8.5 8.5h-8.5V2Z"/>`,
 

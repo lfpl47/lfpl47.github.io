@@ -31,11 +31,6 @@ const profiles = [
   { href: site.links.github, label: t(locale, "github") },
   { href: site.links.linkedin, label: t(locale, "linkedin") },
 ];
-// Day or night view: rendered in the desktop row and in the menu; the script shows it and keeps both in step.
-const schemes = [
-  { value: "light", label: t(locale, "view_day") },
-  { value: "dark", label: t(locale, "view_night") },
-];
 ---
 
 <header class="site-header">
@@ -60,8 +55,17 @@ const schemes = [
         ))
       }
       <div class="view" role="group" aria-label={t(locale, "view_label")} data-view hidden>
-        {schemes.map((s) => <button type="button" name="scheme" value={s.value} aria-pressed="false">{s.label}</button>)}
-        <button type="button" name="motion" aria-pressed="false">{t(locale, "bg_pause")}</button>
+        <button type="button" name="scheme" role="switch" aria-checked="false" aria-label={t(locale, "view_night")} title={`${t(locale, "view_day")} / ${t(locale, "view_night")}`}>
+          <span class="view__track" aria-hidden="true">
+            <svg class="view__knob" viewBox="0 0 16 16">
+              <g class="view__sun"><circle cx="8" cy="8" r="3" /><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.4 1.4M11.55 11.55l1.4 1.4M3.05 12.95l1.4-1.4M11.55 4.45l1.4-1.4" /></g>
+              <path class="view__moon" d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5z" />
+            </svg>
+          </span>
+        </button>
+        <button type="button" name="motion" aria-pressed="false" aria-label={t(locale, "bg_pause")} title={t(locale, "bg_pause")}>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path class="view__pause" d="M4 3h3v10H4zM9 3h3v10H9z" /><path class="view__play" d="M5 3l8 5-8 5z" /></svg>
+        </button>
       </div>
     </div>
     <details class="menu" data-menu>
@@ -80,8 +84,17 @@ const schemes = [
           }
         </div>
         <div class="view" role="group" aria-label={t(locale, "view_label")} data-view hidden>
-          {schemes.map((s) => <button type="button" name="scheme" value={s.value} aria-pressed="false">{s.label}</button>)}
-          <button type="button" name="motion" aria-pressed="false">{t(locale, "bg_pause")}</button>
+          <button type="button" name="scheme" role="switch" aria-checked="false" aria-label={t(locale, "view_night")} title={`${t(locale, "view_day")} / ${t(locale, "view_night")}`}>
+            <span class="view__track" aria-hidden="true">
+              <svg class="view__knob" viewBox="0 0 16 16">
+                <g class="view__sun"><circle cx="8" cy="8" r="3" /><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.4 1.4M11.55 11.55l1.4 1.4M3.05 12.95l1.4-1.4M11.55 4.45l1.4-1.4" /></g>
+                <path class="view__moon" d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5z" />
+              </svg>
+            </span>
+          </button>
+          <button type="button" name="motion" aria-pressed="false" aria-label={t(locale, "bg_pause")} title={t(locale, "bg_pause")}>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path class="view__pause" d="M4 3h3v10H4zM9 3h3v10H9z" /><path class="view__play" d="M5 3l8 5-8 5z" /></svg>
+          </button>
         </div>
       </div>
     </details>
@@ -104,12 +117,13 @@ const schemes = [
     const root = document.documentElement;
     const key = "lfpl47-scheme";
     const system = matchMedia("(prefers-color-scheme: dark)");
-    // Only the scheme buttons: a later button in the same group (the background pause) keeps its own state.
+    // Only the scheme switches (the desktop row and the menu): the background pause keeps its own state.
     const buttons = document.querySelectorAll('[data-view] [name="scheme"]');
-    // Pressed = the scheme in effect: the visitor's choice, else the system setting.
+    // The scheme in effect: the visitor's choice, else the system setting. The switch is on at night.
+    const current = () => root.dataset.theme || (system.matches ? "dark" : "light");
     const sync = () => {
-      const scheme = root.dataset.theme || (system.matches ? "dark" : "light");
-      for (const b of buttons) b.setAttribute("aria-pressed", String(b.value === scheme));
+      const scheme = current();
+      for (const b of buttons) b.setAttribute("aria-checked", String(scheme === "dark"));
       if (root.dataset.theme) for (const m of document.querySelectorAll("meta[data-scheme]")) m.media = m.dataset.scheme === scheme ? "all" : "not all";
     };
     // Holds color transitions for two frames (global.css), so the switch is the cross-fade or instant.
@@ -125,9 +139,10 @@ const schemes = [
     };
     for (const b of buttons) {
       b.addEventListener("click", () => {
-        const fade = b.getAttribute("aria-pressed") === "false" && document.startViewTransition && matchMedia("(prefers-reduced-motion: no-preference)").matches;
-        if (fade) document.startViewTransition(() => choose(b.value));
-        else choose(b.value);
+        const next = current() === "dark" ? "light" : "dark";
+        const fade = document.startViewTransition && matchMedia("(prefers-reduced-motion: no-preference)").matches;
+        if (fade) document.startViewTransition(() => choose(next));
+        else choose(next);
       });
     }
     // A system switch is instant too; with a stored choice the scheme does not change, so there is nothing to hold.
@@ -148,7 +163,7 @@ const schemes = [
 <script is:inline>
   (() => {
     // Background pause (public/site-bg.js): one fixed label, pressed = paused (WAI-ARIA APG: a toggle's label does not
-    // change), stored in lfpl47-motion. global.css hides the button where the city does not move (reduced motion, forced
+    // change; the icon turns from pause to play), stored in lfpl47-motion. global.css hides the button where the city does not move (reduced motion, forced
     // colors, more contrast, print).
     const key = "lfpl47-motion";
     const buttons = document.querySelectorAll('[data-view] [name="motion"]');

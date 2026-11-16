@@ -1,5 +1,6 @@
 // Site background (C3): a skyline out of focus. Towers are stations, pipes join them, and each
-// station changes the data's form. Positions depend only on the wall clock and fixed seeds.
+// station changes the data's form. Each wall carries code: rows are lines and each token takes a
+// syntax color. Positions depend only on the wall clock and fixed seeds.
 (() => {
   const d = document, root = d.documentElement, mq = (q) => matchMedia(q), c = d.getElementById("site-bg");
   // FC: the media where global.css hides the canvas; the loop stops there too.
@@ -27,6 +28,10 @@
     [30, 70, 60, .06, .3, 120, 12, 4.2, 70, 1.8, 6, 0],
   ];
   const U = [.45, .65, .85, 1];
+  // Syntax hues as a dark editor theme shows them: variable, keyword, type, comment, function,
+  // control, plain text, string. PICK weighs them as real code does: blues lead, warm hues are few.
+  const HUES = [[90, 170, 255], [50, 100, 255], [0, 200, 170], [60, 200, 90], [235, 200, 60], [170, 90, 255], [190, 195, 205], [240, 150, 50]];
+  const PICK = [0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 7];
 
   function build() {
     sc = Math.min(1, Math.max(.72, W / 720));
@@ -63,21 +68,25 @@
       const v = x.fillStyle;
       return v[0] == "#" && [1, 3, 5].map((i) => parseInt(v.substr(i, 2), 16));
     };
-    const P = get("--paper"), I = get("--ink"), A = get("--accent"), T = get("--ink-3"), k = [P, I, A, T] + "";
+    const P = get("--paper"), I = get("--ink"), A = get("--accent"), T = get("--ink-3"), B = get("--ph-bo"), k = [P, I, A, T, B] + "";
     if (k == key) return false;
     key = k;
     // Fail closed: a token that is not opaque sRGB hides the city.
-    if (c.hidden = !(P && I && A && T)) return false;
+    if (c.hidden = !(P && I && A && T && B)) return false;
     // cap(Y): most paper-to-Y mix that keeps --ink-3 and --accent at min(7.3, .86 x their ratio
     // on paper). Masses go the safe way: white by day, black at night.
     const lp = lum(P), D = lp < .2, Q = [T, A].map((y) => [lum(y), Math.min(7.3, .86 * cr(lum(y), lp))]);
-    const cap = (Y) => { let k = 0; for (let h = .5; h > .001; h /= 2) if (Q.every(([l, n]) => cr(l, lum(mx(P, Y, k + h))) >= n)) k += h; return k; };
+    const cap = (Y, q = Q) => { let k = 0; for (let h = .5; h > .001; h /= 2) if (q.every(([l, n]) => cr(l, lum(mx(P, Y, k + h))) >= n)) k += h; return k; };
+    // Code tokens are small and blurred, so they go further than the masses: each hue as far as
+    // --ink-3 and --accent keep 4.6:1 on its raw color (WCAG AA for text is 4.5:1) and the palest
+    // phase bar keeps 3:1 (WCAG 1.4.11).
+    const QC = [[lum(T), 4.6], [lum(A), 4.6], [lum(B), 3.05]], kc = HUES.map((h) => cap(h, QC));
     const kI = cap(I), pI = mx(P, I, kI), pA = mx(P, A, cap(A)), f = (Y, k) => css(mx(P, Y, k)), Z = D ? [0, 0, 0] : [255, 255, 255];
     C = U.map((u) => ({
       face: f(Z, (D ? .8 : 1) * u),
       edge: f(I, kI * (D ? .25 : .7) * u),
       pipe: f(I, kI * (D ? .4 : .8) * u),
-      win: f(I, kI * .5 * (.5 + .5 * u)),
+      code: HUES.map((h, i) => f(h, kc[i] * (.6 + .4 * u))),
       pk: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => css(mx(P, mx(pI, pA, i / 7), .5 + .5 * u))),
     }));
     C.D = D;
@@ -113,17 +122,24 @@
       if (tw > 2) { sx.strokeStyle = cc.face; sx.lineWidth = (tw - 2) * lw; sx.stroke(); }
       g.filter = `blur(${l.b}px)`;
       g.drawImage(s, -m, -m);
-      if (!C.D) return;
-      // Lit windows get half the blur: soft points of light that stay visible.
+      // Code on the walls gets half the blur: soft streaks of color that stay visible.
       g.filter = `blur(${l.b / 2}px)`;
       g.setTransform(sc, 0, 0, sc, 0, 0);
-      g.fillStyle = cc.win;
-      g.beginPath();
       for (const q of l.T) {
-        const R = prng(q.i * 977 + k * 31 + 1), st = [7, 6, 6, 7][k];
-        for (let yy = VH - q.h + 4; yy < VH; yy += st) for (let xx = q.x + 3; xx < q.x + q.w - 2; xx += st - 2) if (R() < [.05, .07, .1, .12][k]) { g.moveTo(xx + 2, yy); g.arc(xx, yy, [2.4, 1.8, 1.3, 1][k], 0, 7); }
+        const R = prng(q.i * 977 + k * 31 + 1), st = [7, 6, 6, 7][k], th = [3.4, 3, 2.8, 2.8][k];
+        for (let yy = VH - q.h + 5, ind = 0; yy < VH; yy += st) {
+          const a = R();
+          if (a < .2) continue; // an empty line
+          ind = Math.max(0, Math.min(3, ind + (a < .45 ? 1 : a > .8 ? -1 : 0)));
+          for (let xx = q.x + 2 + ind * 3, n = 0; n < 4; n++) {
+            const w = 2 + R() * q.w * .35;
+            if (xx + w > q.x + q.w - 2) break;
+            g.fillStyle = cc.code[PICK[R() * PICK.length | 0]];
+            g.fillRect(xx, yy, w, th);
+            xx += w + 2;
+          }
+        }
       }
-      g.fill();
     });
   }
 

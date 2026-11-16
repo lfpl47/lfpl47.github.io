@@ -35,6 +35,7 @@
 @layer tokens {
   :root {
     color-scheme: light;
+    --night: 0; /* 1 at night: moves the knob of the day or night switch */
 
     /* Color: light, the reference scheme («paper»); the day view */
     --paper: #F6F6F3;
@@ -94,6 +95,7 @@
       --accent: #9DA8FF; --accent-hover: #C3CAFF; --on-accent: #151514;
       --rule: #3C3B37; --grid: #2A2A27;
       --ph-ana: #ABAAA3; --ph-bo: #74736E;
+      --night: 1;
     }
   }
   @media screen {
@@ -104,6 +106,7 @@
       --accent: #9DA8FF; --accent-hover: #C3CAFF; --on-accent: #151514;
       --rule: #3C3B37; --grid: #2A2A27;
       --ph-ana: #ABAAA3; --ph-bo: #74736E;
+      --night: 1;
     }
   }
 }
@@ -484,26 +487,28 @@
   .site-nav a:hover, .site-aux a:hover, .site-aux button:hover { color: var(--ink); }
   /* The pressed scheme also follows the root state (the conditions of the token blocks), so the first paint shows it
      before the header script sets aria-pressed. */
-  .site-nav a[aria-current="page"], .site-aux [name="scheme"][aria-pressed="true"],
-  :root[data-theme="light"] .site-aux [value="light"], :root[data-theme="dark"] .site-aux [value="dark"] { color: var(--ink); font-weight: 600; box-shadow: inset 0 -3px 0 var(--ink); }
-  @media (prefers-color-scheme: light) { :root:not([data-theme]) .site-aux [value="light"] { color: var(--ink); font-weight: 600; box-shadow: inset 0 -3px 0 var(--ink); } }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme]) .site-aux [value="dark"] { color: var(--ink); font-weight: 600; box-shadow: inset 0 -3px 0 var(--ink); } }
-  /* Background pause (one fixed label, pressed = paused): the same bar without the weight change, so the row does not move. */
-  .site-aux [name="motion"][aria-pressed="true"] { color: var(--ink); box-shadow: inset 0 -3px 0 var(--ink); }
+  .site-nav a[aria-current="page"] { color: var(--ink); font-weight: 600; box-shadow: inset 0 -3px 0 var(--ink); }
   .site-aux { display: flex; align-items: center; gap: 20px; align-self: stretch; }
   .site-aux::before { content: ""; width: 1px; height: 20px; margin-right: 8px; background: var(--rule); }
   .site-aux a { min-height: 44px; }
-  /* Day or night and the background pause: buttons as tall as the bar, after a second divider. */
-  .view { display: flex; gap: 20px; }
-  .site-aux .view { align-self: stretch; }
-  .site-aux .view::before { content: ""; width: 1px; height: 20px; align-self: center; margin-inline: 8px; background: var(--rule); }
-  /* Nav links and view buttons are as tall as the bar. They start 6 px below its top edge, so the focus ring (3 px out)
-     is not cut off at the top of the window; the padding keeps the text centered. */
-  .site-nav a, .site-aux .view button { margin-top: 6px; padding-bottom: 6px; }
-  @media (forced-colors: active) {
-    /* Forced colors drop the box-shadow bar, so the pressed option is underlined. */
-    .site-aux [aria-pressed="true"] { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 0.3em; }
+  /* Day or night is one switch, and the background pause one icon. The knob is a sun by day and a moon at night; it
+     follows --night from the token blocks, so the first paint is right before the header script runs. */
+  .view { display: flex; align-items: center; gap: 4px; }
+  .view button { display: grid; place-items: center; min-width: 44px; min-height: 44px; color: var(--ink-2); }
+  .view button:hover { color: var(--ink); }
+  .view svg { width: 16px; height: 16px; fill: currentColor; }
+  .view__track { display: block; width: 42px; height: 24px; padding: 2.5px; border: 1.5px solid currentColor; border-radius: 999px; }
+  .view__knob { display: block; translate: calc(var(--night) * 18px); }
+  .view__sun { opacity: calc(1 - var(--night)); }
+  .view__sun path { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+  .view__moon { opacity: var(--night); }
+  @media (prefers-reduced-motion: no-preference) {
+    .view__knob { transition: translate 0.2s; }
   }
+  [name="motion"][aria-pressed="true"] .view__pause, [name="motion"][aria-pressed="false"] .view__play { display: none; }
+  /* Nav links are as tall as the bar. They start 6 px below its top edge, so the focus ring (3 px out) is not cut off
+     at the top of the window; the padding keeps the text centered. */
+  .site-nav a { margin-top: 6px; padding-bottom: 6px; }
 
   .menu { display: none; }
   .menu summary {
@@ -549,9 +554,9 @@
     color: var(--ink);
     text-decoration: none;
   }
-  .menu__nav a[aria-current="page"], .menu .view [aria-pressed="true"] { color: var(--ink); text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 0.2em; }
+  .menu__nav a[aria-current="page"] { color: var(--ink); text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 0.2em; }
   .menu__ext { display: flex; flex-wrap: wrap; gap: 0 var(--s-5); padding-top: var(--s-2); }
-  .menu__ext a, .menu .view button {
+  .menu__ext a {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
@@ -561,23 +566,16 @@
     color: var(--ink-2);
     text-decoration: none;
   }
-  .menu__ext a:hover, .menu .view button:hover { color: var(--ink); }
-  .menu .view { flex-wrap: wrap; gap: 0 var(--s-5); margin-top: var(--s-2); padding-top: var(--s-2); border-top: 1px solid var(--rule); }
+  .menu__ext a:hover { color: var(--ink); }
+  .menu .view { margin-top: var(--s-2); padding-top: var(--s-2); border-top: 1px solid var(--rule); }
   /* Where the city does not move (static frame or hidden), there is nothing to pause. */
   @media (prefers-reduced-motion: reduce), (forced-colors: active), (prefers-contrast: more), print {
     .view button[name="motion"] { display: none; }
   }
-  /* Under 1240 the row tightens. Measured (EN/ES): it fits at every width from 960 px, also with a Projects item.
-     A third button in the view group (the background pause) does not fit below about 1000 px, and below 1095 px with a
-     Projects item and a classic scrollbar. Decision: under 1120 px, while the group and its third button show (JavaScript
-     on, and the pause is not hidden by the media below), GitHub and LinkedIn leave the bar (they stay in the footer),
-     instead of the menu starting at a wider width. */
+  /* Under 1240 the row tightens. With the switch and the pause as icons, the row fits from 960 px (EN/ES). */
   @media (max-width: 1239px) {
     .site-header__row, .site-nav { gap: 16px; }
-    .site-aux, .view { gap: 12px; }
-  }
-  @media screen and (max-width: 1119px) and (prefers-reduced-motion: no-preference) and (forced-colors: none) and (not (prefers-contrast: more)) {
-    .site-aux:has(.view:not([hidden]) > :nth-child(3)) > .site-aux__ext { display: none; }
+    .site-aux { gap: 12px; }
   }
   @media (max-width: 959px) {
     .site-header__row { gap: 20px; }
@@ -725,6 +723,14 @@
     font-weight: 500;
   }
   .toggle:hover { border-color: var(--ink); }
+  /* One color per course area, bright at night and deep by day (--night is 0 or 1). The course graph and the area
+     toggles share them. --ci is the deep one, for marks on light plates. */
+  [data-area="cloud"] { --ci: #1F5FBF; --c: color-mix(in srgb, #7FB6FF calc(var(--night) * 100%), var(--ci)); }
+  [data-area="data_science_bi"] { --ci: #0B7A5B; --c: color-mix(in srgb, #5FE0B0 calc(var(--night) * 100%), var(--ci)); }
+  [data-area="programming"] { --ci: #6B3FC0; --c: color-mix(in srgb, #C29BFF calc(var(--night) * 100%), var(--ci)); }
+  [data-area="productivity"] { --ci: #9A5B00; --c: color-mix(in srgb, #F0C674 calc(var(--night) * 100%), var(--ci)); }
+  .toggle__icon { flex: none; width: 18px; height: 18px; margin-right: 8px; color: var(--c, currentColor); }
+  .toggle[aria-pressed="true"] .toggle__icon { color: inherit; }
   .toggle__count { color: var(--ink-3); font-variant-numeric: tabular-nums; }
   .toggle[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
   .toggle[aria-pressed="true"] .toggle__count { color: var(--paper); }
