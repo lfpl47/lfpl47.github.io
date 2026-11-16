@@ -30,7 +30,7 @@ export const ICONS = {
   "phase-engineering": `<circle cx="4.25" cy="4.75" r="2.5" fill="currentColor" stroke="none"/><circle cx="4.25" cy="12" r="2.5" fill="currentColor" stroke="none"/><circle cx="4.25" cy="19.25" r="2.5" fill="currentColor" stroke="none"/><path d="M6.5 5.75 11.5 12 6.5 18.25M6.75 12H13"/><rect x="13" y="9.75" width="9" height="4.5" fill="currentColor" stroke="none"/>`,
   // Data analysis: a bar chart.
   "phase-analysis": `<path d="M2.5 21.25h19"/><rect x="4.5" y="13" width="3.5" height="8.25" fill="currentColor" stroke="none"/><rect x="10.25" y="8" width="3.5" height="13.25" fill="currentColor" stroke="none"/><rect x="16" y="3" width="3.5" height="18.25" fill="currentColor" stroke="none"/>`,
-  // Back office and reporting: a sheet, a header row over two rows of cells.
+  // Reporting and analytics: a sheet, a header row over two rows of cells.
   "phase-backoffice": `<rect x="2.75" y="3.75" width="18.5" height="4.25" fill="currentColor" stroke="none"/><rect x="2.75" y="10" width="5.5" height="4.25" fill="currentColor" stroke="none"/><rect x="10.25" y="10" width="11" height="4.25" fill="currentColor" stroke="none"/><rect x="2.75" y="16.25" width="5.5" height="4" fill="currentColor" stroke="none"/><rect x="10.25" y="16.25" width="11" height="4" fill="currentColor" stroke="none"/>`,
   // Education: a mortarboard.
   "phase-education": `<path d="M12 3.5 1.5 9 12 14.5 22.5 9Z" fill="currentColor" stroke="none"/><path d="M6 13.4 12 16.5l6-3.1v4.1c0 1.6-2.7 3-6 3s-6-1.4-6-3Z" fill="currentColor" stroke="none"/><path d="M21 9.75v6"/>`,

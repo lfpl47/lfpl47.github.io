@@ -70,7 +70,7 @@ const career = await getCareer(locale, { education: false });
 const engineering = career.phases.find((p) => p.id === "engineering")!;
 const firstYear = career.firstStart!.getUTCFullYear();
 
-// Oldest phase first, as one sentence: «Back office and reporting (2016–2020), data analysis (…), …».
+// Oldest phase first, as one sentence: «Reporting and analytics (2016–2020), data analysis (…), …».
 const pathText =
   [...career.phases]
     .reverse()
